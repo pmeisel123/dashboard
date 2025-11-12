@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import '../../App.css'
 import {getTicketsApi} from '../../Api'
 import type {TicketProps} from '../../Api'
 import {EstimatorTable, FormFields} from '../../Components/Estimator';
@@ -12,17 +11,29 @@ function EstimatorPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const defaultDefaultEstimate: number = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
 	const defaultSearch: string = searchParams.get('search') || '';
+	const defaultEpic: string = searchParams.get('epic') || '';
 	const [data, setData] = useState<TicketProps[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
 	const [search, setSearch] = useState<string>(defaultSearch);
+	const [epic, setEpic] = useState<string>(defaultEpic);
 
 
 	var getFunc = function() {
-		if (!search) {
+		var jira_search = '';
+		if (search && epic) {
+			jira_search = search + ' AND parent=' + epic
+		} else if (!search && epic) {
+			jira_search = 'parent = ' + epic
+		} else {
+			jira_search = search
+		}
+		if (!jira_search) {
 			return;
 		}
-		getTicketsApi(search)
+		console.log(search);
+		console.log(jira_search);
+		getTicketsApi(jira_search)
 			.then(data => {
 				setLoading(false);
 				console.log(data);
@@ -36,7 +47,7 @@ function EstimatorPage() {
 			getFunc();
 		}, 30000);
 		return () => clearInterval(intervalId);
-	}, [search]);
+	}, [search, epic]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (defaultEstimate != defaultDefaultDefaultEstimate) {
@@ -49,16 +60,24 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('search');
 		}
+		if (epic != '') {
+			newSearchParams.set('epic', epic);
+		} else {
+			newSearchParams.delete('epic');
+		}
 		setSearchParams(newSearchParams);
-	}, [search, defaultEstimate]);
+	}, [search, defaultEstimate, epic]);
 	return (
 		<>
-			<FormFields search={search}
+			<FormFields
+				search={search}
 				setSearch={setSearch}
+				epic={epic}
+				setEpic={setEpic}
 				defaultEstimate={defaultEstimate}
 				setDefaultEstimate={setDefaultEstimate}
 			/>
-			{search && <EstimatorTable data={data} defaultEstimate={defaultEstimate} loading={loading} />}
+			{(search || epic) && <EstimatorTable data={data} defaultEstimate={defaultEstimate} loading={loading} />}
 		</>
 	);
 }

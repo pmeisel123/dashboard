@@ -1,4 +1,3 @@
-import '../../App.css'
 import { Link } from '@mui/material';
 
 

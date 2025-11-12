@@ -1,4 +1,4 @@
-
+import './App.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from './Pages/Home';
 import EstimatorPage from './Pages/Estimator';

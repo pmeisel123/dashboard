@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import {getTicketsApi} from '../../Api'
-import type {TicketProps} from '../../Api'
-import {EstimatorTable, FormFields} from '../../Components/Estimator';
+import {getTicketsApi} from '/src/Api'
+import type {TicketProps} from '/src/Api'
+import {EstimatorTable, FormFields} from '/src/Components/Estimator';
 import { useSearchParams } from 'react-router-dom';
 
 
@@ -10,13 +10,13 @@ const defaultDefaultDefaultEstimate = 2;
 function EstimatorPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const defaultDefaultEstimate: number = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
-	const defaultSearch: string = searchParams.get('search') || '';
 	const defaultEpic: string = searchParams.get('epic') || '';
 	const [data, setData] = useState<TicketProps[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
-	const [search, setSearch] = useState<string>(defaultSearch);
+	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
 	const [epic, setEpic] = useState<string>(defaultEpic);
+	const [fudgeFactor, setFudgeFactor] = useState<number>(parseFloat(searchParams.get('fudgeFactor') || '0'));
 
 
 	var getFunc = function() {
@@ -65,8 +65,13 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('epic');
 		}
+		if (fudgeFactor != 0) {
+			newSearchParams.set('fudgeFactor', fudgeFactor + '');
+		} else {
+			newSearchParams.delete('fudgeFactor');
+		}
 		setSearchParams(newSearchParams);
-	}, [search, defaultEstimate, epic]);
+	}, [search, defaultEstimate, epic, fudgeFactor]);
 	return (
 		<>
 			<FormFields
@@ -76,8 +81,17 @@ function EstimatorPage() {
 				setEpic={setEpic}
 				defaultEstimate={defaultEstimate}
 				setDefaultEstimate={setDefaultEstimate}
+				fudgeFactor={fudgeFactor}
+				setFudgeFactor={setFudgeFactor}
 			/>
-			{(search || epic) && <EstimatorTable data={data} defaultEstimate={defaultEstimate} loading={loading} />}
+			{
+				(search || epic) &&
+				<EstimatorTable
+					data={data}
+					defaultEstimate={defaultEstimate}
+					loading={loading}
+					fudgeFactor={fudgeFactor}
+				/>}
 		</>
 	);
 }

@@ -3,10 +3,10 @@ import Typography from '@mui/material/Typography';
 import { DataGrid, GridPagination } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
-import type {TicketProps} from '../../Api'
+import type {TicketProps} from '/src/Api'
 import { formatDistanceToNow } from 'date-fns';
 
-const API_URL = __API_URL__;
+const API_URL = __API_URL__; // @ts-ignore
 
 
 interface CustomFooterProps {
@@ -42,9 +42,9 @@ const CustomFooterStatusComponent = (props: CustomFooterProps) => {
 	);
 }
 
-const EstimatorTable: React.FC<{data: TicketProps[], defaultEstimate: number, loading: boolean}> = ({data, defaultEstimate, loading}) => {
-	const totalTimEestimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0);
-	const totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0);
+const EstimatorTable: React.FC<{data: TicketProps[], defaultEstimate: number, loading: boolean, fudgeFactor: number}> = ({data, defaultEstimate, loading, fudgeFactor}) => {
+	const totalTimEestimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + fudgeFactor;
+	const totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + fudgeFactor;
 	const totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	const columns: GridColDef<any>[] = [
 //		{ field: 'id', headerName: 'id' },

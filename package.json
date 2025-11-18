@@ -17,6 +17,7 @@
     "@mui/styled-engine-sc": "^7.3.5",
     "@mui/x-data-grid": "^8.17.0",
     "date-fns": "^4.1.0",
+    "date-holidays": "^3.26.5",
     "mui": "^0.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

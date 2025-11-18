@@ -3,16 +3,17 @@ import Typography from '@mui/material/Typography';
 import { DataGrid, GridPagination } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
-import type {TicketProps} from '/src/Api'
+import type {TicketProps} from '@src/Api'
 import { formatDistanceToNow } from 'date-fns';
 
+declare const __API_URL__: string;
 const API_URL = __API_URL__; // @ts-ignore
 
 
 interface CustomFooterProps {
-  totalTimEestimate: number;
-  totalTimeOriginalEstimate: number;
-  totalTimeSpent: number;
+	totalTimEestimate: number | null;
+	totalTimeOriginalEstimate: number | null;
+	totalTimeSpent: number | null;
 }
 
 
@@ -30,7 +31,7 @@ const Ago = (value: Date): string => {
 	return formatDistanceToNow(value, { addSuffix: false });
 };
 
-const CustomFooterStatusComponent = (props: CustomFooterProps) => {
+function CustomFooterStatusComponent(props: CustomFooterProps) { 
 	const { totalTimEestimate, totalTimeOriginalEstimate, totalTimeSpent } = props;
 	return (
 		<Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>

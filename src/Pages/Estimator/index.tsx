@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import {getTicketsApi} from '/src/Api'
-import type {TicketProps} from '/src/Api'
-import {EstimatorTable, FormFields} from '/src/Components/Estimator';
+import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
+import type {TicketProps, UsersGroupProps} from '@src/Api'
+import {EstimatorTable, FormFields, Calendar} from '@src/Components/Estimator';
+import {UserSelectors} from '@src/Components/Users';
 import { useSearchParams } from 'react-router-dom';
 
 
@@ -17,8 +18,11 @@ function EstimatorPage() {
 	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
 	const [epic, setEpic] = useState<string>(defaultEpic);
 	const [fudgeFactor, setFudgeFactor] = useState<number>(parseFloat(searchParams.get('fudgeFactor') || '0'));
+	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
+	const [group, setGroup] = useState<string>('');
+	const [users, setUsers] = useState<string[]>([]);
 
-
+	console.log('here');
 	var getFunc = function() {
 		var jira_search = '';
 		if (search && epic) {
@@ -31,22 +35,30 @@ function EstimatorPage() {
 		if (!jira_search) {
 			return;
 		}
-		console.log(search);
-		console.log(jira_search);
 		getTicketsApi(jira_search)
-			.then(data => {
+			.then((data: TicketProps[]) => {
 				setLoading(false);
-				console.log(data);
 				setData(data);
 			})
-			.catch(error => console.error("Caught error in main:", error));
+	};
+	var getUsers = function() {
+		getUsersAndGroupsApi().then((data: UsersGroupProps) => {
+			console.log(data);
+			setPossibleUsersGroups(data);
+		});
 	};
 	useEffect(() => {
+		getUsers();
+	}, []);
+	useEffect(() => {
+		console.log('here');
 		getFunc();
+		/*
 		const intervalId = setInterval(() => {
 			getFunc();
 		}, 30000);
 		return () => clearInterval(intervalId);
+		*/
 	}, [search, epic]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -70,8 +82,13 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('fudgeFactor');
 		}
+		if (group != '') {
+			newSearchParams.set('group', group);
+		} else {
+			newSearchParams.delete('group');
+		}
 		setSearchParams(newSearchParams);
-	}, [search, defaultEstimate, epic, fudgeFactor]);
+	}, [search, defaultEstimate, epic, fudgeFactor, group]);
 	return (
 		<>
 			<FormFields
@@ -84,6 +101,13 @@ function EstimatorPage() {
 				fudgeFactor={fudgeFactor}
 				setFudgeFactor={setFudgeFactor}
 			/>
+			<UserSelectors
+				possibleUsersGroups={possibleUsersGroups}
+				group={group}
+				setGroup={setGroup}
+				users={users}
+				setUsers={setUsers}
+			/>
 			{
 				(search || epic) &&
 				<EstimatorTable
@@ -91,7 +115,13 @@ function EstimatorPage() {
 					defaultEstimate={defaultEstimate}
 					loading={loading}
 					fudgeFactor={fudgeFactor}
-				/>}
+				/>
+			}
+			<Calendar
+				users={users}
+				group={group}
+				possibleUsersGroups={possibleUsersGroups}
+			/>
 		</>
 	);
 }

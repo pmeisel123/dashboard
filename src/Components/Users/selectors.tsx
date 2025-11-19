@@ -2,16 +2,17 @@ import type {UsersGroupProps, UserProps} from '@src/Api';
 import { Select, MenuItem, InputLabel, FormControl} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams, GridFilterOperator} from '@mui/x-data-grid';
+import {getDateString} from '@src/Components/Estimator';
 
 const UserSelectors: React.FC<{
 	possibleUsersGroups: UsersGroupProps,
 	group: string
 	setGroup: React.Dispatch<React.SetStateAction<string>>,
-	users: string[],
-	setUsers: React.Dispatch<React.SetStateAction<string[]>>,
+	users: Set<string>,
+	setUsers: React.Dispatch<React.SetStateAction<Set<string>>>,
 }> = ({possibleUsersGroups, group, setGroup, users, setUsers}) => {
 	const customOperator: GridFilterOperator<any, number, string> = {
-		label: 'HAS',
+		label: 'has',
 		value: 'Contains', // A unique value for the operator
 		getApplyFilterFn: () => {
 			return (value: string[]): boolean => {
@@ -57,10 +58,26 @@ const UserSelectors: React.FC<{
 		{ field: 'name', headerName: 'Name', flex: 1 },
 		{ field: 'email', headerName: 'Email', flex: 1 },
 		{ field: 'groups', headerName: 'Groups', flex: 1, filterOperators: [customOperator]},
-		{ field: 'vacations', headerName: 'Vacations', flex: 1, filterOperators: [customOperator]},
+		{
+			field: 'vacations',
+			headerName: 'Vacations',
+			flex: 1,
+			renderCell: (params: GridRenderCellParams<UserProps>) => (
+				<>
+					{console.log(params.value)}
+					{params.value && params.value.map((value:string, index: number) => (
+						<>
+							{(!!index) && <>, </>}
+							{getDateString(new Date(value))}
+						</>
+					))}
+				</>
+			),
+		},
 	];
+	console.log(possibleUsersGroups.users);
 	return (
-		<>Hi
+		<>
 			<DataGrid
 				getRowHeight={() => 'auto'}
 				rows={Object.values(possibleUsersGroups.users)}
@@ -74,7 +91,9 @@ const UserSelectors: React.FC<{
 					}
 				}}
 				onRowSelectionModelChange={(newRowSelectionModel) => {
-					setUsers(newRowSelectionModel.ids);
+					if (Object.values(possibleUsersGroups.users).length) {
+						setUsers(newRowSelectionModel.ids as Set<string>);
+					}
 				}}
 				rowSelectionModel={{type: 'include', ids: new Set(users)}}
 			/>

@@ -11,7 +11,7 @@ const API_URL = __API_URL__; // @ts-ignore
 
 
 interface CustomFooterProps {
-	totalTimEestimate: number | null;
+	totalTimEstimate: number | null;
 	totalTimeOriginalEstimate: number | null;
 	totalTimeSpent: number | null;
 }
@@ -32,10 +32,10 @@ const Ago = (value: Date): string => {
 };
 
 function CustomFooterStatusComponent(props: CustomFooterProps) { 
-	const { totalTimEestimate, totalTimeOriginalEstimate, totalTimeSpent } = props;
+	const { totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent } = props;
 	return (
 		<Box sx={{ p: 1, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-			<Typography variant="body2">totalTimEestimate: {totalTimEestimate}</Typography>
+			<Typography variant="body2">totalTimEstimate: {totalTimEstimate}</Typography>
 			<Typography variant="body2">totalTimeOriginalEstimate: {totalTimeOriginalEstimate}</Typography>
 			<Typography variant="body2">totalTimeSpent: {totalTimeSpent}</Typography>
 			<GridPagination />
@@ -43,10 +43,16 @@ function CustomFooterStatusComponent(props: CustomFooterProps) {
 	);
 }
 
-const EstimatorTable: React.FC<{data: TicketProps[], defaultEstimate: number, loading: boolean, fudgeFactor: number}> = ({data, defaultEstimate, loading, fudgeFactor}) => {
-	const totalTimEestimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + fudgeFactor;
-	const totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + fudgeFactor;
-	const totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
+const EstimatorTable: React.FC<{
+	data: TicketProps[],
+	defaultEstimate: number,
+	loading: boolean,
+	totalTimEstimate: number,
+	totalTimeOriginalEstimate: number,
+	totalTimeSpent: number
+}> = (
+	{data, defaultEstimate, loading, totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent}
+) => {
 	const columns: GridColDef<any>[] = [
 //		{ field: 'id', headerName: 'id' },
 		{
@@ -132,7 +138,7 @@ const EstimatorTable: React.FC<{data: TicketProps[], defaultEstimate: number, lo
 				}}
 				slotProps={{
 					footer: {
-						totalTimEestimate,
+						totalTimEstimate,
 						totalTimeOriginalEstimate,
 						totalTimeSpent,
 					} as CustomFooterProps,

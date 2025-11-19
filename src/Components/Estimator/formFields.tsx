@@ -14,9 +14,8 @@ const FormFields: React.FC<{
 	const [localSearch, setLocalSearch] = useState<string>(search);
 	const [localEpic, setLocalEpic] = useState<string>(epic);
 	var values = [...Array(11).keys()];
-	var fudgeSteps =  Array.from({ length: 20 }, (_, index) => index * 0.25);
-	fudgeSteps = fudgeSteps.concat(Array.from({ length: 5 }, (_, index) => index + 5));
-	fudgeSteps = fudgeSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 10));
+	var fudgeSteps =  [...Array(16).keys()];
+	fudgeSteps = fudgeSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 20));
 	return (<>
 		<Grid container spacing={2}>
 			<Grid size={3}>

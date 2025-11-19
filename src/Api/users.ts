@@ -1,3 +1,4 @@
+import {getHolidayDayString} from '@src/Components/Estimator';
 
 export interface UserProps {
 	id: number;
@@ -5,7 +6,7 @@ export interface UserProps {
 	name: string;
 	email: string | null;
 	groups: string[] | null;
-	vacations: Date[] | null
+	vacations: String[] | null
 }
 
 export interface UsersGroupProps {
@@ -39,13 +40,21 @@ const getUserDataFromAjaxResponse = (user: any) => {
 	if (!user || !user.displayName) {
 		return null;
 	}
+	const vacations: string[] = [];
+	if (user.displayName == 'Paul Meisel') {
+		let date = new Date();
+		date.setDate(date.getDate() + 7)
+		vacations.push(getHolidayDayString(date));
+		date.setDate(date.getDate() + 7)
+		vacations.push(getHolidayDayString(date));
+	}
 	const return_obj: UserProps = {
 		id: user.accountId,
 		icon: user.avatarUrls ? user.avatarUrls['16x16'] : null,
 		name: user.displayName,
 		email: user.emailAddress,
 		groups: [],
-		vacations: [],
+		vacations: vacations,
 	}
 	return return_obj;
 };
@@ -76,11 +85,9 @@ export const getUsersAndGroupsApi = async() =>  {
 					if (formatted != null) {
 						await getUserGroupApi(user.accountId).then(data => {
 							groups = [...new Set(groups.concat(data))];
-							console.log(groups);
 							formatted.groups = data;
 						});
-						formatted.vacations = [];
-						results[formatted.name] = formatted;
+						results[formatted.id] = formatted;
 					}
 				}
 			};

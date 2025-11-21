@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import {getUsersAndGroupsApi} from '@src/Api'
 import type {UsersGroupProps} from '@src/Api'
 import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
-import {Table, TableBody, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
+import {Table, TableBody, TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel, FormGroup} from '@mui/material';
 import {EstimatorCell} from '@src/Components/Estimator';
-
+import { useSearchParams } from 'react-router-dom';
 
 interface cellData {
 	day: Date,
@@ -15,7 +15,11 @@ interface cellData {
 };
 
 function WhoIsOutPage() {
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
+	let param_groups = searchParams.get('groups');
+	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
+
 	const hasFetchedUser = useRef(false);
 	var getUsers = function() {
 		getUsersAndGroupsApi().then((data: UsersGroupProps) => {
@@ -49,44 +53,105 @@ function WhoIsOutPage() {
 	current_day.setDate(current_day.getDate() - current_day.getDay());
 	current_day.setHours(0, 0, 0, 0);
 
-	for(var week = 0; week <= 5; week++) {
-		let row: cellData[] = [];
-		for(var i = 0; i <= 6; i++) {
-			let weekend = false;
-			let holiday = '';
-			let past = false;
-			let whoisout: string[] = [];
-			if(current_day.getDay() == 0 || current_day.getDay() == 6) {
-				weekend = true
-			} else if (current_day < today) {
-				past = true;
-			} else {
-				const holiday_string = getHolidayDayString(current_day);
-				if (allUsHolidays[holiday_string]) {
-					holiday = allUsHolidays[getHolidayDayString(current_day)];
-				} else {
-					Object.keys(possibleUsersGroups.users).forEach((user_id) => {
-						const user = possibleUsersGroups.users[user_id];
-						if (user && user.vacations && user.vacations.includes(holiday_string)) {
-							whoisout.push(user.name);
-						}
-					});
+	let users = possibleUsersGroups.users;
+	const getRows = () => {
+		console.log(groups);
+		if (groups.length) {
+			users = {};
+			Object.keys(possibleUsersGroups.users).forEach((user_id) => {
+				const user = possibleUsersGroups.users[user_id];
+				if (user.groups && user.groups.some(item => groups.includes(item))) {
+					users[user_id] = user;
 				}
-			}
-			row.push({
-				day: new Date(current_day),
-				holiday: holiday,
-				weekend: weekend,
-				whoisout: whoisout,
-				past: past,
 			});
-			current_day.setDate(current_day.getDate() + 1);
-			current_day.setHours(0, 0, 0, 0);
+		} else {
+			users = possibleUsersGroups.users;
 		}
-		rows.push(row);
-	}
+		let rows:cellData[][] = [];
+		for(var week = 0; week <= 10; week++) {
+			let row: cellData[] = [];
+			for(var i = 0; i <= 6; i++) {
+				let weekend = false;
+				let holiday = '';
+				let past = false;
+				let whoisout: string[] = [];
+				if(current_day.getDay() == 0 || current_day.getDay() == 6) {
+					weekend = true
+				} else if (current_day < today) {
+					past = true;
+				} else {
+					const holiday_string = getHolidayDayString(current_day);
+					if (allUsHolidays[holiday_string]) {
+						holiday = allUsHolidays[getHolidayDayString(current_day)];
+					} else {
+						Object.keys(users).forEach((user_id) => {
+							const user = possibleUsersGroups.users[user_id];
+							if (user && user.vacations && user.vacations.includes(holiday_string)) {
+								whoisout.push(user.name);
+							}
+						});
+					}
+				}
+				row.push({
+					day: new Date(current_day),
+					holiday: holiday,
+					weekend: weekend,
+					whoisout: whoisout,
+					past: past,
+				});
+				current_day.setDate(current_day.getDate() + 1);
+				current_day.setHours(0, 0, 0, 0);
+			}
+			rows.push(row);
+		}
+		return rows;
+	};
+	useEffect(() => {
+		rows = getRows();
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (groups.length) {
+			newSearchParams.set('groups', groups.join(','));
+		} else {
+			newSearchParams.delete('groups');
+		}
+		setSearchParams(newSearchParams);
+	}, [groups]);
+	rows = getRows();
+
+	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const value = event.target.value;
+		if (event.target.checked) {
+			// Add the value if checked
+			setGroups((prev) => [...prev, value]);
+		} else {
+			// Remove the value if unchecked
+			setGroups((prev) => prev.filter((item) => item !== value));
+		}
+	};
 
 	return (
+		<>
+			<FormGroup>
+				<div style={{ display: 'flex', flexDirection: 'row', minHeight: '3em' }}>
+					{
+						possibleUsersGroups.groups.map((option, index) => (
+							<FormControlLabel
+								key={index}
+								control={
+									<Checkbox
+										checked={groups.includes(option)}
+										onChange={handleChange}
+										name={option}
+										value={option}
+									/>
+								}
+								label={option}
+								sx={{display: "inline"}}
+							/>
+						))
+					}
+				</div>
+			</FormGroup>
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">
 					<TableHead>
@@ -131,6 +196,7 @@ function WhoIsOutPage() {
 					</TableBody>
 				</Table>
 			</TableContainer>
+		</>
 	)
 }
 

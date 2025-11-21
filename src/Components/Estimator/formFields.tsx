@@ -18,7 +18,7 @@ const FormFields: React.FC<{
 	fudgeSteps = fudgeSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 20));
 	return (<>
 		<Grid container spacing={2}>
-			<Grid size={3}>
+			<Grid size={{ xs: 12, md: 3 }}>
 				<InputLabel id="search">Search</InputLabel>
 				<TextField
 					id="search"
@@ -28,7 +28,7 @@ const FormFields: React.FC<{
 					}}
 				/>
 			</Grid>
-			<Grid size={3}>
+			<Grid  size={{ xs: 12, md: 3 }}>
 				<InputLabel id="parent">Parent Ticket ID</InputLabel>
 				<TextField
 					id="parent"
@@ -59,7 +59,7 @@ const FormFields: React.FC<{
 			</Grid>
 		</Grid>
 		<Grid container spacing={2}>
-			<Grid size={3}>
+			<Grid size={{ xs: 12, md: 3 }}>
 				<InputLabel id="default_estimate">Default Estimate</InputLabel>
 				<Select
 					labelId="default_estimate"
@@ -76,7 +76,7 @@ const FormFields: React.FC<{
 					))}
 				</Select>
 			</Grid>
-			<Grid size={3}>
+			<Grid size={{ xs: 12, md: 3 }}>
 				<InputLabel id="fudgeFactor">Fudge Factor</InputLabel>
 				<Select
 					labelId="fudgeFactor"

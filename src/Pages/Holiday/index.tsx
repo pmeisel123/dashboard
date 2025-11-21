@@ -27,7 +27,6 @@ const HolidayPage = (() => {
 		setSearchParams(newSearchParams);
 	}, [year]);
 	const usHolidays = getHolidays(year);
-	console.log(usHolidays);
 	return (
 		<>
 			<InputLabel id="Year">Year</InputLabel>

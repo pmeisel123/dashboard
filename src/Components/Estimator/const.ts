@@ -5,18 +5,20 @@ interface EstimatorCellProps {
 	isDone?: boolean;
 	isPartial?: boolean;
 }
+
 export const EstimatorCell = styled(
 		TableCell,
 		{ shouldForwardProp: (prop) => prop !== 'isOff' && prop !== 'isDone'  && prop !== 'isPartial' }
 	)<EstimatorCellProps>(({ isOff , isDone, isPartial }) => ({
+	border: '1px solid',
 	verticalAlign: 'top',
 	...(isDone && {
- 		 backgroundColor: '#F88',
+		 backgroundColor: '#8F8',
 	}),
 	...(isOff && {
- 		 backgroundColor: '#DDD',
+		 backgroundColor: '#DDD',
 	}),
 	...(isPartial && {
- 		 backgroundColor: '#EEE',
+		 backgroundColor: '#EEE',
 	}),
 }));

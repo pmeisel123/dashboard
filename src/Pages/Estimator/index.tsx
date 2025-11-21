@@ -40,7 +40,6 @@ function EstimatorPage() {
 		if (!jira_search) {
 			return;
 		}
-		console.log(jira_search);
 		getTicketsApi(jira_search)
 			.then((data: TicketProps[]) => {
 				setLoading(false);

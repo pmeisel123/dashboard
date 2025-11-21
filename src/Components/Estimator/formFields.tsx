@@ -6,13 +6,13 @@ const FormFields: React.FC<{
 	setSearch: React.Dispatch<React.SetStateAction<string>>,
 	defaultEstimate: number,
 	setDefaultEstimate: React.Dispatch<React.SetStateAction<number>>
-	epic: string,
-	setEpic: React.Dispatch<React.SetStateAction<string>>,
+	parent: string,
+	setParent: React.Dispatch<React.SetStateAction<string>>,
 	fudgeFactor: number,
 	setFudgeFactor: React.Dispatch<React.SetStateAction<number>>,
-}> = ({search, setSearch, defaultEstimate, setDefaultEstimate, epic, setEpic, fudgeFactor, setFudgeFactor}) => {
+}> = ({search, setSearch, defaultEstimate, setDefaultEstimate, parent, setParent, fudgeFactor, setFudgeFactor}) => {
 	const [localSearch, setLocalSearch] = useState<string>(search);
-	const [localEpic, setLocalEpic] = useState<string>(epic);
+	const [localParent, setLocalParent] = useState<string>(parent);
 	var values = [...Array(11).keys()];
 	var fudgeSteps =  [...Array(16).keys()];
 	fudgeSteps = fudgeSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 20));
@@ -29,21 +29,21 @@ const FormFields: React.FC<{
 				/>
 			</Grid>
 			<Grid size={3}>
-				<InputLabel id="epic">Epic</InputLabel>
+				<InputLabel id="parent">Parent Ticket ID</InputLabel>
 				<TextField
-					id="epic"
-					value={localEpic}
+					id="parent"
+					value={localParent}
 					onChange={(event) => {
-						setLocalEpic(event.target.value);
+						setLocalParent(event.target.value);
 					}}
 				/>
 			</Grid>
 			<Grid size={2}>
-				<InputLabel id="epic">&nbsp;</InputLabel>
+				<InputLabel id="parent">&nbsp;</InputLabel>
 				<Button
 					variant="contained"
 					onClick={() => {
-						setEpic(localEpic);
+						setParent(localParent);
 						if (!localSearch) {
 							setSearch('');
 						} else if (localSearch.match(/[^a-z]/i)) {
@@ -52,7 +52,7 @@ const FormFields: React.FC<{
 							setSearch('textfields ~ "' + localSearch + '*"');
 						}
 					}}
-					disabled={search == localSearch && epic == localEpic}
+					disabled={search == localSearch && parent == localParent}
 				>
 					Update
 				</Button>

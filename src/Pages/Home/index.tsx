@@ -5,7 +5,9 @@ function HomePage() {
 
   return (
     <>
-      <Link href='/Estimator'>Estimator</Link>
+      <Link href='/Estimator'>Estimator</Link><br />
+      <Link href='/Holidays'>Holidays</Link><br />
+      <Link href='/whoisout'>Who is out</Link>
     </>
   )
 }

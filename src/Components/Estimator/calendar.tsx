@@ -1,8 +1,7 @@
-import holidays from 'date-holidays';
-import type {UsersGroupProps} from '@src/Api'
+import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
+import type {UsersGroupProps} from '@src/Api';
 import {Table, TableBody, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
-import {EstimatorCell, getHolidayDayString, getDateString} from './const';
-
+import {EstimatorCell} from './const';
 
 interface cellData {
 	day: Date,
@@ -21,31 +20,24 @@ const Calendar: React.FC<{
 	if (!Object.keys(possibleUsersGroups.users).length) {
 		return (<></>);
 	}
-	const hd = new holidays('US'); // For United States
 	const today = new Date();
 	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 	// Get holidays for a specific year
-	const usHolidays = hd.getHolidays(today.getFullYear().toString()).filter(holiday => {
-		if (holiday.type === 'public' || holiday.type === 'bank') {
-			return (holiday.end >= today);
-		}
-		return false;
+	const usHolidays = getHolidays(today.getFullYear().toString()).filter(holiday => {
+		return (holiday.end >= today);
 	});
-	const nextYearUsHolidays = hd.getHolidays(nextyear.getFullYear().toString()).filter(holiday => {
-		if (holiday.type === 'public' || holiday.type === 'bank') {
-			return (holiday.start <= nextyear);
-		}
-		return false;
+	const nextYearUsHolidays = getHolidays(nextyear.getFullYear().toString()).filter(holiday => {
+		return (holiday.start <= nextyear);
 	});
 
 	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce((newFormat, holiday) => {
 		newFormat[holiday.date] = holiday.name;
 		return newFormat;
 	}, {} as Record<string, string>);
-	console.log(allUsHolidays);
 
 	const current_day = new Date();
 	current_day.setDate(current_day.getDate() - current_day.getDay());
+	current_day.setHours(0, 0, 0, 0);
 	let local_users = users;
 	let user_count = local_users.size;
 	if (!user_count) {
@@ -60,7 +52,6 @@ const Calendar: React.FC<{
 	user_count = local_users.size;
 	let remainingTimEstimate = totalTimEstimate;
 	let rows:cellData[][] = [];
-	current_day.setHours(0, 0, 0, 0);
 	let extra = true;
 	let max_rows = 30;
 	let last_day = '';
@@ -90,7 +81,12 @@ const Calendar: React.FC<{
 						const user = possibleUsersGroups.users[user_id];
 						if (!user || !user.vacations || !user.vacations.includes(holiday_string)) {
 							working++;
-							title += user.name + "\n";
+							if (user) {
+								if (!title) {
+									title = "Working:\n\n";
+								}
+								title += user.name + "\n";
+							}
 						}
 					});
 					if (!working) {
@@ -99,10 +95,10 @@ const Calendar: React.FC<{
 				}
 				remainingTimEstimate -= working;
 				if (remainingTimEstimate < 0) {
-					last_day = getDateString(current_day);
 					remainingTimEstimate = 0;
 				}
 				if(!remainingTimEstimate) {
+					last_day = getDateString(current_day);
 					description = 'WORK COMPLETE!!!';
 				}
 			}
@@ -119,10 +115,9 @@ const Calendar: React.FC<{
 		rows.push(row);
 	}
 
-	//console.log(allUsHolidays);
 	return (
 		<>
-			Complete: {last_day}<br />
+			<strong>Work will be completed on {last_day}</strong><br />
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">
 					<TableHead>
@@ -145,15 +140,15 @@ const Calendar: React.FC<{
 										title={cell.title}
 										isOff={!cell.working}
 										isDone={!!cell.working && !cell.workleft}
-										isPartial={cell.working && cell.working != user_count}
+										isPartial={(cell.working && cell.working != user_count) ? true: false}
 									>
+										{getDateString(cell.day)}<br />
 										{
 											cell.description ? 
 												<>
-													{getDateString(cell.day)}<br />{cell.description}
+													{cell.description}
 												</> :
 												<>
-													{getDateString(cell.day)}<br />
 													Working: {cell.working}<br />
 													Work Left: {cell.workleft}
 												</>

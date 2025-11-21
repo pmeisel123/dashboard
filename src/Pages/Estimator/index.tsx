@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
 import type {TicketProps, UsersGroupProps} from '@src/Api'
 import {EstimatorTable, FormFields, Calendar} from '@src/Components/Estimator';
@@ -11,33 +11,36 @@ const defaultDefaultDefaultEstimate = 2;
 function EstimatorPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const defaultDefaultEstimate: number = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
-	const defaultEpic: string = searchParams.get('epic') || '';
+	const defaultParent: string = searchParams.get('parent') || '';
 	const [data, setData] = useState<TicketProps[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
 	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
-	const [epic, setEpic] = useState<string>(defaultEpic);
+	const [parent, setParent] = useState<string>(defaultParent);
 	const [fudgeFactor, setFudgeFactor] = useState<number>(parseFloat(searchParams.get('fudgeFactor') || '0'));
 	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
 	const [group, setGroup] = useState<string>(searchParams.get('group') || '');
 	const user_param = searchParams.get('users') || '';
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(',')));
+	const hasFetchedUser = useRef(false);
+	const hasFetchedTickets = useRef('');
 
 	let totalTimEstimate = 0;
 	let totalTimeOriginalEstimate = 0;
 	let totalTimeSpent = 0;
 	var getFunc = function() {
 		var jira_search = '';
-		if (search && epic) {
-			jira_search = search + ' AND parent=' + epic
-		} else if (!search && epic) {
-			jira_search = 'parent = ' + epic
+		if (search && parent) {
+			jira_search = search + ' AND parent=' + parent;
+		} else if (!search && parent) {
+			jira_search = 'parent = ' + parent;
 		} else {
-			jira_search = search
+			jira_search = search;
 		}
 		if (!jira_search) {
 			return;
 		}
+		console.log(jira_search);
 		getTicketsApi(jira_search)
 			.then((data: TicketProps[]) => {
 				setLoading(false);
@@ -50,17 +53,23 @@ function EstimatorPage() {
 		});
 	};
 	useEffect(() => {
-		getUsers();
+		if (!hasFetchedUser.current) {
+			getUsers();
+			hasFetchedUser.current = true;
+		}
 	}, []);
 	useEffect(() => {
-		getFunc();
+		if ((search || parent) && hasFetchedTickets.current != search + ' -- ' + parent) {
+			getFunc();
+			hasFetchedTickets.current = search + ' -- ' + parent;
+		}
 		/*
 		const intervalId = setInterval(() => {
 			getFunc();
 		}, 30000);
 		return () => clearInterval(intervalId);
 		*/
-	}, [search, epic]);
+	}, [search, parent]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (defaultEstimate != defaultDefaultDefaultEstimate) {
@@ -73,10 +82,10 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('search');
 		}
-		if (epic != '') {
-			newSearchParams.set('epic', epic);
+		if (parent != '') {
+			newSearchParams.set('parent', parent);
 		} else {
-			newSearchParams.delete('epic');
+			newSearchParams.delete('parent');
 		}
 		if (fudgeFactor != 0) {
 			newSearchParams.set('fudgeFactor', fudgeFactor + '');
@@ -88,13 +97,14 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('group');
 		}
+		if (possibleUsersGroups && possibleUsersGroups.users && Object.keys(possibleUsersGroups.users).length)
 		if (users.size) {
 			newSearchParams.set('users', [...users].join(','));
 		} else {
 			newSearchParams.delete('users');
 		}
 		setSearchParams(newSearchParams);
-	}, [search, defaultEstimate, epic, fudgeFactor, group, users]);
+	}, [search, defaultEstimate, parent, fudgeFactor, group, users]);
 
 	totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + fudgeFactor;
 	totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + fudgeFactor;
@@ -104,8 +114,8 @@ function EstimatorPage() {
 			<FormFields
 				search={search}
 				setSearch={setSearch}
-				epic={epic}
-				setEpic={setEpic}
+				parent={parent}
+				setParent={setParent}
 				defaultEstimate={defaultEstimate}
 				setDefaultEstimate={setDefaultEstimate}
 				fudgeFactor={fudgeFactor}
@@ -119,7 +129,7 @@ function EstimatorPage() {
 				setUsers={setUsers}
 			/>
 			{
-				(search || epic) &&
+				(search || parent) &&
 				<EstimatorTable
 					data={data}
 					defaultEstimate={defaultEstimate}
@@ -129,14 +139,15 @@ function EstimatorPage() {
 					totalTimeSpent={totalTimeSpent}
 				/>
 			}
-			<Calendar
-				users={users}
-				group={group}
-				possibleUsersGroups={possibleUsersGroups}
-				totalTimEstimate={totalTimEstimate}
-				totalTimeOriginalEstimate={totalTimeOriginalEstimate}
-				totalTimeSpent={totalTimeSpent}
-			/>
+			{
+				((search || parent) && !!data.length) &&
+				<Calendar
+					users={users}
+					group={group}
+					possibleUsersGroups={possibleUsersGroups}
+					totalTimEstimate={totalTimEstimate}
+				/>
+			}
 		</>
 	);
 }

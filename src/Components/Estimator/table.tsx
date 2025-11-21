@@ -1,13 +1,13 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { DataGrid, GridPagination } from '@mui/x-data-grid';
-import type { GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import type { GridColDef, GridRenderCellParams, GridRowParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
 import type {TicketProps} from '@src/Api'
 import { formatDistanceToNow } from 'date-fns';
 
 declare const __API_URL__: string;
-const API_URL = __API_URL__; // @ts-ignore
+const API_URL = __API_URL__;
 
 
 interface CustomFooterProps {
@@ -18,7 +18,7 @@ interface CustomFooterProps {
 
 
 const RenderEstimate: React.FC<{value: number | null, defaultEstimate: number}> = ({value, defaultEstimate}) => {
-	if (value) {
+	if (value != null) {
 		return <>{value}</>; 
 	}
 	return(<span style={{ color: "red" }}>{defaultEstimate}</span>);
@@ -126,13 +126,22 @@ const EstimatorTable: React.FC<{
 		},
 		{ field: 'timespent', headerName: 'Spent' },
 	];
+	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
+		return params.row.isdone ? 'MuiDataGrid-row-done' : '';
+	};
 	return (
 		<Box sx={{ width: '100%'}}>
 			<DataGrid
+				sx={{
+					'& .MuiDataGrid-row-done': {
+						backgroundColor: '#DDD',
+					},
+				}}
 				loading={loading}
 				getRowHeight={() => 'auto'}
 				rows={data}
 				columns={columns}
+				getRowClassName={getRowClassName}
 				slots={{
 					footer: CustomFooterStatusComponent,
 				}}

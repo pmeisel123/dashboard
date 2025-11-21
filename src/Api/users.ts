@@ -1,4 +1,7 @@
-import {getHolidayDayString} from '@src/Components/Estimator';
+import {getHolidayDayString} from './holiday';
+import {getVacationApi} from './vacations';
+
+declare const __VACATION_KEY__: string;
 
 export interface UserProps {
 	id: number;
@@ -40,21 +43,13 @@ const getUserDataFromAjaxResponse = (user: any) => {
 	if (!user || !user.displayName) {
 		return null;
 	}
-	const vacations: string[] = [];
-	if (user.displayName == 'Paul Meisel') {
-		let date = new Date();
-		date.setDate(date.getDate() + 7)
-		vacations.push(getHolidayDayString(date));
-		date.setDate(date.getDate() + 7)
-		vacations.push(getHolidayDayString(date));
-	}
 	const return_obj: UserProps = {
 		id: user.accountId,
 		icon: user.avatarUrls ? user.avatarUrls['16x16'] : null,
 		name: user.displayName,
 		email: user.emailAddress,
 		groups: [],
-		vacations: vacations,
+		vacations: [],
 	}
 	return return_obj;
 };
@@ -73,6 +68,11 @@ export const getUsersAndGroupsApi = async() =>  {
 	let start_at = 0;
 	let results: {[key: string]: UserProps} = {};
 	let groups: string[] = [];
+	let vacations: {[key: string]: string[]} = {};
+	await getVacationApi().then(data => {
+		vacations = data;
+	});
+
 	while(!last) {
 		let url = main_url + '&startAt=' + start_at;
 		let response = await fetch(url, paramaters)
@@ -87,6 +87,14 @@ export const getUsersAndGroupsApi = async() =>  {
 							groups = [...new Set(groups.concat(data))];
 							formatted.groups = data;
 						});
+						
+						let vacation_key: string | null = formatted.name;
+						if (__VACATION_KEY__ == 'email') {
+							vacation_key = formatted.email;
+						}
+						if (vacation_key && vacations[vacation_key]) {
+							formatted.vacations = vacations[vacation_key];
+						}
 						results[formatted.id] = formatted;
 					}
 				}

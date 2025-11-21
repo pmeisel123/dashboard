@@ -2,7 +2,8 @@ import type {UsersGroupProps, UserProps} from '@src/Api';
 import { Select, MenuItem, InputLabel, FormControl} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams, GridFilterOperator} from '@mui/x-data-grid';
-import {getDateString} from '@src/Components/Estimator';
+import {getDayString} from '@src/Api';
+import React from 'react';
 
 const UserSelectors: React.FC<{
 	possibleUsersGroups: UsersGroupProps,
@@ -61,24 +62,28 @@ const UserSelectors: React.FC<{
 		{
 			field: 'vacations',
 			headerName: 'Vacations',
-			flex: 1,
+			flex: 3,
 			renderCell: (params: GridRenderCellParams<UserProps>) => (
 				<>
-					{console.log(params.value)}
 					{params.value && params.value.map((value:string, index: number) => (
-						<>
+						<React.Fragment key={index}>
 							{(!!index) && <>, </>}
-							{getDateString(new Date(value))}
-						</>
+							{getDayString(new Date(value))}
+						</React.Fragment>
 					))}
 				</>
 			),
 		},
 	];
-	console.log(possibleUsersGroups.users);
 	return (
 		<>
 			<DataGrid
+				sx={{
+					'& .MuiDataGrid-cell': {
+						display: 'flex',
+						alignItems: 'center',
+					},
+				}}
 				getRowHeight={() => 'auto'}
 				rows={Object.values(possibleUsersGroups.users)}
 				columns={columns}

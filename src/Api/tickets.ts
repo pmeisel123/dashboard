@@ -1,3 +1,7 @@
+
+declare const __DONE_STATUS__: string[];
+
+
 export interface SearchProps {
 	search: string | null;
 }
@@ -16,6 +20,7 @@ export interface TicketProps {
 	timespent: number | null;
 	parentkey: string | null;
 	parentname: string | null;
+	isdone: boolean;
 }
 
 function getNameFromPerson(person: any): string | null {
@@ -52,6 +57,10 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let timespent: number | null = fields.timespent;
 		let parentkey: string | null = null;
 		let parentname: string | null = null;
+		let isdone: boolean = (!!status && __DONE_STATUS__.includes(status));
+		if (isdone) {
+			timeestimate = 0;
+		}
 		if (fields.parent) {
 			parentkey = fields.parent.key;
 			parentname = fields.parent.fields.summary;
@@ -70,6 +79,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			'timespent': convertEstimateToDays(timespent),
 			'parentkey': parentkey,
 			'parentname': parentname,
+			'isdone': isdone,
 		}
 	}
 	return null;

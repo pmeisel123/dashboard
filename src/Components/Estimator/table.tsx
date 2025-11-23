@@ -16,9 +16,12 @@ interface CustomFooterProps {
 }
 
 
-const RenderEstimate: React.FC<{value: number | null, defaultEstimate: number}> = ({value, defaultEstimate}) => {
+const RenderEstimate: React.FC<{value: number | null, defaultEstimate: number | null}> = ({value, defaultEstimate}) => {
 	if (value != null) {
 		return <>{value}</>; 
+	}
+	if (defaultEstimate == null) {
+		return(<span style={{ color: "red" }}>-</span>);
 	}
 	return(<span style={{ color: "red" }}>{defaultEstimate}</span>);
 };
@@ -44,7 +47,7 @@ function CustomFooterStatusComponent(props: CustomFooterProps) {
 
 const EstimatorTable: React.FC<{
 	data: TicketProps[],
-	defaultEstimate: number,
+	defaultEstimate: number | null,
 	loading: boolean,
 	totalTimEstimate: number,
 	totalTimeOriginalEstimate: number,

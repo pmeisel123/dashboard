@@ -26,10 +26,13 @@ interface BasicModalProps {
 
 export const SavePageModal = (props: BasicModalProps) => {
 	const [open, setOpen] = useState<boolean>(false);
-	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
 	const [name, setName] = useState<string>(props.name || '');
 	const url = window.location.href.replace(/http.?:\/\/[^\/]+/, '');
+	const handleOpen = () => {
+		setOpen(true);
+		setName('');
+	};
 	const save = () => {
 		let savedViewJson = window.localStorage.getItem('saveViews');
 		let savedViews: {[key: string]: string} = {};
@@ -72,7 +75,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList = (width: number) => {
+export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 	const navigate = useNavigate();
 	const handleClick = (url: string) => {
 		navigate(url, { replace: true });
@@ -108,6 +111,9 @@ export const SavePageList = (width: number) => {
 		window.localStorage.setItem('saveViews', JSON.stringify(savedViews));
 		window.dispatchEvent(new Event('storage'));
 	};
+	if (!Object.keys(savedViews).length) {
+		return;
+	}
 	return (
 		<>
 			Saved Views:
@@ -116,10 +122,12 @@ export const SavePageList = (width: number) => {
 					let url = savedViews[name];
 					return (
 					<>
-						<ListItem disablePadding key={name + ' ' + url}  >
-							<ListItemButton component={MuiLink}>
-								<ListItemText title={name} primary={name}  onClick={() => handleClick(url)}  sx={{width: 'calc(100% - 20px)', flex: 'unset',  whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'}}/>
-								<ListItemIcon title={'delete'} onClick={() => deleteSave(name)} sx={{float: 'right', minWidth: 24}} ><Delete /></ListItemIcon>
+						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} >
+							<ListItemButton title={name} component={MuiLink}  sx={{width: width, flex: 'unset',  whiteSpace: 'nowrap', overflow: 'hidden'}} >
+								<ListItemText primary={name} />
+							</ListItemButton>
+							<ListItemButton title={'delete'} component={MuiLink}  sx={{minWidth: 24, padding: '10px 4px 10px 0'}}  onClick={() => deleteSave(name)}>
+								<ListItemIcon sx={{minWidth: 24}} ><Delete /></ListItemIcon>
 							</ListItemButton>
 						</ListItem>
 					</>

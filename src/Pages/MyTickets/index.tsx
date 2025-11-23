@@ -68,9 +68,8 @@ function MyTicketsPage() {
 		window.localStorage.setItem('user', user);
 		setSearchParams(newSearchParams);
 	}, [group, user]);
-	let defaultEstimate = 0;
-	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0);
-	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0);
+	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
+	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
 	let totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
@@ -85,7 +84,7 @@ function MyTicketsPage() {
 				(user) &&
 				<EstimatorTable
 					data={data}
-					defaultEstimate={defaultEstimate}
+					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}

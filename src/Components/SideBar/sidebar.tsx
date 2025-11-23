@@ -1,5 +1,6 @@
 import {Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar}	from '@mui/material';
 import { Link } from 'react-router-dom'; // From react-router-dom
+import {SavePageList} from '@src/Components/SavePage';
 
 interface SidebarProps {
 	open: boolean;
@@ -27,6 +28,11 @@ const SideBar: React.FC<SidebarProps> = ({ open, width }) => {
 					</ListItemButton>
 				</ListItem>
 				<ListItem disablePadding>
+					<ListItemButton component={Link} to="/MyTickets">
+						<ListItemText primary="My Tickets" />
+					</ListItemButton>
+				</ListItem>
+				<ListItem disablePadding>
 					<ListItemButton component={Link} to="/holidays">
 						<ListItemText primary="Holidays" />
 					</ListItemButton>
@@ -37,6 +43,7 @@ const SideBar: React.FC<SidebarProps> = ({ open, width }) => {
 					</ListItemButton>
 				</ListItem>
 			</List>
+			<SavePageList />
 		</Drawer>
 	);
 };

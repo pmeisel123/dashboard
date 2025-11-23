@@ -1,5 +1,4 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import {Box, Typography, useTheme} from '@mui/material';
 import { DataGrid, GridPagination } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams, GridRowParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
@@ -53,6 +52,7 @@ const EstimatorTable: React.FC<{
 }> = (
 	{data, defaultEstimate, loading, totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent}
 ) => {
+	const theme = useTheme();
 	const columns: GridColDef<any>[] = [
 //		{ field: 'id', headerName: 'id' },
 		{
@@ -134,7 +134,7 @@ const EstimatorTable: React.FC<{
 			<DataGrid
 				sx={{
 					'& .MuiDataGrid-row-done': {
-						backgroundColor: '#DDD',
+						backgroundColor: theme.palette.grey.A400,
 					},
 				}}
 				loading={loading}

@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom'; // From react-router-dom
+import {SavePageModal} from '@src/Components/SavePage';
 
 interface TopNavBarProps {
 	toggleDrawer: () => void; // Function to open/close sidebar
@@ -27,6 +28,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ toggleDrawer }) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Validator
         </Typography>
+        <SavePageModal />
         <Button color="inherit" component={Link} to="/">Home</Button>
       </Toolbar>
     </AppBar>

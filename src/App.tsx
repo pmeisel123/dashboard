@@ -4,11 +4,12 @@ import HomePage from './Pages/Home';
 import EstimatorPage from '@src/Pages/Estimator';
 import WhoIsOutPage from '@src/Pages/WhoIsOut';
 import HolidayPage from '@src/Pages/Holiday';
+import MyTicketsPage from '@src/Pages/MyTickets';
 import {TopNav} from '@src/Components/TopNav';
 import {SideBar} from '@src/Components/SideBar';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box, Toolbar } from '@mui/material';
+import { Box } from '@mui/material';
 
 const router = createBrowserRouter([{
 	path: '/',
@@ -21,6 +22,10 @@ const router = createBrowserRouter([{
 		{
 			path: '/Estimator',
 			element: <EstimatorPage />,
+		},
+		{
+			path: '/MyTickets',
+			element: <MyTicketsPage />,
 		},
 		{
 			path: '/holidays',

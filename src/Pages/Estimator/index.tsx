@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
 import type {TicketProps, UsersGroupProps} from '@src/Api'
 import {EstimatorTable, FormFields, Calendar} from '@src/Components/Estimator';
-import {UserSelectors} from '@src/Components/Users';
+import {UsersSelector} from '@src/Components/Users';
 import { useSearchParams } from 'react-router-dom';
 
 
@@ -25,9 +25,6 @@ function EstimatorPage() {
 	const hasFetchedUser = useRef(false);
 	const hasFetchedTickets = useRef('');
 
-	let totalTimEstimate = 0;
-	let totalTimeOriginalEstimate = 0;
-	let totalTimeSpent = 0;
 	var getFunc = function() {
 		var jira_search = '';
 		if (search && parent) {
@@ -62,12 +59,6 @@ function EstimatorPage() {
 			getFunc();
 			hasFetchedTickets.current = search + ' -- ' + parent;
 		}
-		/*
-		const intervalId = setInterval(() => {
-			getFunc();
-		}, 30000);
-		return () => clearInterval(intervalId);
-		*/
 	}, [search, parent]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -105,9 +96,9 @@ function EstimatorPage() {
 		setSearchParams(newSearchParams);
 	}, [search, defaultEstimate, parent, fudgeFactor, group, users]);
 
-	totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + fudgeFactor;
-	totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + fudgeFactor;
-	totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + fudgeFactor;
+	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + fudgeFactor;
+	let totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			<FormFields
@@ -120,7 +111,7 @@ function EstimatorPage() {
 				fudgeFactor={fudgeFactor}
 				setFudgeFactor={setFudgeFactor}
 			/>
-			<UserSelectors
+			<UsersSelector
 				possibleUsersGroups={possibleUsersGroups}
 				group={group}
 				setGroup={setGroup}

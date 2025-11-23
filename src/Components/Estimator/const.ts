@@ -9,16 +9,16 @@ interface EstimatorCellProps {
 export const EstimatorCell = styled(
 		TableCell,
 		{ shouldForwardProp: (prop) => prop !== 'isOff' && prop !== 'isDone'  && prop !== 'isPartial' }
-	)<EstimatorCellProps>(({ isOff , isDone, isPartial }) => ({
+	)<EstimatorCellProps>(({ isOff , isDone, isPartial, theme }) => ({
 	border: '1px solid',
 	verticalAlign: 'top',
 	...(isDone && {
-		 backgroundColor: '#8F8',
+		 backgroundColor: theme.palette.success.light,
 	}),
 	...(isOff && {
-		 backgroundColor: '#DDD',
+		 backgroundColor: theme.palette.grey.A400,
 	}),
 	...(isPartial && {
-		 backgroundColor: '#EEE',
+		 backgroundColor: theme.palette.grey[300],
 	}),
 }));

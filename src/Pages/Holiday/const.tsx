@@ -7,8 +7,8 @@ const today = new Date();
 export const DateRow = styled(
 		TableRow,
 		{ shouldForwardProp: (prop) => prop !== 'date'}
-	)<DateCellProps>(({ date }) => ({
+	)<DateCellProps>(({ date, theme }) => ({
 	...(new Date(date) < today && {
- 		 backgroundColor: '#DDD',
+ 		 backgroundColor: theme.palette.grey.A400,
 	})
 }));

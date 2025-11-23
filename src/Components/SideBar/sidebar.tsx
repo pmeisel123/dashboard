@@ -43,7 +43,7 @@ const SideBar: React.FC<SidebarProps> = ({ open, width }) => {
 					</ListItemButton>
 				</ListItem>
 			</List>
-			<SavePageList />
+			<SavePageList width={width} />
 		</Drawer>
 	);
 };

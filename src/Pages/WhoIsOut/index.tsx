@@ -55,7 +55,6 @@ function WhoIsOutPage() {
 
 	let users = possibleUsersGroups.users;
 	const getRows = () => {
-		console.log(groups);
 		if (groups.length) {
 			users = {};
 			Object.keys(possibleUsersGroups.users).forEach((user_id) => {

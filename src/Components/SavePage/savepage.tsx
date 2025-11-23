@@ -1,9 +1,10 @@
 import {useEffect, useState} from 'react';
-import {Box, Button, InputLabel, TextField, List, ListItem, ListItemButton, Link, ListItemText} from '@mui/material';
+import {Box, Button, InputLabel, TextField, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import MuiLink, { LinkProps as MuiLinkProps } from '@mui/material/Link';
+import MuiLink from '@mui/material/Link';
 import { useNavigate } from "react-router-dom";
+import Delete from '@mui/icons-material/Delete';
 
 // Define the style for the modal content
 const style = {
@@ -71,7 +72,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList = () => {
+export const SavePageList = (width: number) => {
 	const navigate = useNavigate();
 	const handleClick = (url: string) => {
 		navigate(url, { replace: true });
@@ -92,18 +93,33 @@ export const SavePageList = () => {
 			window.removeEventListener('storage', checkSavedViews)
 		}
 	}, []);
-	
+
+	const deleteSave = (name: string) => {
+		let savedViewJson = window.localStorage.getItem('saveViews');
+		let savedViews: {[key: string]: string} = {};
+		if (!savedViewJson || !name) {
+			return;
+		}
+		savedViews = JSON.parse(savedViewJson);
+		if (!savedViews[name]) {
+			return;
+		}
+		delete savedViews[name];
+		window.localStorage.setItem('saveViews', JSON.stringify(savedViews));
+		window.dispatchEvent(new Event('storage'));
+	};
 	return (
 		<>
 			Saved Views:
-			<List>
-				{Object.keys(savedViews).map((name: string) => {
+			<List sx={{width: width}}>
+				{Object.keys(savedViews).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((name: string) => {
 					let url = savedViews[name];
 					return (
 					<>
-						<ListItem disablePadding key={name + ' ' + url}>
-							<ListItemButton component={MuiLink} onClick={() => handleClick(url)}>
-								<ListItemText primary={name} />
+						<ListItem disablePadding key={name + ' ' + url}  >
+							<ListItemButton component={MuiLink}>
+								<ListItemText title={name} primary={name}  onClick={() => handleClick(url)}  sx={{width: 'calc(100% - 20px)', flex: 'unset',  whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden'}}/>
+								<ListItemIcon title={'delete'} onClick={() => deleteSave(name)} sx={{float: 'right', minWidth: 24}} ><Delete /></ListItemIcon>
 							</ListItemButton>
 						</ListItem>
 					</>

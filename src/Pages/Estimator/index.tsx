@@ -10,20 +10,41 @@ const defaultDefaultDefaultEstimate = 2;
 
 function EstimatorPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const defaultDefaultEstimate: number = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
-	const defaultParent: string = searchParams.get('parent') || '';
+	let defaultDefaultEstimate: number = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
 	const [data, setData] = useState<TicketProps[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
 	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
-	const [parent, setParent] = useState<string>(defaultParent);
+	const [parent, setParent] = useState<string>(searchParams.get('parent') || '');
 	const [fudgeFactor, setFudgeFactor] = useState<number>(parseFloat(searchParams.get('fudgeFactor') || '0'));
 	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
 	const [group, setGroup] = useState<string>(searchParams.get('group') || '');
-	const user_param = searchParams.get('users') || '';
+	let user_param = searchParams.get('users') || '';
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(',')));
 	const hasFetchedUser = useRef(false);
 	const hasFetchedTickets = useRef('');
+	const freezeParams = useRef(false);
+
+
+	const loadParams = () => {
+		defaultDefaultEstimate = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
+		setDefaultEstimate(defaultDefaultEstimate);
+		setSearch(searchParams.get('search') || '');
+		setParent(searchParams.get('parent') || '');
+		setFudgeFactor(parseFloat(searchParams.get('fudgeFactor') || '0'));
+		setGroup(searchParams.get('group') || '');
+		user_param = searchParams.get('users') || '';
+		setUsers(new Set(user_param.split(',')));
+		setSearchParams(searchParams);
+	};
+
+	useEffect(() => {
+		freezeParams.current = true;
+		loadParams();
+		setTimeout(function() {
+			freezeParams.current = false;
+		});
+	}, [searchParams]);
 
 	var getFunc = function() {
 		var jira_search = '';
@@ -61,6 +82,9 @@ function EstimatorPage() {
 		}
 	}, [search, parent]);
 	useEffect(() => {
+		if (freezeParams.current) {
+			return;
+		}
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (defaultEstimate != defaultDefaultDefaultEstimate) {
 			newSearchParams.set('defaultEstimate', defaultEstimate + '');

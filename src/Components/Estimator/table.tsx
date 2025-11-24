@@ -87,11 +87,11 @@ const EstimatorTable: React.FC<{
 					return null
 				}
 			},
-			flex: 1,
+			flex: 2,
 			minWidth: 125,
 		},
-		{ field: 'assignee', headerName: 'assignee' },
-		{ field: 'creator', headerName: 'creator' },
+		{ field: 'assignee', headerName: 'assignee', flex: 1 },
+		{ field: 'creator', headerName: 'creator', flex: 1 },
 		{ field: 'status', headerName: 'status' },
 		{
 			field: 'summary',

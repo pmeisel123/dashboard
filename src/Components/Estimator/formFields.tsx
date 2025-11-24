@@ -1,5 +1,5 @@
 import { TextField, Select, MenuItem, InputLabel, Button, Grid} from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const FormFields: React.FC<{
 	search: string,
@@ -13,6 +13,10 @@ const FormFields: React.FC<{
 }> = ({search, setSearch, defaultEstimate, setDefaultEstimate, parent, setParent, fudgeFactor, setFudgeFactor}) => {
 	const [localSearch, setLocalSearch] = useState<string>(search);
 	const [localParent, setLocalParent] = useState<string>(parent);
+	useEffect(() => {
+		setLocalSearch(search);
+		setLocalParent(parent);
+	}, [search, parent]);
 	var values = [...Array(11).keys()];
 	var fudgeSteps =  [...Array(16).keys()];
 	fudgeSteps = fudgeSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 20));

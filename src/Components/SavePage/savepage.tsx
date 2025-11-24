@@ -75,7 +75,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList: React.FC<{width:number}> = ({  width }) => {
+export const SavePageList: React.FC<{width:number; dispatch: Function}> = ({  width }) => {
 	const navigate = useNavigate();
 	const handleClick = (url: string) => {
 		navigate(url, { replace: true });
@@ -121,7 +121,6 @@ export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 				{Object.keys(savedViews).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((name: string) => {
 					let url = savedViews[name];
 					return (
-					<>
 						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} >
 							<ListItemButton title={name} component={MuiLink}  sx={{width: width, flex: 'unset',  whiteSpace: 'nowrap', overflow: 'hidden'}} >
 								<ListItemText primary={name} />
@@ -130,7 +129,6 @@ export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 								<ListItemIcon sx={{minWidth: 24}} ><Delete /></ListItemIcon>
 							</ListItemButton>
 						</ListItem>
-					</>
 					)
 				})}
 			</List>

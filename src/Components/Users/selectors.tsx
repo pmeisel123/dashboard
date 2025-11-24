@@ -164,7 +164,7 @@ export const UserSelector: React.FC<{
 			{
 				(group) &&
 				<>
-					<InputLabel id="user">User</InputLabel> 
+					<InputLabel id="user">User</InputLabel>
 					<Select
 						label="user"
 						value={user}

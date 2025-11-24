@@ -5,6 +5,7 @@ import EstimatorPage from '@src/Pages/Estimator';
 import WhoIsOutPage from '@src/Pages/WhoIsOut';
 import HolidayPage from '@src/Pages/Holiday';
 import MyTicketsPage from '@src/Pages/MyTickets';
+import RecentTicketsPage from '@src/Pages/RecentTickets';
 import {TopNav} from '@src/Components/TopNav';
 import {SideBar} from '@src/Components/SideBar';
 import { useState, useEffect } from 'react';
@@ -26,6 +27,10 @@ const router = createBrowserRouter([{
 		{
 			path: '/MyTickets',
 			element: <MyTicketsPage />,
+		},
+		{
+			path: '/RecentTickets',
+			element: <RecentTicketsPage />,
 		},
 		{
 			path: '/holidays',

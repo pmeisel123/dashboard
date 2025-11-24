@@ -33,6 +33,11 @@ const SideBar: React.FC<SidebarProps> = ({ open, width }) => {
 					</ListItemButton>
 				</ListItem>
 				<ListItem disablePadding>
+					<ListItemButton component={Link} to="/RecentTickets">
+						<ListItemText primary="Recent Tickets" />
+					</ListItemButton>
+				</ListItem>
+				<ListItem disablePadding>
 					<ListItemButton component={Link} to="/holidays">
 						<ListItemText primary="Holidays" />
 					</ListItemButton>

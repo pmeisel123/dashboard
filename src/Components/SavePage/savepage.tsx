@@ -50,7 +50,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 
 	return (
 		<div>
-			<Button color="inherit" onClick={handleOpen}>Save Page</Button>
+			<Button color="inherit" onClick={handleOpen}  title="Give the current page, with parameters, a name and add it to the left side nav">Save Page</Button>
 			<Modal
 				open={open}
 				onClose={handleClose}
@@ -116,16 +116,20 @@ export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 	}
 	return (
 		<>
-			Saved Views:
+			<Box sx={{padding: 1}}>Saved Views:</Box>
 			<List sx={{width: width}}>
 				{Object.keys(savedViews).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((name: string) => {
 					let url = savedViews[name];
 					return (
 						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} >
-							<ListItemButton title={name} component={MuiLink}  sx={{width: width, flex: 'unset',  whiteSpace: 'nowrap', overflow: 'hidden'}} >
-								<ListItemText primary={name} />
+							<ListItemButton title={name} component={MuiLink} sx={{width: width - 10, paddingRight: 0}}>
+								<ListItemText>
+									<Box  sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}} >
+										{name}
+									</Box>
+								</ListItemText>
 							</ListItemButton>
-							<ListItemButton title={'delete'} component={MuiLink}  sx={{minWidth: 24, padding: '10px 4px 10px 0'}}  onClick={() => deleteSave(name)}>
+							<ListItemButton title={'Delete'} component={MuiLink}  sx={{minWidth: 24, padding: '10px 4px'}}  onClick={() => deleteSave(name)}>
 								<ListItemIcon sx={{minWidth: 24}} ><Delete /></ListItemIcon>
 							</ListItemButton>
 						</ListItem>

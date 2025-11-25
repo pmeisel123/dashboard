@@ -9,9 +9,11 @@ import {SavePageModal} from '@src/Components';
 
 interface TopNavBarProps {
 	toggleLeftNav: () => void; // Function to open/close Left Nav
+	toggleHideTitle: () => void; // Function to hide/show Title on pages
+	hideTitle: boolean;
 }
 
-const TopNavBar: React.FC<TopNavBarProps> = ({ toggleLeftNav }) => {
+const TopNavBar: React.FC<TopNavBarProps> = ({ toggleLeftNav, toggleHideTitle, hideTitle }) => {
   return (
 <>
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
@@ -29,6 +31,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({ toggleLeftNav }) => {
           Dashboard
         </Typography>
         <SavePageModal />
+        <Button color="inherit" onClick={toggleHideTitle} title="Hide/Show the Page Titles and Description on every page">{hideTitle ? 'Show' : 'Hide'} Page Titles</Button>
         <Button color="inherit" component={Link} to="/">Home</Button>
       </Toolbar>
     </AppBar>

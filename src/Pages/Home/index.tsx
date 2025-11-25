@@ -15,7 +15,7 @@ function HomePage() {
 					</ListItem>
 				))
 			}
-			<SavePageList width={500}/>
+			<SavePageList width={500} />
 		</Box>
 	)
 }

@@ -3,7 +3,7 @@ import {getUsersAndGroupsApi} from '@src/Api'
 import type {UsersGroupProps} from '@src/Api'
 import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
 import {Table, TableBody, TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel, FormGroup} from '@mui/material';
-import {EstimatorCell} from '@src/Components/Estimator';
+import {EstimatorCell} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
 
 interface cellData {

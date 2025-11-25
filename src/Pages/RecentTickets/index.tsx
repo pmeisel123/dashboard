@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {getTicketsApi, getJiraDayString} from '@src/Api'
 import type {TicketProps} from '@src/Api'
-import {EstimatorTable} from '@src/Components/Estimator';
+import {TicketTable} from '@src/Components';
 import { Select, MenuItem, InputLabel, Grid, TextField, Button} from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
@@ -93,7 +93,7 @@ function RecentTicketsPage() {
 				</Grid>
 			</Grid>
 			{
-				<EstimatorTable
+				<TicketTable
 					data={data}
 					defaultEstimate={null}
 					loading={loading}

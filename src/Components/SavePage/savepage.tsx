@@ -75,7 +75,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList: React.FC<{width:number; dispatch: Function}> = ({  width }) => {
+export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 	const navigate = useNavigate();
 	const handleClick = (url: string) => {
 		navigate(url, { replace: true });

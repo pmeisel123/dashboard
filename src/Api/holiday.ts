@@ -1,6 +1,14 @@
 import holidays from 'date-holidays';
 
 
+export const getHolidays = ((year: string) => {
+	const hd = new holidays('US'); // For United States
+	const usHolidays = hd.getHolidays(year).filter(holiday => {
+		return(holiday.type === 'public' || holiday.type === 'bank');
+	});
+	return usHolidays;
+});
+
 export const getHolidayDayString = ((dateObj:Date) => {
 	let month: (string | number)	= dateObj.getUTCMonth() + 1; // months from 1-12
 	let day: (string | number)	= dateObj.getUTCDate();
@@ -59,12 +67,4 @@ export const getDateString = ((dateObj: Date) => {
 });
 export const getDateStringWithDayOfWeek = ((dateObj: Date) => {
 	return dateObj.toLocaleDateString('en-US', { weekday: 'long' }) + ' ' + getDateString(dateObj);
-});
-
-export const getHolidays = ((year: string) => {
-	const hd = new holidays('US'); // For United States
-	const usHolidays = hd.getHolidays(year).filter(holiday => {
-		return(holiday.type === 'public' || holiday.type === 'bank');
-	});
-	return usHolidays;
 });

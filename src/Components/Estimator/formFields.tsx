@@ -8,9 +8,9 @@ const FormFields: React.FC<{
 	setDefaultEstimate: React.Dispatch<React.SetStateAction<number>>
 	parent: string,
 	setParent: React.Dispatch<React.SetStateAction<string>>,
-	fudgeFactor: number,
-	setFudgeFactor: React.Dispatch<React.SetStateAction<number>>,
-}> = ({search, setSearch, defaultEstimate, setDefaultEstimate, parent, setParent, fudgeFactor, setFudgeFactor}) => {
+	estimatePadding: number,
+	setEstimatePadding: React.Dispatch<React.SetStateAction<number>>,
+}> = ({search, setSearch, defaultEstimate, setDefaultEstimate, parent, setParent, estimatePadding, setEstimatePadding}) => {
 	const [localSearch, setLocalSearch] = useState<string>(search);
 	const [localParent, setLocalParent] = useState<string>(parent);
 	useEffect(() => {
@@ -18,8 +18,8 @@ const FormFields: React.FC<{
 		setLocalParent(parent);
 	}, [search, parent]);
 	var values = [...Array(11).keys()];
-	var fudgeSteps =  [...Array(16).keys()];
-	fudgeSteps = fudgeSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 20));
+	var estimateSteps =  [...Array(16).keys()];
+	estimateSteps = estimateSteps.concat(Array.from({ length: 9 }, (_, index) => (5 * index) + 20));
 	return (<>
 		<Grid container spacing={2}>
 			<Grid size={{ xs: 12, md: 3 }}>
@@ -81,16 +81,16 @@ const FormFields: React.FC<{
 				</Select>
 			</Grid>
 			<Grid size={{ xs: 12, md: 3 }}>
-				<InputLabel id="fudgeFactor">Fudge Factor</InputLabel>
+				<InputLabel id="estimatePadding">Estimate Padding</InputLabel>
 				<Select
-					labelId="fudgeFactor"
-					value={fudgeFactor + ''}
+					labelId="estimatePadding"
+					value={estimatePadding + ''}
 					onChange={(event) => {
-						setFudgeFactor(parseFloat(event.target.value));
+						setEstimatePadding(parseFloat(event.target.value));
 					}}
 					inputProps={{ 'aria-label': 'Number dropdown' }}
 				>
-					{fudgeSteps.map((value) => (
+					{estimateSteps.map((value) => (
 						<MenuItem key={value} value={value}>
 							{value}
 						</MenuItem>

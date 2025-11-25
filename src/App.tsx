@@ -1,46 +1,15 @@
 import './App.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import HomePage from './Pages/Home';
-import EstimatorPage from '@src/Pages/Estimator';
-import WhoIsOutPage from '@src/Pages/WhoIsOut';
-import HolidayPage from '@src/Pages/Holiday';
-import MyTicketsPage from '@src/Pages/MyTickets';
-import RecentTicketsPage from '@src/Pages/RecentTickets';
-import {TopNav} from '@src/Components/TopNav';
-import {SideBar} from '@src/Components/SideBar';
+import {TopNav, LeftNav} from '@src/Components';
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { pages } from '@src/Pages/const';
 
 const router = createBrowserRouter([{
 	path: '/',
 	element: <Main />,
-	children: [
-		{
-			path: '/',
-			element: <HomePage />,
-		},
-		{
-			path: '/Estimator',
-			element: <EstimatorPage />,
-		},
-		{
-			path: '/MyTickets',
-			element: <MyTicketsPage />,
-		},
-		{
-			path: '/RecentTickets',
-			element: <RecentTicketsPage />,
-		},
-		{
-			path: '/holidays',
-			element: <HolidayPage />,
-		},
-		{
-			path: '/whoisout',
-			element: <WhoIsOutPage />,
-		},
-	]
+	children: pages
 }]);
 
 const defaultLeftWidth = 150;
@@ -62,7 +31,7 @@ function Main() {
 	return (
 		<>
 			<TopNav toggleDrawer={toggleLeftNav}></TopNav>
-			<SideBar open={leftNavOpen} width={sideWidth}></SideBar>
+			<LeftNav open={leftNavOpen} width={sideWidth}></LeftNav>
 			<Box sx={{
 				paddingLeft: sideWidth + 'px', 
 				transition: 'padding-left 0.1s'

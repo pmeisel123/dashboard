@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
 import type {TicketProps, UsersGroupProps} from '@src/Api'
-import {EstimatorTable, FormFields, Calendar} from '@src/Components/Estimator';
-import {UsersSelector} from '@src/Components/Users';
+import {TicketTable, FormFields, Calendar, UsersSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
 
 
@@ -16,7 +15,7 @@ function EstimatorPage() {
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
 	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
 	const [parent, setParent] = useState<string>(searchParams.get('parent') || '');
-	const [fudgeFactor, setFudgeFactor] = useState<number>(parseFloat(searchParams.get('fudgeFactor') || '0'));
+	const [estimatePadding, setEstimatePadding] = useState<number>(parseFloat(searchParams.get('estimatePadding') || '0'));
 	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
 	const [group, setGroup] = useState<string>(searchParams.get('group') || '');
 	let user_param = searchParams.get('users') || '';
@@ -31,7 +30,7 @@ function EstimatorPage() {
 		setDefaultEstimate(defaultDefaultEstimate);
 		setSearch(searchParams.get('search') || '');
 		setParent(searchParams.get('parent') || '');
-		setFudgeFactor(parseFloat(searchParams.get('fudgeFactor') || '0'));
+		setEstimatePadding(parseFloat(searchParams.get('estimatePadding') || '0'));
 		setGroup(searchParams.get('group') || '');
 		user_param = searchParams.get('users') || '';
 		setUsers(new Set(user_param.split(',')));
@@ -101,10 +100,10 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('parent');
 		}
-		if (fudgeFactor != 0) {
-			newSearchParams.set('fudgeFactor', fudgeFactor + '');
+		if (estimatePadding != 0) {
+			newSearchParams.set('estimatePadding', estimatePadding + '');
 		} else {
-			newSearchParams.delete('fudgeFactor');
+			newSearchParams.delete('estimatePadding');
 		}
 		if (group != '') {
 			newSearchParams.set('group', group);
@@ -118,10 +117,10 @@ function EstimatorPage() {
 			newSearchParams.delete('users');
 		}
 		setSearchParams(newSearchParams);
-	}, [search, defaultEstimate, parent, fudgeFactor, group, users]);
+	}, [search, defaultEstimate, parent, estimatePadding, group, users]);
 
-	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + fudgeFactor;
-	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + fudgeFactor;
+	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding;
+	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding;
 	let totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
@@ -132,8 +131,8 @@ function EstimatorPage() {
 				setParent={setParent}
 				defaultEstimate={defaultEstimate}
 				setDefaultEstimate={setDefaultEstimate}
-				fudgeFactor={fudgeFactor}
-				setFudgeFactor={setFudgeFactor}
+				estimatePadding={estimatePadding}
+				setEstimatePadding={setEstimatePadding}
 			/>
 			<UsersSelector
 				possibleUsersGroups={possibleUsersGroups}
@@ -144,7 +143,7 @@ function EstimatorPage() {
 			/>
 			{
 				(search || parent) &&
-				<EstimatorTable
+				<TicketTable
 					data={data}
 					defaultEstimate={defaultEstimate}
 					loading={loading}

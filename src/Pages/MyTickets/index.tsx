@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
 import type {TicketProps, UsersGroupProps} from '@src/Api'
-import {EstimatorTable} from '@src/Components/Estimator';
-import {UserSelector} from '@src/Components/Users';
+import {TicketTable, UserSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
 
 declare const __DONE_STATUS__: string[];
@@ -82,7 +81,7 @@ function MyTicketsPage() {
 			/>
 			{
 				(user) &&
-				<EstimatorTable
+				<TicketTable
 					data={data}
 					defaultEstimate={null}
 					loading={loading}

@@ -55,7 +55,7 @@ const HolidayPage = (() => {
 					<TableBody>
 						{
 							usHolidays.map((holiday) =>
-								<DateRow date={holiday.date}>
+								<DateRow date={holiday.date} key={holiday.name}>
 									<TableCell>{holiday.name}</TableCell>
 									<TableCell>{getDateStringWithDayOfWeek(new Date(holiday.date))}</TableCell>
 								</DateRow>

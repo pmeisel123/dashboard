@@ -21,6 +21,7 @@ const Calendar: React.FC<{
 		return (<></>);
 	}
 	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 	// Get holidays for a specific year
 	const usHolidays = getHolidays(today.getFullYear().toString()).filter(holiday => {

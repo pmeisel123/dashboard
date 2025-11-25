@@ -15,7 +15,6 @@ interface CustomFooterProps {
 	totalTimeSpent: number | null;
 }
 
-
 const RenderEstimate: React.FC<{value: number | null, defaultEstimate: number | null}> = ({value, defaultEstimate}) => {
 	if (value != null) {
 		return <>{value}</>; 
@@ -45,7 +44,7 @@ function CustomFooterStatusComponent(props: CustomFooterProps) {
 	);
 }
 
-const EstimatorTable: React.FC<{
+const TicketTable: React.FC<{
 	data: TicketProps[],
 	defaultEstimate: number | null,
 	loading: boolean,
@@ -159,14 +158,6 @@ const EstimatorTable: React.FC<{
 						noRowsVariant: 'skeleton',
 					},
 				}}
-				initialState={{
-					pagination: {
-						paginationModel: {
-							pageSize: 100,
-						},
-					},
-				}}
-				pageSizeOptions={[5]}
 				checkboxSelection={false}
 				disableRowSelectionOnClick
 				autosizeOnMount
@@ -178,4 +169,4 @@ const EstimatorTable: React.FC<{
 		</Box>
 	);
 }
-export default EstimatorTable;
+export default TicketTable;

@@ -16,11 +16,13 @@
     "@mui/material": "^7.3.5",
     "@mui/styled-engine-sc": "^7.3.5",
     "@mui/x-data-grid": "^8.17.0",
+    "@reduxjs/toolkit": "^2.11.0",
     "date-fns": "^4.1.0",
     "date-holidays": "^3.26.5",
     "mui": "^0.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.9.5",
     "styled-components": "^6.1.19"
   },

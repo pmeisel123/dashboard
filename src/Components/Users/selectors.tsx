@@ -133,10 +133,38 @@ export const UserSelector: React.FC<{
 	setUser: React.Dispatch<React.SetStateAction<string>>,
 }> = ({possibleUsersGroups, group, setGroup, user, setUser}) => {
 	if (!Object.values(possibleUsersGroups.users).length) {
-		return;
+		return (
+			<Grid container spacing={2} sx={{paddingBottom: 1}}>
+				<Grid>
+					<InputLabel id="UserGroup">Group</InputLabel> 
+					<Select
+						label="Group"
+						value=""
+						sx={{minWidth: 200}}
+					>
+						<MenuItem key="" value=""></MenuItem>
+					</Select>
+				</Grid>
+				<Grid>
+				{
+					(group) &&
+					<>
+						<InputLabel id="user">User</InputLabel>
+						<Select
+							label="user"
+							value={user}
+							sx={{minWidth: 200}}
+						>
+							<MenuItem key="" value=""></MenuItem>
+						</Select>
+					</>
+				}
+				</Grid>
+			</Grid>
+		)
 	}
 	return (
-		<Grid container spacing={2}>
+		<Grid container spacing={2} sx={{paddingBottom: 1}}>
 			<Grid>
 				<InputLabel id="UserGroup">Group</InputLabel> 
 				<Select
@@ -148,7 +176,7 @@ export const UserSelector: React.FC<{
 							setUser('');
 						}
 					}}
-					sx={{minWidth: 100}}
+					sx={{minWidth: 200}}
 				>
 					<MenuItem key={allGroups} value={allGroups}>
 						All
@@ -171,7 +199,7 @@ export const UserSelector: React.FC<{
 						onChange={(event) => {
 							setUser(event.target.value);
 						}}
-						sx={{minWidth: 100}}
+						sx={{minWidth: 200}}
 					>
 						{Object.keys(possibleUsersGroups.users).filter(user_id => UserHasGroup(possibleUsersGroups, user_id, group)).map((user_id: string) => (
 							<MenuItem key={user_id} value={user_id}>

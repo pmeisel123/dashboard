@@ -25,7 +25,7 @@ export const pages = [
 	},
 	{
 		path: '/MyTickets',
-		name: 'MyTickets',
+		name: 'My Tickets',
 		element: <MyTicketsPage />,
 		description: (
 			<>

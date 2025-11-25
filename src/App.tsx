@@ -49,7 +49,6 @@ function Main() {
 			setName('');
 		}
 		document.title = title;
-		console.log(route);
 	}, [location]);
 
 	return (

@@ -10,10 +10,19 @@ const HolidayPage = (() => {
 	const this_year = (new Date().getFullYear() + '');
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [year, setYear] = useState<string>(searchParams.get('year') || this_year);
-	const year_as_int = parseInt(year);
+	const year_as_int = parseInt(this_year);
+
+	
+	const loadParams = () => {
+		setYear(searchParams.get('year') || this_year)
+	};
+
+	useEffect(() => {
+		loadParams();
+	}, [searchParams]);
 
 	let years_choices: string[] = [];
-	for(let val = year_as_int - 10; val <= year_as_int + 10; val++) {
+	for(let val = year_as_int - 1; val <= year_as_int + 10; val++) {
 		years_choices.push(val + '');
 	}
 

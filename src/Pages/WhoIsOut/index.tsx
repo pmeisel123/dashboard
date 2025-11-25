@@ -19,8 +19,17 @@ function WhoIsOutPage() {
 	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
 	let param_groups = searchParams.get('groups');
 	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
-
 	const hasFetchedUser = useRef(false);
+
+	const loadParams = () => {
+		param_groups = searchParams.get('groups');
+		setGroups(param_groups ? param_groups.split(/,/g) : []);
+	};
+
+	useEffect(() => {
+		loadParams();
+	}, [searchParams]);
+
 	var getUsers = function() {
 		getUsersAndGroupsApi().then((data: UsersGroupProps) => {
 			setPossibleUsersGroups(data);

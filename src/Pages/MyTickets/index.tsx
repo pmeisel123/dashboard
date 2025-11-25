@@ -18,6 +18,15 @@ function MyTicketsPage() {
 	const hasFetchedUser = useRef(false);
 	const hasFetchedTickets = useRef('');
 
+	const loadParams = () => {
+		setGroup(searchParams.get('group') || window.localStorage.getItem('group') || '');
+		setUser(searchParams.get('user') || window.localStorage.getItem('user') || '');
+	};
+
+	useEffect(() => {
+		loadParams();
+	}, [searchParams]);
+
 	var getFunc = function() {
 		if (!user) {
 			setData([])

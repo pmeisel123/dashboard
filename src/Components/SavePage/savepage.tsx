@@ -122,7 +122,7 @@ export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 					let url = savedViews[name];
 					return (
 						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} >
-							<ListItemButton title={name} component={MuiLink} sx={{width: width - 10, paddingRight: 0}}>
+							<ListItemButton title={name} component={MuiLink} sx={{width: width - 30, paddingRight: 0}}>
 								<ListItemText>
 									<Box  sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}} >
 										{name}

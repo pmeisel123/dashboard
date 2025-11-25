@@ -139,10 +139,11 @@ export const UserSelector: React.FC<{
 					<InputLabel id="UserGroup">Group</InputLabel> 
 					<Select
 						label="Group"
-						value=""
+						value='x'
 						sx={{minWidth: 200}}
+						disabled
 					>
-						<MenuItem key="" value=""></MenuItem>
+						<MenuItem key='x' value='x'>Loading...</MenuItem>
 					</Select>
 				</Grid>
 				<Grid>
@@ -152,10 +153,11 @@ export const UserSelector: React.FC<{
 						<InputLabel id="user">User</InputLabel>
 						<Select
 							label="user"
-							value={user}
+							value="x"
 							sx={{minWidth: 200}}
+							disabled
 						>
-							<MenuItem key="" value=""></MenuItem>
+							<MenuItem key="" value="x">Loading...</MenuItem>
 						</Select>
 					</>
 				}

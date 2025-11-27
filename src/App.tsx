@@ -20,13 +20,14 @@ function Main() {
 	const [sideWidth, setSideWidth] = useState<number>(defaultLeftWidth);
 	const [currentDescription, setCurrentDescription] = useState<JSX.Element>();
 	const [currentName, setName] = useState<String>();
-	const [hideTitle, setHideTitle] = useState<boolean>(false);
+	const [hideTitle, setHideTitle] = useState<boolean>( window.localStorage.getItem('hideTitle') == 'true' );
 	const location = useLocation();
 
 	const toggleLeftNav = () => {
 		setLeftNavOpen(!leftNavOpen);
 	};
 	const toggleHideTitle = () => {
+		window.localStorage.setItem('hideTitle', (!hideTitle).toString());
 		setHideTitle(!hideTitle);
 	};
 	useEffect(() => {

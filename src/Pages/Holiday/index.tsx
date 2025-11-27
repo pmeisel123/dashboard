@@ -4,7 +4,7 @@ import { Select, MenuItem, InputLabel} from '@mui/material';
 import {getHolidays, getDateStringWithDayOfWeek} from '@src/Api';
 import {Table, TableBody, TableCell,  TableContainer, TableHead, TableRow, Paper} from '@mui/material';
 import {DateRow} from './const';
-
+import { formatDistanceToNow } from 'date-fns';
 
 const HolidayPage = (() => {
 	const this_year = (new Date().getFullYear() + '');
@@ -12,7 +12,7 @@ const HolidayPage = (() => {
 	const [year, setYear] = useState<string>(searchParams.get('year') || this_year);
 	const year_as_int = parseInt(this_year);
 
-	
+	const today = new Date();
 	const loadParams = () => {
 		setYear(searchParams.get('year') || this_year)
 	};
@@ -25,6 +25,19 @@ const HolidayPage = (() => {
 	for(let val = year_as_int - 1; val <= year_as_int + 10; val++) {
 		years_choices.push(val + '');
 	}
+
+	const getDate = ((date_string: string) => {
+		console.log(date_string, today.getTime());
+		let date = new Date(date_string);
+		const hours = today.getHours();
+		const minutes = today.getMinutes();
+		const seconds = today.getSeconds();
+		date.setHours(hours);
+		date.setMinutes(minutes);
+		date.setSeconds(seconds);
+
+		return date;
+	});
 
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -59,6 +72,7 @@ const HolidayPage = (() => {
 						<TableRow>
 							<TableCell>Name</TableCell>
 							<TableCell>Date</TableCell>
+							<TableCell>When</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -66,7 +80,8 @@ const HolidayPage = (() => {
 							usHolidays.map((holiday) =>
 								<DateRow date={holiday.date} key={holiday.name}>
 									<TableCell>{holiday.name}</TableCell>
-									<TableCell>{getDateStringWithDayOfWeek(new Date(holiday.date))}</TableCell>
+									<TableCell>{getDateStringWithDayOfWeek(getDate(holiday.date))}</TableCell>
+									<TableCell>{formatDistanceToNow(getDate(holiday.date), { addSuffix: true })}</TableCell>
 								</DateRow>
 							)
 						}

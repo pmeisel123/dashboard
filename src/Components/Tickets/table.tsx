@@ -68,7 +68,7 @@ const TicketTable: React.FC<{
 			minWidth: 80
 		},
 		{
-			field: 'parentname',
+			field: 'parentkey',
 			headerName: 'parent',
 			renderCell: (params: GridRenderCellParams<TicketProps>) => {
 				if (params.value) {
@@ -78,7 +78,7 @@ const TicketTable: React.FC<{
 								{params.row.parentkey}
 							</Link>: &#x200b;
 							<Link href={API_URL + '/browse/' + params.row.parentkey as string} target="_blank" rel="noopener noreferrer">
-								{params.value}
+								{params.row.parentname}
 							</Link>
 						</>
 					);

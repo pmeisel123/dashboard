@@ -1,4 +1,3 @@
-import {getHolidayDayString} from './holiday';
 import {getVacationApi} from './vacations';
 
 declare const __VACATION_KEY__: string;
@@ -104,8 +103,8 @@ export const getUsersAndGroupsApi = async() =>  {
 			last = true;
 		}
 	}
-	return ({
+	return {
 		groups: groups,
 		users: results,
-	});
+	};
 }

@@ -12,13 +12,13 @@ export const EstimatorCell = styled(
 	)<EstimatorCellProps>(({ isOff , isDone, isPartial, theme }) => ({
 	border: '1px solid',
 	verticalAlign: 'top',
-	...(isDone && {
-		 backgroundColor: theme.palette.success.light,
-	}),
-	...(isOff && {
+	...(!isDone && isOff && {
 		 backgroundColor: theme.palette.grey.A400,
 	}),
-	...(isPartial && {
+	...(!isDone && isPartial && {
 		 backgroundColor: theme.palette.grey[300],
+	}),
+	...(isDone && {
+		 backgroundColor: theme.palette.success.light,
 	}),
 }));

@@ -3,7 +3,7 @@ import {Box, Button, InputLabel, TextField, List, ListItem, ListItemButton, List
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import MuiLink from '@mui/material/Link';
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Delete from '@mui/icons-material/Delete';
 
 // Define the style for the modal content
@@ -75,10 +75,11 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList: React.FC<{width?:number}> = ({  width }) => {
-	const navigate = useNavigate();
-	const handleClick = (url: string) => {
-		navigate(url, { replace: true });
+export const SavePageList: React.FC<{width?:number, parentHandleClick?: Function}> = ({ width, parentHandleClick }) => {
+	const handleClick = () => {
+		if (parentHandleClick) {
+			parentHandleClick();
+		}
 	};
 	const [savedViews, setSaveViews] = useState<{[key: string]: string}>({});
 	useEffect(() => {
@@ -127,8 +128,8 @@ export const SavePageList: React.FC<{width?:number}> = ({  width }) => {
 				{Object.keys(savedViews).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((name: string) => {
 					let url = savedViews[name];
 					return (
-						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} sx={{maxWidth: 532}}>
-							<ListItemButton title={name} component={MuiLink} sx={{width: new_width, maxWidth: 500, paddingRight: 0}}>
+						<ListItem disablePadding key={name + ' ' + url} sx={{maxWidth: 532}}>
+							<ListItemButton title={name} component={Link} to={url} onClick={() => handleClick()} sx={{width: new_width, maxWidth: 500, paddingRight: 0}}>
 								<ListItemText>
 									<Box  sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}} >
 										{name}

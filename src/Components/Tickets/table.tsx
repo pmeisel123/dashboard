@@ -1,6 +1,6 @@
 import {Box, Typography, useTheme} from '@mui/material';
 import { DataGrid, GridPagination, GridFooterContainer, useGridApiRef } from '@mui/x-data-grid';
-import type { GridColDef, GridRenderCellParams, GridRowParams, GridSlotsComponentsProps, GridSortModel, GridFilterModel, GridColumnVisibilityModel } from '@mui/x-data-grid';
+import type { GridColDef, GridRenderCellParams, GridRowParams, GridSlotsComponentsProps, GridColumnVisibilityModel } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
 import type {TicketProps, CustomFieldsProps} from '@src/Api'
 import { formatDistanceToNow } from 'date-fns';

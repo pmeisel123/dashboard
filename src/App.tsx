@@ -83,7 +83,7 @@ function Main() {
 	return (
 		<>
 			<TopNav toggleLeftNav={toggleLeftNav} toggleHideTitle={toggleHideTitle} hideTitle={hideTitle}></TopNav>
-			<LeftNav open={leftNavOpen} width={sideWidth}></LeftNav>
+			<LeftNav open={leftNavOpen} setLeftNavOpen={setLeftNavOpen} width={sideWidth}></LeftNav>
 			<Box sx={{
 				paddingLeft: isSmallOrLarger ? (sideWidth + 20) + 'px' : 0, 
 				transition: 'padding-left 0.1s'

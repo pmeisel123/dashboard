@@ -1,7 +1,7 @@
 import {SavePageList} from '@src/Components';
 import { pages } from '@src/Pages/const';
+import { Link } from 'react-router-dom';
 import {Box, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import MuiLink from '@mui/material/Link';
 
 function HomePage() {
 	return (
@@ -9,7 +9,7 @@ function HomePage() {
 			{
 				pages.map((page) => (
 					<ListItem disablePadding key={page.path} >
-						<ListItemButton title={page.name} component={MuiLink} href={page.path}>
+						<ListItemButton title={page.name} component={Link} to={page.path}>
 							<ListItemText primary={page.name} secondary={page.description} />
 						</ListItemButton>
 					</ListItem>

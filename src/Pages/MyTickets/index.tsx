@@ -74,7 +74,9 @@ function MyTicketsPage() {
 			newSearchParams.delete('user');
 		}
 		window.localStorage.setItem('user', user);
-		setSearchParams(newSearchParams);
+		if(searchParams.toString() != newSearchParams.toString()) {
+			setSearchParams(newSearchParams);
+		}
 	}, [group, user]);
 	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
 	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);

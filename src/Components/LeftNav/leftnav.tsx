@@ -1,5 +1,5 @@
 import {Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMediaQuery, useTheme}	 from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {SavePageList} from '@src/Components';
 import { pages } from '@src/Pages/const';
 
@@ -11,8 +11,9 @@ interface LeftNavProps {
 }
 
 const LeftNav: React.FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
+	const location = useLocation();
 	const theme = useTheme();
-	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up('sm'))
+	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up('sm'));
 	const handleClick = () => {
 		if (!isSmallOrLarger) {
 			setLeftNavOpen(false);
@@ -30,7 +31,13 @@ const LeftNav: React.FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 				{
 					pages.map((page) => (
 						<ListItem disablePadding key={page.path} >
-							<ListItemButton title={page.name} component={Link} to={page.path} onClick={() => {handleClick()}}>
+							<ListItemButton
+								title={page.name}
+								component={Link}
+								to={page.path}
+								onClick={() => {handleClick()}}
+								selected={location.pathname == page.path }
+							>
 								<ListItemText primary={page.name} />
 							</ListItemButton>
 						</ListItem>

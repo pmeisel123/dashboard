@@ -43,7 +43,9 @@ function RecentTicketsPage() {
 			} else {
 				newSearchParams.delete('search');
 			}
-			setSearchParams(newSearchParams);
+			if(searchParams.toString() != newSearchParams.toString()) {
+				setSearchParams(newSearchParams);
+			}
 			getFunc();
 		}
 	}, [loading]);

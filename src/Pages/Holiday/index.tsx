@@ -27,7 +27,6 @@ const HolidayPage = (() => {
 	}
 
 	const getDate = ((date_string: string) => {
-		console.log(date_string, today.getTime());
 		let date = new Date(date_string);
 		const hours = today.getHours();
 		const minutes = today.getMinutes();
@@ -46,7 +45,9 @@ const HolidayPage = (() => {
 		} else {
 			newSearchParams.delete('year');
 		}
-		setSearchParams(newSearchParams);
+		if(searchParams.toString() != newSearchParams.toString()) {
+			setSearchParams(newSearchParams);
+		}
 	}, [year]);
 	const usHolidays = getHolidays(year);
 	return (

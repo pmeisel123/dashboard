@@ -37,7 +37,6 @@ function Main() {
 		setHideTitle(!hideTitle);
 	};
 	useEffect(() => {
-		console.log(isSmallOrLarger, leftNavOpen);
 		if (!isSmallOrLarger) {
 			let tmp_width = windowSize.width * .75;
 			if (tmp_width > defaultLeftWidth * 2) {

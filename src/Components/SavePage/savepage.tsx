@@ -3,7 +3,7 @@ import {Box, Button, InputLabel, TextField, List, ListItem, ListItemButton, List
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import MuiLink from '@mui/material/Link';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Delete from '@mui/icons-material/Delete';
 
 // Define the style for the modal content
@@ -76,12 +76,14 @@ export const SavePageModal = (props: BasicModalProps) => {
 }
 
 export const SavePageList: React.FC<{width?:number, parentHandleClick?: Function}> = ({ width, parentHandleClick }) => {
+	const [savedViews, setSaveViews] = useState<{[key: string]: string}>({});
 	const handleClick = () => {
 		if (parentHandleClick) {
 			parentHandleClick();
 		}
 	};
-	const [savedViews, setSaveViews] = useState<{[key: string]: string}>({});
+	const location = useLocation();
+
 	useEffect(() => {
 		const checkSavedViews = () => {
 			const savedViewJson = window.localStorage.getItem('saveViews');
@@ -119,7 +121,7 @@ export const SavePageList: React.FC<{width?:number, parentHandleClick?: Function
 	if (!width) {
 		new_width = "calc(100% - 30px)";
 	} else {
-		new_width = width - 30;
+		new_width = width - 52;
 	}
 	return (
 		<>
@@ -128,16 +130,29 @@ export const SavePageList: React.FC<{width?:number, parentHandleClick?: Function
 				{Object.keys(savedViews).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((name: string) => {
 					let url = savedViews[name];
 					return (
-						<ListItem disablePadding key={name + ' ' + url} sx={{maxWidth: 532}}>
-							<ListItemButton title={name} component={Link} to={url} onClick={() => handleClick()} sx={{width: new_width, maxWidth: 500, paddingRight: 0}}>
+						<ListItem disablePadding key={name + ' ' + url}  sx={{width: width, maxWidth: 532}}>
+							<ListItemButton
+								title={name}
+								component={Link}
+								to={url}
+								onClick={() => handleClick()}
+								sx={{width: new_width, maxWidth: 500, paddingRight: 0}}
+								selected={location.pathname + location.search == url }
+							>
 								<ListItemText>
-									<Box  sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}} >
+									<Box sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}} >
 										{name}
 									</Box>
 								</ListItemText>
 							</ListItemButton>
-							<ListItemButton title={'Delete'} component={MuiLink}  sx={{width: 32, padding: '10px 4px'}}  onClick={() => deleteSave(name)}>
-								<ListItemIcon sx={{width: 24}} ><Delete /></ListItemIcon>
+							<ListItemButton
+								title={'Delete'}
+								component={MuiLink}
+								sx={{width: 20, padding: '12px 4px'}}
+								onClick={() => deleteSave(name)}
+								selected={location.pathname + location.search == url }
+							>
+								<ListItemIcon sx={{minWidth: 0, width: 24, padding: 0}} ><Delete /></ListItemIcon>
 							</ListItemButton>
 						</ListItem>
 					)

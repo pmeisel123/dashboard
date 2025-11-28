@@ -34,7 +34,6 @@ function EstimatorPage() {
 		setGroup(searchParams.get('group') || '');
 		user_param = searchParams.get('users') || '';
 		setUsers(new Set(user_param.split(',')));
-		setSearchParams(searchParams);
 	};
 
 	useEffect(() => {
@@ -110,13 +109,17 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('group');
 		}
-		if (possibleUsersGroups && possibleUsersGroups.users && Object.keys(possibleUsersGroups.users).length)
-		if (users.size) {
-			newSearchParams.set('users', [...users].join(','));
-		} else {
-			newSearchParams.delete('users');
+		if (possibleUsersGroups && possibleUsersGroups.users && Object.keys(possibleUsersGroups.users).length) {
+			if (users.size) {
+				newSearchParams.set('users', [...users].join(','));
+			} else {
+				newSearchParams.delete('users');
+			}
 		}
-		setSearchParams(newSearchParams);
+
+		if(searchParams.toString() != newSearchParams.toString()) {
+			setSearchParams(newSearchParams);
+		}
 	}, [search, defaultEstimate, parent, estimatePadding, group, users]);
 
 	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding;

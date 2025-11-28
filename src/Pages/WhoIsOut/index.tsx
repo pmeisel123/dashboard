@@ -122,7 +122,9 @@ function WhoIsOutPage() {
 		} else {
 			newSearchParams.delete('groups');
 		}
-		setSearchParams(newSearchParams);
+		if(searchParams.toString() != newSearchParams.toString()) {
+			setSearchParams(newSearchParams);
+		}
 	}, [groups]);
 	rows = getRows();
 

@@ -9,7 +9,11 @@ export const pages = [
 		path: '/',
 		name: 'Home',
 		element: <HomePage />,
-		description: (<>Landing Page</>),
+		description: (
+			<>
+				Landing Page
+			</>
+		),
 	},
 	{
 		path: '/Estimator',
@@ -17,9 +21,9 @@ export const pages = [
 		element: <EstimatorPage />,
 		description: (
 			<>
-				Display Jira tickets, user their estimate, and select users to get the approximat date of when they all will be completed<br />
-				Will use upcoming vacation time and holidays in the estimates<br />
-				Useful for project planning
+				Display Jira tickets with their estimates and allow selecting users to calculate the approximate completion date.<br />
+				Include upcoming vacation time and holidays in the estimates.<br />
+				Useful for project planning.<br />
 			</>
 		),
 	},

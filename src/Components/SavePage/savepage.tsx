@@ -75,7 +75,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList: React.FC<{width:number}> = ({  width }) => {
+export const SavePageList: React.FC<{width?:number}> = ({  width }) => {
 	const navigate = useNavigate();
 	const handleClick = (url: string) => {
 		navigate(url, { replace: true });
@@ -114,6 +114,12 @@ export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 	if (!Object.keys(savedViews).length) {
 		return;
 	}
+	let new_width: number | string;;
+	if (!width) {
+		new_width = "calc(100% - 30px)";
+	} else {
+		new_width = width - 30;
+	}
 	return (
 		<>
 			<Box sx={{padding: 1}}>Saved Views:</Box>
@@ -121,16 +127,16 @@ export const SavePageList: React.FC<{width:number}> = ({  width }) => {
 				{Object.keys(savedViews).sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase())).map((name: string) => {
 					let url = savedViews[name];
 					return (
-						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} >
-							<ListItemButton title={name} component={MuiLink} sx={{width: width - 30, paddingRight: 0}}>
+						<ListItem disablePadding key={name + ' ' + url}   onClick={() => handleClick(url)} sx={{maxWidth: 532}}>
+							<ListItemButton title={name} component={MuiLink} sx={{width: new_width, maxWidth: 500, paddingRight: 0}}>
 								<ListItemText>
 									<Box  sx={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}} >
 										{name}
 									</Box>
 								</ListItemText>
 							</ListItemButton>
-							<ListItemButton title={'Delete'} component={MuiLink}  sx={{minWidth: 24, padding: '10px 4px'}}  onClick={() => deleteSave(name)}>
-								<ListItemIcon sx={{minWidth: 24}} ><Delete /></ListItemIcon>
+							<ListItemButton title={'Delete'} component={MuiLink}  sx={{width: 32, padding: '10px 4px'}}  onClick={() => deleteSave(name)}>
+								<ListItemIcon sx={{width: 24}} ><Delete /></ListItemIcon>
 							</ListItemButton>
 						</ListItem>
 					)

@@ -26,7 +26,7 @@ export const getUserGroupApi = async(userId: string) =>  {
 		},
 	};
 	let response = await fetch(url, paramaters)
-	const ajax_result = await response.json();
+	const ajax_result: any = await response.json();
 	if (ajax_result && ajax_result.groups && ajax_result.groups.items) {
 		ajax_result.groups.items.forEach((group: any) => {
 			let name = group.name;
@@ -75,7 +75,7 @@ export const getUsersAndGroupsApi = async() =>  {
 	while(!last) {
 		let url = main_url + '&startAt=' + start_at;
 		let response = await fetch(url, paramaters)
-		const ajax_result = await response.json();
+		const ajax_result: any = await response.json();
 		if (ajax_result.length) {
 			for(const user of ajax_result) {
 			// ajax_result.forEach((user: any) => {

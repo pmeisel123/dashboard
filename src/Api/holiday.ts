@@ -47,12 +47,6 @@ export const getJiraDayString = ((dateObj:Date) => {
 	if (month < 10) {
 		month = '0' + month;
 	}
-	if (month == "NaN") {
-		alert(Date);
-	}
-	if(year + "-" + month + "-" + day + " 00:00:00" == "NaN/NaN/NaN"){
-		alert(dateObj);
-	}
 	return year + "-" + month + "-" + day;
 });
 

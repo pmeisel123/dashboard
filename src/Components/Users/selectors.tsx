@@ -1,7 +1,8 @@
+37
 import type {UsersGroupProps, UserProps} from '@src/Api';
 import { Select, MenuItem, InputLabel, FormControl, Grid} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import type { GridColDef, GridRenderCellParams, GridFilterOperator} from '@mui/x-data-grid';
+import type { GridFilterItem, GridColDef, GridRenderCellParams, GridFilterOperator} from '@mui/x-data-grid';
 import {getDayString} from '@src/Api';
 import React from 'react';
 
@@ -34,13 +35,11 @@ export const UsersSelector: React.FC<{
 	const customOperator: GridFilterOperator<any, number, string> = {
 		label: 'has',
 		value: 'Contains', // A unique value for the operator
-		getApplyFilterFn: () => {
-			return (value: string[]): boolean => {
-				if (!group) {
-					return true;
-				}
-				return value.includes( group );
-			};
+		getApplyFilterFn: (filterItem: GridFilterItem, __column: GridColDef) => {
+			if (!group) {
+				return true;
+			}
+			return filterItem.value.includes( group );
 		},
 		InputComponent: () => {
 			return (

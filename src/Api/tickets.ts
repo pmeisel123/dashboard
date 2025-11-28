@@ -1,9 +1,11 @@
-
+import * as MuiIcons from '@mui/icons-material';
 declare const __DONE_STATUS__: string[];
 
 export interface CustomFieldsProps {
 	Name: string,
 	Type: 'Text' | 'Link'
+	LinkText?: string
+	LinkIcon?: keyof typeof MuiIcons
 }
 
 declare const __CUSTOM_FIELDS__: {[key: string]: CustomFieldsProps};
@@ -120,7 +122,7 @@ export const getTicketsApi = async(search: string ) =>  {
 	};
 	while(!last) {
 		let response = await fetch(url, paramaters)
-		const ajax_result = await response.json();
+		const ajax_result: any = await response.json();
 		if (ajax_result.issues) {
 			ajax_result.issues.forEach(function(issue: any) {
 				let ticket = ticketFromIssue(issue);

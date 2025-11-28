@@ -1,4 +1,4 @@
-import {Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar}	from '@mui/material';
+import {Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMediaQuery, useTheme}	 from '@mui/material';
 import { Link } from 'react-router-dom'; // From react-router-dom
 import {SavePageList} from '@src/Components';
 import { pages } from '@src/Pages/const';
@@ -9,15 +9,16 @@ interface LeftNavProps {
 }
 
 const LeftNav: React.FC<LeftNavProps> = ({ open, width }) => {
+	const theme = useTheme();
+	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up('sm'))
 	return (
 		<Drawer
 			anchor="left"
 			open={open}
-			variant="persistent"
+			variant={isSmallOrLarger ? 'persistent' : 'temporary'}
 			sx={{width: width}}
 		>
 			<Toolbar />
-			
 			<List sx={{width: width}}>
 				{
 					pages.map((page) => (

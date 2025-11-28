@@ -34,7 +34,6 @@ export default defineConfig({
 			],
 			allow: [
 				'src',
-				'src/**',
 				'node_modules',
 				'index.html',
 			]

@@ -4,7 +4,7 @@ import { matchRoutes } from "react-router";
 import {TopNav, LeftNav} from '@src/Components';
 import { useState, useEffect} from 'react';
 import type {JSX} from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme, useMediaQuery} from '@mui/material';
 import { pages } from '@src/Pages/const';
 
 const router = createBrowserRouter([{
@@ -16,12 +16,18 @@ const router = createBrowserRouter([{
 const defaultLeftWidth = 150;
 
 function Main() {
-	const [leftNavOpen, setLeftNavOpen] = useState<boolean>(true);
+	const theme = useTheme();
+	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up('sm'))
+	const [leftNavOpen, setLeftNavOpen] = useState<boolean>(isSmallOrLarger);
 	const [sideWidth, setSideWidth] = useState<number>(defaultLeftWidth);
 	const [currentDescription, setCurrentDescription] = useState<JSX.Element>();
 	const [currentName, setName] = useState<String>();
 	const [hideTitle, setHideTitle] = useState<boolean>( window.localStorage.getItem('hideTitle') == 'true' );
 	const location = useLocation();
+	const [windowSize, setWindowSize] = useState({
+		width: window.innerWidth,
+		height: window.innerHeight,
+	});
 
 	const toggleLeftNav = () => {
 		setLeftNavOpen(!leftNavOpen);
@@ -31,12 +37,34 @@ function Main() {
 		setHideTitle(!hideTitle);
 	};
 	useEffect(() => {
-		if (leftNavOpen) {
+		console.log(isSmallOrLarger, leftNavOpen);
+		if (!isSmallOrLarger) {
+			let tmp_width = windowSize.width * .75;
+			if (tmp_width > defaultLeftWidth * 2) {
+				tmp_width = defaultLeftWidth * 2;
+			}
+			setSideWidth(tmp_width);
+		} else if (leftNavOpen && isSmallOrLarger) {
 			setSideWidth(defaultLeftWidth);
 		} else {
 			setSideWidth(0);
 		}
-	}, [leftNavOpen]);
+	}, [leftNavOpen, isSmallOrLarger, windowSize]);
+
+	useEffect(() => {
+		const handleResize = () => {
+			setWindowSize({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		};
+	
+		window.addEventListener('resize', handleResize);
+	
+		return () => {
+			window.removeEventListener('resize', handleResize);
+		};
+	}, []);
 	
 	useEffect(() => {
 		const route = matchRoutes(pages, {pathname: window.location.pathname});
@@ -57,7 +85,7 @@ function Main() {
 			<TopNav toggleLeftNav={toggleLeftNav} toggleHideTitle={toggleHideTitle} hideTitle={hideTitle}></TopNav>
 			<LeftNav open={leftNavOpen} width={sideWidth}></LeftNav>
 			<Box sx={{
-				paddingLeft: (sideWidth + 20) + 'px', 
+				paddingLeft: isSmallOrLarger ? (sideWidth + 20) + 'px' : 0, 
 				transition: 'padding-left 0.1s'
 			}}>
 				{ !hideTitle &&

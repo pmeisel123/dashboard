@@ -2,11 +2,13 @@ import {Box, Typography, useTheme} from '@mui/material';
 import { DataGrid, GridPagination } from '@mui/x-data-grid';
 import type { GridColDef, GridRenderCellParams, GridRowParams } from '@mui/x-data-grid';
 import { Link } from '@mui/material';
-import type {TicketProps} from '@src/Api'
+import type {TicketProps, CustomFieldsProps} from '@src/Api'
 import { formatDistanceToNow } from 'date-fns';
 
 declare const __API_URL__: string;
 const API_URL = __API_URL__;
+declare const __CUSTOM_FIELDS__: {[key: string]: CustomFieldsProps};
+
 
 
 interface CustomFooterProps {
@@ -55,7 +57,7 @@ const TicketTable: React.FC<{
 	{data, defaultEstimate, loading, totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent}
 ) => {
 	const theme = useTheme();
-	const columns: GridColDef<any>[] = [
+	let columns: GridColDef<any>[] = [
 //		{ field: 'id', headerName: 'id' },
 		{
 			field: 'key',
@@ -128,6 +130,44 @@ const TicketTable: React.FC<{
 		},
 		{ field: 'timespent', headerName: 'Spent' },
 	];
+	Object.keys(__CUSTOM_FIELDS__).forEach(custom_field_key => {
+		let custom_field_name = __CUSTOM_FIELDS__[custom_field_key].Name;
+		let custom_field_type = __CUSTOM_FIELDS__[custom_field_key].Type;
+
+		if (custom_field_type == 'Text') {
+			columns.push({
+				field: 'customFields.' + custom_field_key,
+				headerName: custom_field_name,
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string | null = params.row.customFields[custom_field_key];
+					if (value) {
+						return (
+							<>{value}</>
+						)
+					}
+					return (<></>);
+				}
+			});
+		}
+
+		if (custom_field_type == 'Link') {
+			columns.push({
+				field: 'customFields.' + custom_field_key,
+				headerName: custom_field_name,
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string | null = params.row.customFields[custom_field_key];
+					if (value) {
+						return (
+							<Link href={value} target="_blank" rel="noopener noreferrer">
+								{custom_field_name}
+							</Link>
+						);
+					}
+					return (<></>);
+				}
+			});
+		}
+	});
 	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
 		return params.row.isdone ? 'MuiDataGrid-row-done' : '';
 	};

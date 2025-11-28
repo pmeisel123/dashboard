@@ -1,6 +1,12 @@
 
 declare const __DONE_STATUS__: string[];
 
+export interface CustomFieldsProps {
+	Name: string,
+	Type: 'Text' | 'Link'
+}
+
+declare const __CUSTOM_FIELDS__: {[key: string]: CustomFieldsProps};
 
 export interface SearchProps {
 	search: string | null;
@@ -21,6 +27,7 @@ export interface TicketProps {
 	parentkey: string | null;
 	parentname: string | null;
 	isdone: boolean;
+	customFields: {[key: string]: string | null}
 }
 
 function getNameFromPerson(person: any): string | null {
@@ -65,6 +72,16 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			parentkey = fields.parent.key;
 			parentname = fields.parent.fields.summary;
 		}
+		let custom_fields: {[key: string]: string | null} = {};
+		if (__CUSTOM_FIELDS__) {
+			Object.keys(__CUSTOM_FIELDS__).forEach(custom_field_key => {
+				let custom_field_value = fields[custom_field_key] || '';
+				if (typeof custom_field_value == "object" && custom_field_value != null) {
+					custom_field_value = fields[custom_field_key].name || '';
+				}
+				custom_fields[custom_field_key] = custom_field_value;
+			});
+		}
 		return {
 			'id': id,
 			'key': key,
@@ -80,13 +97,18 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			'parentkey': parentkey,
 			'parentname': parentname,
 			'isdone': isdone,
+			'customFields': custom_fields
 		}
 	}
 	return null;
 }
 
 export const getTicketsApi = async(search: string ) =>  {
-	const main_url = '/jira/rest/api/3/search/jql?maxResults=5000&validateQuery=1&fields=key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent&jql=' + encodeURI(search);
+	let extra_fields = Object.keys(__CUSTOM_FIELDS__).join(',');
+	if (extra_fields) {
+		extra_fields += ',';
+	}
+	const main_url = '/jira/rest/api/3/search/jql?maxResults=5000&validateQuery=1&fields=' + extra_fields + 'key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent&jql=' + encodeURI(search);
 	let last = false;
 	let result: TicketProps[] = [];
 	let url = main_url;

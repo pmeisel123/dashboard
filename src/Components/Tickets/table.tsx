@@ -48,8 +48,8 @@ const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps
 				<Typography variant="body2">totalTimEstimate: {totalTimEstimate}</Typography>
 				<Typography variant="body2">totalTimeOriginalEstimate: {totalTimeOriginalEstimate}</Typography>
 				<Typography variant="body2">totalTimeSpent: {totalTimeSpent}</Typography>
-				<GridPagination />
 			</Box>
+			<GridPagination />
 		</GridFooterContainer>
 	);
 };

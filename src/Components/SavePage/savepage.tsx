@@ -25,10 +25,11 @@ interface BasicModalProps {
 }
 
 export const SavePageModal = (props: BasicModalProps) => {
+	const location = useLocation();
 	const [open, setOpen] = useState<boolean>(false);
 	const handleClose = () => setOpen(false);
 	const [name, setName] = useState<string>(props.name || '');
-	const url = window.location.href.replace(/http.?:\/\/[^\/]+/, '');
+	const url = location.pathname + location.search;
 	const handleOpen = () => {
 		setOpen(true);
 		setName('');

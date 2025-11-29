@@ -3,7 +3,7 @@ import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
 import type {TicketProps, UsersGroupProps} from '@src/Api'
 import {TicketTable, FormFields, Calendar, UsersSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
-
+import { allGroups } from '@src/Components/const';
 
 const defaultDefaultDefaultEstimate = 2;
 
@@ -17,7 +17,7 @@ function EstimatorPage() {
 	const [parent, setParent] = useState<string>(searchParams.get('parent') || '');
 	const [estimatePadding, setEstimatePadding] = useState<number>(parseFloat(searchParams.get('estimatePadding') || '0'));
 	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
-	const [group, setGroup] = useState<string>(searchParams.get('group') || '');
+	const [group, setGroup] = useState<string>(searchParams.get('group') || allGroups);
 	let user_param = searchParams.get('users') || '';
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(',')));
 	const hasFetchedUser = useRef(false);
@@ -104,7 +104,7 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('estimatePadding');
 		}
-		if (group != '') {
+		if (group != allGroups) {
 			newSearchParams.set('group', group);
 		} else {
 			newSearchParams.delete('group');

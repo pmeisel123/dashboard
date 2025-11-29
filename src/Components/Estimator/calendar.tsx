@@ -64,6 +64,7 @@ const Calendar: React.FC<{
 		let row: cellData[] = [];
 		for(var i = 0; i <= 6; i++) {
 			let title = '';
+			let off = '';
 			let description = '';
 			let working = 0;
 			 if (!remainingTimEstimate) {
@@ -84,14 +85,28 @@ const Calendar: React.FC<{
 							working++;
 							if (user) {
 								if (!title) {
-									title = "Working:\n\n";
+									title = "Working:\n";
 								}
 								title += user.name + "\n";
+							}
+						} else {
+							if (user) {
+								if (!off) {
+									off = "Off:\n";
+								}
+								off += user.name + "\n";
 							}
 						}
 					});
 					if (!working) {
 						description = 'Vacation';
+					} else {
+						if (off) {
+							if (title) {
+								title += "\n";
+							}
+							title += off;
+						}
 					}
 				}
 				remainingTimEstimate -= working;

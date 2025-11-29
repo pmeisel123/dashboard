@@ -1,12 +1,15 @@
 37
 import type {UsersGroupProps, UserProps} from '@src/Api';
 import { Select, MenuItem, InputLabel, FormControl, Grid} from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import type { GridFilterItem, GridColDef, GridRenderCellParams, GridFilterOperator} from '@mui/x-data-grid';
+import { DataGrid, useGridApiRef} from '@mui/x-data-grid';
+import type { GridFilterItem, GridColDef, GridRenderCellParams, GridFilterOperator, GridColumnVisibilityModel, GridSortModel, GridFilterModel } from '@mui/x-data-grid';
 import {getDayString} from '@src/Api';
 import React from 'react';
+import { useEffect, useState } from 'react';
+import type { tableSetingsProps, updateGridModelProps } from '@src/Components/const';
+import { getTicketColumns, defaultTableSettings, allGroups } from '@src/Components/const';
+import { useLocation } from "react-router-dom";
 
-export const allGroups = 'All';
 
 export const UserHasGroup = (possibleUsersGroups: UsersGroupProps, user_id: string, group: string) => {
 	if (
@@ -32,14 +35,26 @@ export const UsersSelector: React.FC<{
 	users: Set<string>,
 	setUsers: React.Dispatch<React.SetStateAction<Set<string>>>,
 }> = ({possibleUsersGroups, group, setGroup, users, setUsers}) => {
-	const customOperator: GridFilterOperator<any, number, string> = {
+	const location = useLocation();
+	const localStorageName = 'TicketTableColumns.' + location.pathname;
+	const apiRef = useGridApiRef();
+	const [columnModel, setColumnModel] = useState<tableSetingsProps>({...defaultTableSettings});
+	const customOperator: GridFilterOperator<UsersGroupProps, string[]> = {
 		label: 'has',
-		value: 'Contains', // A unique value for the operator
-		getApplyFilterFn: (filterItem: GridFilterItem, __column: GridColDef) => {
+		value: 'Contains',
+		getApplyFilterFn: (_filterItem: GridFilterItem) => {
 			if (!group) {
-				return true;
+				setGroup(allGroups);
 			}
-			return filterItem.value.includes( group );
+			return (cellValue) => {
+				if (!cellValue) {
+					return false; 
+				}
+				if(!group || group == allGroups) {
+					return true;
+				}
+				return cellValue.includes(group);
+			};
 		},
 		InputComponent: () => {
 			return (
@@ -49,7 +64,13 @@ export const UsersSelector: React.FC<{
 						label="Group"
 						value={group}
 						onChange={(event) => {
-							setGroup(event.target.value);
+							if (event.target.value) {
+								handleColumnModelChange( {
+									column: 'GridFilterModel',
+									newModel: {items: [{ field: 'groups', operator: 'Contains', value: event.target.value }]}
+								});
+								setGroup(event.target.value);
+							}
 						}}
 						sx={{minWidth: 100}}
 					>
@@ -93,6 +114,51 @@ export const UsersSelector: React.FC<{
 			),
 		},
 	];
+
+	
+
+	const handleColumnModelChange = ({column, newModel}:updateGridModelProps) => {
+		const newColumnModel = {
+			...columnModel,
+			[column]: newModel
+		};
+		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
+		setColumnModel(newColumnModel);
+	};
+
+
+	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
+		handleColumnModelChange({column: 'GridColumnVisibilityModel', 'newModel': newModel});
+	};
+
+	const handleSortModelChange = (newModel: GridSortModel) => {
+		handleColumnModelChange({column: 'GridSortModel', 'newModel': newModel});
+	};
+
+	const handleFilterChange = (newModel: GridFilterModel) => {
+		if (
+			newModel.items.length &&
+			!newModel.items.some(filter => filter.field === "groups")
+		) {
+			setGroup(allGroups);
+		}
+		handleColumnModelChange({column: 'GridFilterModel', 'newModel': newModel});
+	}
+
+	useEffect(() => {
+		let columnModel = getTicketColumns(localStorageName, columns);
+		let local_group = group;
+		console.log(group);
+		if (group != allGroups) {
+			local_group == allGroups;
+			setGroup(local_group);
+		}
+		if (local_group != allGroups) {
+			columnModel.GridFilterModel.items = [{ field: 'groups', operator: 'Contains', value: local_group }];
+		}
+		console.log(columnModel);
+		setColumnModel(columnModel);
+	}, []);
 	return (
 		<>
 			<DataGrid
@@ -119,6 +185,13 @@ export const UsersSelector: React.FC<{
 					}
 				}}
 				rowSelectionModel={{type: 'include', ids: new Set(users)}}
+				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
+				sortModel={columnModel.GridSortModel}
+				filterModel={columnModel.GridFilterModel}
+				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
+				onSortModelChange={handleSortModelChange}
+				onFilterModelChange={handleFilterChange}
+				apiRef={apiRef}
 			/>
 		</>
 	)

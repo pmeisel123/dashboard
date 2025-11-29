@@ -1,12 +1,13 @@
-import {Box, Typography, useTheme} from '@mui/material';
+import { Link, Box, Typography, useTheme } from '@mui/material';
 import { DataGrid, GridPagination, GridFooterContainer, useGridApiRef } from '@mui/x-data-grid';
-import type { GridColDef, GridRenderCellParams, GridRowParams, GridSlotsComponentsProps, GridColumnVisibilityModel } from '@mui/x-data-grid';
-import { Link } from '@mui/material';
+import type { GridColDef, GridRenderCellParams, GridRowParams, GridSlotsComponentsProps, GridColumnVisibilityModel, GridSortModel, GridFilterModel } from '@mui/x-data-grid';
+import { useLocation } from "react-router-dom";
 import type {TicketProps, CustomFieldsProps} from '@src/Api'
 import { formatDistanceToNow } from 'date-fns';
 import * as icons from '@mui/icons-material';
 import { useEffect, useState } from 'react';
-
+import type { tableSetingsProps, updateGridModelProps } from '@src/Components/const';
+import { getTicketColumns, defaultTableSettings } from '@src/Components/const';
 
 declare const __API_URL__: string;
 const API_URL = __API_URL__;
@@ -63,21 +64,10 @@ const TicketTable: React.FC<{
 }> = (
 	{data, defaultEstimate, loading, totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent}
 ) => {
-	
+	const location = useLocation();
+	const localStorageName = 'TicketTableColumns.' + location.pathname;
 	const apiRef = useGridApiRef();
-	const [columnVisibilityModel, setColumnVisibilityModel] = useState<GridColumnVisibilityModel>({});
-
-	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
-		localStorage.setItem('TicketTableVisibleColumns', JSON.stringify(newModel));
-		setColumnVisibilityModel(newModel);
-	};
-
-	useEffect(() => {
-		const ticketTableVisibleColumns = localStorage.getItem('TicketTableVisibleColumns');
-		if (ticketTableVisibleColumns) {
-			setColumnVisibilityModel(JSON.parse(ticketTableVisibleColumns));
-		}
-	}, []);
+	const [columnModel, setColumnModel] = useState<tableSetingsProps>({...defaultTableSettings});
 
 	const theme = useTheme();
 	let columns: GridColDef<any>[] = [
@@ -201,6 +191,34 @@ const TicketTable: React.FC<{
 			});
 		}
 	});
+
+	const handleColumnModelChange = ({column, newModel}:updateGridModelProps) => {
+		const newColumnModel = {
+			...columnModel,
+			[column]: newModel
+		};
+		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
+		setColumnModel(newColumnModel);
+	};
+
+
+	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
+		handleColumnModelChange({column: 'GridColumnVisibilityModel', 'newModel': newModel});
+	};
+
+	const handleSortModelChange = (newModel: GridSortModel) => {
+		handleColumnModelChange({column: 'GridSortModel', 'newModel': newModel});
+	};
+
+	const handleFilterChange = (newModel: GridFilterModel) => {
+		handleColumnModelChange({column: 'GridFilterModel', 'newModel': newModel});
+	}
+
+	useEffect(() => {
+		let columnModel = getTicketColumns(localStorageName, columns);
+		setColumnModel(columnModel);
+	}, []);
+
 	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
 		return params.row.isdone ? 'MuiDataGrid-row-done' : '';
 	};
@@ -238,8 +256,12 @@ const TicketTable: React.FC<{
 					includeHeaders: false,
 					includeOutliers: true,
 				}}
-				columnVisibilityModel={columnVisibilityModel}
+				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
+				sortModel={columnModel.GridSortModel}
+				filterModel={columnModel.GridFilterModel}
 				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
+				onSortModelChange={handleSortModelChange}
+				onFilterModelChange={handleFilterChange}
 				apiRef={apiRef}
 			/>
 		</Box>

@@ -38,11 +38,17 @@ export const getTicketColumns = (localStorageName: string, columns: GridColDef<a
 		let visible = columnModel.GridColumnVisibilityModel;
 		if (
 			visible &&
-			Object.keys(visible).length == Object.keys(columns).length &&
+			Object.keys(visible).length >= Object.keys(columns).length &&
 			Object.values(visible).every(value => !value)
 		) {
-			const first_column_name = Object.keys(visible)[0];
-			visible[first_column_name] = true;
+			let column_name = '__';
+			let col = 0;
+			while (column_name.match(/^__/)) {
+				column_name = Object.keys(visible)[col];
+				console.log(column_name);
+				visible[column_name] = true;
+				col++;
+			}
 		}
 		return(columnModel);
 	}

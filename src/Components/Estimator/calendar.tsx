@@ -2,6 +2,7 @@ import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
 import type {UsersGroupProps} from '@src/Api';
 import {Table, TableBody, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
 import {EstimatorCell} from './const';
+import { allGroups } from '@src/Components/const';
 
 interface cellData {
 	day: Date,
@@ -16,7 +17,8 @@ const Calendar: React.FC<{
 	users: Set<string>,
 	group: string,
 	totalTimEstimate: number,
-}> = ({possibleUsersGroups, users, group, totalTimEstimate}) => {
+	visibleUsers: Set<string>,
+}> = ({possibleUsersGroups, users, group, totalTimEstimate, visibleUsers}) => {
 	if (!Object.keys(possibleUsersGroups.users).length) {
 		return (<></>);
 	}
@@ -42,12 +44,12 @@ const Calendar: React.FC<{
 	let local_users = users;
 	let user_count = local_users.size;
 	if (!user_count) {
-		if (group) {
+		if (group && group != allGroups) {
 			local_users = new Set(Object.keys(possibleUsersGroups.users).filter(key => {
 				return possibleUsersGroups.users[key].groups && possibleUsersGroups.users[key].groups.includes(group)
 			}));
 		} else { 
-			local_users = new Set(Object.keys(possibleUsersGroups.users));
+			local_users = visibleUsers;
 		}
 	}
 	user_count = local_users.size;

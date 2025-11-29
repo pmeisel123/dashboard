@@ -20,6 +20,7 @@ function EstimatorPage() {
 	const [group, setGroup] = useState<string>(searchParams.get('group') || allGroups);
 	let user_param = searchParams.get('users') || '';
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(',')));
+	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
 	const hasFetchedUser = useRef(false);
 	const hasFetchedTickets = useRef('');
 	const freezeParams = useRef(false);
@@ -31,7 +32,7 @@ function EstimatorPage() {
 		setSearch(searchParams.get('search') || '');
 		setParent(searchParams.get('parent') || '');
 		setEstimatePadding(parseFloat(searchParams.get('estimatePadding') || '0'));
-		setGroup(searchParams.get('group') || '');
+		setGroup(searchParams.get('group') || allGroups);
 		user_param = searchParams.get('users') || '';
 		setUsers(new Set(user_param.split(',')));
 	};
@@ -104,7 +105,7 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete('estimatePadding');
 		}
-		if (group != allGroups) {
+		if (group && group != allGroups) {
 			newSearchParams.set('group', group);
 		} else {
 			newSearchParams.delete('group');
@@ -143,6 +144,7 @@ function EstimatorPage() {
 				setGroup={setGroup}
 				users={users}
 				setUsers={setUsers}
+				setVisibleUsers={setVisibleUsers}
 			/>
 			{
 				(search || parent) &&
@@ -162,6 +164,7 @@ function EstimatorPage() {
 					group={group}
 					possibleUsersGroups={possibleUsersGroups}
 					totalTimEstimate={totalTimEstimate}
+					visibleUsers={visibleUsers}
 				/>
 			}
 		</>

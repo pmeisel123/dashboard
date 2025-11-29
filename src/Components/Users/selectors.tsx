@@ -1,7 +1,6 @@
-37
 import type {UsersGroupProps, UserProps} from '@src/Api';
 import { Select, MenuItem, InputLabel, FormControl, Grid} from '@mui/material';
-import { DataGrid, useGridApiRef} from '@mui/x-data-grid';
+import { DataGrid, useGridApiRef, gridFilteredSortedRowEntriesSelector} from '@mui/x-data-grid';
 import type { GridFilterItem, GridColDef, GridRenderCellParams, GridFilterOperator, GridColumnVisibilityModel, GridSortModel, GridFilterModel } from '@mui/x-data-grid';
 import {getDayString} from '@src/Api';
 import React from 'react';
@@ -9,6 +8,7 @@ import { useEffect, useState } from 'react';
 import type { tableSetingsProps, updateGridModelProps } from '@src/Components/const';
 import { getTicketColumns, defaultTableSettings, allGroups } from '@src/Components/const';
 import { useLocation } from "react-router-dom";
+
 
 
 export const UserHasGroup = (possibleUsersGroups: UsersGroupProps, user_id: string, group: string) => {
@@ -34,11 +34,13 @@ export const UsersSelector: React.FC<{
 	setGroup: React.Dispatch<React.SetStateAction<string>>,
 	users: Set<string>,
 	setUsers: React.Dispatch<React.SetStateAction<Set<string>>>,
-}> = ({possibleUsersGroups, group, setGroup, users, setUsers}) => {
+	setVisibleUsers: React.Dispatch<React.SetStateAction<Set<string>>>,
+}> = ({possibleUsersGroups, group, setGroup, users, setUsers, setVisibleUsers}) => {
 	const location = useLocation();
 	const localStorageName = 'TicketTableColumns.' + location.pathname;
 	const apiRef = useGridApiRef();
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({...defaultTableSettings});
+
 	const customOperator: GridFilterOperator<UsersGroupProps, string[]> = {
 		label: 'has',
 		value: 'Contains',
@@ -89,7 +91,7 @@ export const UsersSelector: React.FC<{
 	const columns: GridColDef<any>[] = [
 		{
 			field: 'icon',
-			headerName: '',
+			headerName: 'Icon',
 			renderCell: (params: GridRenderCellParams<UserProps>) => (
 				<img src={params.value} style={{maxWidth: '30px'}} />
 			),
@@ -115,8 +117,6 @@ export const UsersSelector: React.FC<{
 		},
 	];
 
-	
-
 	const handleColumnModelChange = ({column, newModel}:updateGridModelProps) => {
 		const newColumnModel = {
 			...columnModel,
@@ -136,6 +136,7 @@ export const UsersSelector: React.FC<{
 	};
 
 	const handleFilterChange = (newModel: GridFilterModel) => {
+		console.log('here');
 		if (
 			newModel.items.length &&
 			!newModel.items.some(filter => filter.field === "groups")
@@ -159,6 +160,16 @@ export const UsersSelector: React.FC<{
 		console.log(columnModel);
 		setColumnModel(columnModel);
 	}, []);
+	const getNonFilteredRows = () => {
+		if (Object.values(possibleUsersGroups.users).length) {
+			const allFilteredEntries = gridFilteredSortedRowEntriesSelector(apiRef);
+			const allFilteredEntriesIds = new Set(allFilteredEntries.map(row => row.id));
+			setVisibleUsers(allFilteredEntriesIds as Set<string>);
+		}
+	};
+	useEffect(() => {
+		getNonFilteredRows();
+	}, [possibleUsersGroups.users, columnModel.GridFilterModel]);
 	return (
 		<>
 			<DataGrid
@@ -172,12 +183,13 @@ export const UsersSelector: React.FC<{
 				rows={Object.values(possibleUsersGroups.users)}
 				columns={columns}
 				checkboxSelection={true}
+				disableRowSelectionExcludeModel
 				initialState={{
 					filter: {
 						filterModel: {
 							items: [{ field: 'groups', operator: 'Contains', value: {group} }],
 						},
-					}
+					},
 				}}
 				onRowSelectionModelChange={(newRowSelectionModel) => {
 					if (Object.values(possibleUsersGroups.users).length) {

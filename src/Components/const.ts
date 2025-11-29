@@ -45,7 +45,6 @@ export const getTicketColumns = (localStorageName: string, columns: GridColDef<a
 			let col = 0;
 			while (column_name.match(/^__/)) {
 				column_name = Object.keys(visible)[col];
-				console.log(column_name);
 				visible[column_name] = true;
 				col++;
 			}

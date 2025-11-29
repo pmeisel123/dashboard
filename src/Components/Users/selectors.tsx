@@ -136,7 +136,6 @@ export const UsersSelector: React.FC<{
 	};
 
 	const handleFilterChange = (newModel: GridFilterModel) => {
-		console.log('here');
 		if (
 			newModel.items.length &&
 			!newModel.items.some(filter => filter.field === "groups")
@@ -149,7 +148,6 @@ export const UsersSelector: React.FC<{
 	useEffect(() => {
 		let columnModel = getTicketColumns(localStorageName, columns);
 		let local_group = group;
-		console.log(group);
 		if (group != allGroups) {
 			local_group == allGroups;
 			setGroup(local_group);
@@ -157,7 +155,6 @@ export const UsersSelector: React.FC<{
 		if (local_group != allGroups) {
 			columnModel.GridFilterModel.items = [{ field: 'groups', operator: 'Contains', value: local_group }];
 		}
-		console.log(columnModel);
 		setColumnModel(columnModel);
 	}, []);
 	const getNonFilteredRows = () => {

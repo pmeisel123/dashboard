@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
-import type {TicketProps, UsersGroupProps} from '@src/Api'
+import { useSelector, useDispatch } from 'react-redux';
+import {getTicketsApi, fetchUsersAndGroups} from '@src/Api'
+import type {TicketProps, RootState, AppDispatch} from '@src/Api'
 import {TicketTable, FormFields, Calendar, UsersSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
 import { allGroups } from '@src/Components/const';
@@ -16,14 +17,14 @@ function EstimatorPage() {
 	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
 	const [parent, setParent] = useState<string>(searchParams.get('parent') || '');
 	const [estimatePadding, setEstimatePadding] = useState<number>(parseFloat(searchParams.get('estimatePadding') || '0'));
-	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
+	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get('group') || allGroups);
 	let user_param = searchParams.get('users') || '';
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(',')));
 	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
-	const hasFetchedUser = useRef(false);
 	const hasFetchedTickets = useRef('');
 	const freezeParams = useRef(false);
+	const dispatch = useDispatch<AppDispatch>();
 
 
 	const loadParams = () => {
@@ -63,17 +64,9 @@ function EstimatorPage() {
 				setData(data);
 			})
 	};
-	var getUsers = function() {
-		getUsersAndGroupsApi().then((data: UsersGroupProps) => {
-			setPossibleUsersGroups(data);
-		});
-	};
 	useEffect(() => {
-		if (!hasFetchedUser.current) {
-			getUsers();
-			hasFetchedUser.current = true;
-		}
-	}, []);
+		dispatch(fetchUsersAndGroups());
+	}, [dispatch]);
 	useEffect(() => {
 		if ((search || parent) && hasFetchedTickets.current != search + ' -- ' + parent) {
 			getFunc();

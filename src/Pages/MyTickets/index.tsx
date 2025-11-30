@@ -1,22 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
-import {getTicketsApi, getUsersAndGroupsApi} from '@src/Api'
-import type {TicketProps, UsersGroupProps} from '@src/Api'
+import { useSelector, useDispatch } from 'react-redux';
+import {getTicketsApi, fetchUsersAndGroups} from '@src/Api';
+import type {TicketProps, RootState, AppDispatch} from '@src/Api';
 import {TicketTable, UserSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
 
 declare const __DONE_STATUS__: string[];
 
-
-
 function MyTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
+	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get('group') || window.localStorage.getItem('group') || '');
 	const [user, setUser] = useState<string>(searchParams.get('user') || window.localStorage.getItem('user') || '');
 	const [loading, setLoading] = useState<boolean>(true);
 	const [data, setData] = useState<TicketProps[]>([]);
-	const hasFetchedUser = useRef(false);
 	const hasFetchedTickets = useRef('');
+	const dispatch = useDispatch<AppDispatch>()
+
 
 	const loadParams = () => {
 		setGroup(searchParams.get('group') || window.localStorage.getItem('group') || '');
@@ -37,17 +37,10 @@ function MyTicketsPage() {
 				setData(data);
 			})
 	};
-	var getUsers = function() {
-		getUsersAndGroupsApi().then((data: UsersGroupProps) => {
-			setPossibleUsersGroups(data);
-		});
-	};
 	useEffect(() => {
-		if (!hasFetchedUser.current) {
-			getUsers();
-			hasFetchedUser.current = true;
-		}
-	}, []);
+		dispatch(fetchUsersAndGroups());
+	}, [dispatch]);
+
 	useEffect(() => {
 		if ((user) && hasFetchedTickets.current != user) {
 			getFunc();

@@ -1,20 +1,8 @@
 import {getVacationApi} from './vacations';
+import type { UserProps, UsersGroupProps } from './types'; 
 
 declare const __VACATION_KEY__: string;
 
-export interface UserProps {
-	id: number;
-	icon: URL  | null;
-	name: string;
-	email: string | null;
-	groups: string[] | null;
-	vacations: String[] | null
-}
-
-export interface UsersGroupProps {
-	groups: string[],
-	users: {[key: string]: UserProps},
-}
 
 export const getUserGroupApi = async(userId: string) =>  {
 	const url = '/jira/rest/api/2/user?expand=groups&accountId=' + userId;
@@ -53,7 +41,7 @@ const getUserDataFromAjaxResponse = (user: any) => {
 	return return_obj;
 };
 
-export const getUsersAndGroupsApi = async() =>  {
+export const getUsersAndGroupsApi = async(): Promise<UsersGroupProps> =>  {
 	const max_results = 1000;
 	const main_url = '/jira/rest/api/2/user/search?query=.&maxResults=' + max_results + '&expand=groups,applicationRoles';
 	// let result: TicketProps[] = [];
@@ -74,8 +62,9 @@ export const getUsersAndGroupsApi = async() =>  {
 
 	while(!last) {
 		let url = main_url + '&startAt=' + start_at;
-		let response = await fetch(url, paramaters)
+		let response = await fetch(url, paramaters);
 		const ajax_result: any = await response.json();
+		ajax_result.pending;
 		if (ajax_result.length) {
 			for(const user of ajax_result) {
 			// ajax_result.forEach((user: any) => {

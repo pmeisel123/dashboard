@@ -1,11 +1,16 @@
 import './App.css'
 import { createBrowserRouter, RouterProvider, Outlet, useLocation } from 'react-router-dom';
 import { matchRoutes } from "react-router";
+import { Provider } from 'react-redux';
 import {TopNav, LeftNav} from '@src/Components';
 import { useState, useEffect} from 'react';
 import type {JSX} from 'react';
 import { Box, Typography, useTheme, useMediaQuery} from '@mui/material';
 import { pages } from '@src/Pages/const';
+import { store, fetchUsersAndGroups } from '@src/Api'; 
+import type { AppDispatch } from '@src/Api';
+import { useDispatch } from 'react-redux';
+
 
 const router = createBrowserRouter([{
 	path: '/',
@@ -14,6 +19,7 @@ const router = createBrowserRouter([{
 }]);
 
 const defaultLeftWidth = 150;
+const REFRESH_INTERVAL_MS = 300000;  // Run 5 minute
 
 function Main() {
 	const theme = useTheme();
@@ -28,6 +34,20 @@ function Main() {
 		width: window.innerWidth,
 		height: window.innerHeight,
 	});
+	const dispatch = useDispatch<AppDispatch>()
+
+	useEffect(() => {
+		dispatch(fetchUsersAndGroups());
+		const intervalId = setInterval(() => {
+			console.log('Periodically refreshing user data...'); // TODO Remove this line
+			dispatch(fetchUsersAndGroups());
+		}, REFRESH_INTERVAL_MS);
+
+		return () => {
+			clearInterval(intervalId);
+		};
+	}, [dispatch]); // Dependency array ensures the effect runs only on mount/unmount
+
 
 	const toggleLeftNav = () => {
 		setLeftNavOpen(!leftNavOpen);
@@ -80,7 +100,7 @@ function Main() {
 	}, [location]);
 
 	return (
-		<>
+		 <>
 			<TopNav toggleLeftNav={toggleLeftNav} toggleHideTitle={toggleHideTitle} hideTitle={hideTitle}></TopNav>
 			<LeftNav open={leftNavOpen} setLeftNavOpen={setLeftNavOpen} width={sideWidth}></LeftNav>
 			<Box sx={{
@@ -105,7 +125,11 @@ function Main() {
 
 
 function App() {
-  return <RouterProvider router={router} />;
+	return (
+		<Provider store={store}>
+			<RouterProvider router={router} />;
+		</Provider>
+	);
 }
 
 export default App;

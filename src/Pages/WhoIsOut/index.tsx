@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
-import {getUsersAndGroupsApi} from '@src/Api'
-import type {UsersGroupProps} from '@src/Api'
+import React, { useState, useEffect } from 'react';
+
+import { useSelector, useDispatch } from 'react-redux';
+import {fetchUsersAndGroups} from '@src/Api';
+import type {RootState, AppDispatch} from '@src/Api'
 import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
 import {Table, TableBody, TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel, FormGroup} from '@mui/material';
 import {EstimatorCell} from '@src/Components';
@@ -16,10 +18,10 @@ interface cellData {
 
 function WhoIsOutPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [possibleUsersGroups, setPossibleUsersGroups] = useState<UsersGroupProps>({groups: [], users: {}});
+	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	let param_groups = searchParams.get('groups');
 	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
-	const hasFetchedUser = useRef(false);
+	const dispatch = useDispatch<AppDispatch>()
 
 	const loadParams = () => {
 		param_groups = searchParams.get('groups');
@@ -30,18 +32,9 @@ function WhoIsOutPage() {
 		loadParams();
 	}, [searchParams]);
 
-	var getUsers = function() {
-		getUsersAndGroupsApi().then((data: UsersGroupProps) => {
-			setPossibleUsersGroups(data);
-		});
-	};
-
 	useEffect(() => {
-		if (!hasFetchedUser.current) {
-			getUsers();
-			hasFetchedUser.current = true;
-		}
-	}, []);
+		dispatch(fetchUsersAndGroups());
+	}, [dispatch]);
 	const today = new Date();
 	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 	// Get holidays for a specific year

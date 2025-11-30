@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import {getTicketsApi, fetchUsersAndGroups} from '@src/Api';
+import {fetchTickets, fetchUsersAndGroups} from '@src/Api';
 import type {TicketProps, RootState, AppDispatch} from '@src/Api';
 import {TicketTable, UserSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
@@ -9,11 +9,13 @@ declare const __DONE_STATUS__: string[];
 
 function MyTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
+	const [jiraSearch, setJiraSearch] = useState<string>('');
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get('group') || window.localStorage.getItem('group') || '');
 	const [user, setUser] = useState<string>(searchParams.get('user') || window.localStorage.getItem('user') || '');
 	const [loading, setLoading] = useState<boolean>(true);
-	const [data, setData] = useState<TicketProps[]>([]);
+	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const hasFetchedTickets = useRef('');
 	const dispatch = useDispatch<AppDispatch>()
 
@@ -29,13 +31,14 @@ function MyTicketsPage() {
 
 	var getFunc = function() {
 		if (!user) {
-			setData([])
+			setJiraSearch('')
 		}
-		getTicketsApi("assignee = " + user + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")' )
-			.then((data: TicketProps[]) => {
-				setLoading(false);
-				setData(data);
-			})
+		const jira_search = "assignee = " + user + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
+		setJiraSearch(jira_search);
+		setLoading(!ticketsSelector[jira_search]);
+		dispatch(fetchTickets(jira_search)).then(() =>{
+			setLoading(false);
+		});
 	};
 	useEffect(() => {
 		dispatch(fetchUsersAndGroups());
@@ -71,9 +74,9 @@ function MyTicketsPage() {
 			setSearchParams(newSearchParams);
 		}
 	}, [group, user]);
-	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
-	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
-	let totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
+	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
+	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			<UserSelector
@@ -86,7 +89,7 @@ function MyTicketsPage() {
 			{
 				(user) &&
 				<TicketTable
-					data={data}
+					tickets={tickets}
 					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}

@@ -76,7 +76,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 	return null;
 }
 
-export const getTicketsApi = async(search: string ) =>  {
+export const getTicketsApi = async(search: string ): Promise<TicketProps[]> =>  {
 	let extra_fields = Object.keys(__CUSTOM_FIELDS__).join(',');
 	if (extra_fields) {
 		extra_fields += ',';

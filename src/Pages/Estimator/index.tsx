@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import {getTicketsApi, fetchUsersAndGroups} from '@src/Api'
-import type {TicketProps, RootState, AppDispatch} from '@src/Api'
+import {fetchTickets, fetchUsersAndGroups} from '@src/Api';
+import type { TicketProps, RootState, AppDispatch} from '@src/Api'
 import {TicketTable, FormFields, Calendar, UsersSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
 import { allGroups } from '@src/Components/const';
@@ -11,10 +11,12 @@ const defaultDefaultDefaultEstimate = 2;
 function EstimatorPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	let defaultDefaultEstimate: number = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
-	const [data, setData] = useState<TicketProps[]>([]);
+	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
+	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
+	const [jiraSearch, setJiraSearch] = useState<string>('');
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
-	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
 	const [parent, setParent] = useState<string>(searchParams.get('parent') || '');
 	const [estimatePadding, setEstimatePadding] = useState<number>(parseFloat(searchParams.get('estimatePadding') || '0'));
 	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
@@ -25,7 +27,6 @@ function EstimatorPage() {
 	const hasFetchedTickets = useRef('');
 	const freezeParams = useRef(false);
 	const dispatch = useDispatch<AppDispatch>();
-
 
 	const loadParams = () => {
 		defaultDefaultEstimate = parseInt(searchParams.get('defaultEstimate') || (defaultDefaultDefaultEstimate + ''));
@@ -56,16 +57,18 @@ function EstimatorPage() {
 			jira_search = search;
 		}
 		if (!jira_search) {
+			setJiraSearch('');
 			return;
 		}
-		getTicketsApi(jira_search)
-			.then((data: TicketProps[]) => {
-				setLoading(false);
-				setData(data);
-			})
+		setJiraSearch(jira_search);
+		setLoading(!ticketsSelector[jira_search]);
+		dispatch(fetchTickets(jira_search)).then(() =>{
+			setLoading(false);
+		});
 	};
 	useEffect(() => {
 		dispatch(fetchUsersAndGroups());
+		getFunc();
 	}, [dispatch]);
 	useEffect(() => {
 		if ((search || parent) && hasFetchedTickets.current != search + ' -- ' + parent) {
@@ -116,9 +119,9 @@ function EstimatorPage() {
 		}
 	}, [search, defaultEstimate, parent, estimatePadding, group, users]);
 
-	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding;
-	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding;
-	let totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding;
+	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding;
+	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			<FormFields
@@ -142,7 +145,7 @@ function EstimatorPage() {
 			{
 				(search || parent) &&
 				<TicketTable
-					data={data}
+					tickets={tickets}
 					defaultEstimate={defaultEstimate}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
@@ -151,7 +154,7 @@ function EstimatorPage() {
 				/>
 			}
 			{
-				((search || parent) && !!data.length) &&
+				((search || parent) && !!tickets.length) &&
 				<Calendar
 					users={users}
 					group={group}

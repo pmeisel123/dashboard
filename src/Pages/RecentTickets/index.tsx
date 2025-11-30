@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import {getTicketsApi, getJiraDayString} from '@src/Api'
-import type {TicketProps} from '@src/Api'
+import {fetchTickets, getJiraDayString} from '@src/Api';
+import type { RootState, AppDispatch, TicketProps} from '@src/Api'
 import {TicketTable} from '@src/Components';
 import { Select, MenuItem, InputLabel, Grid, TextField, Button} from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 const default_days = 5;
 
@@ -12,7 +13,10 @@ function RecentTicketsPage() {
 	const [days, setDays] = useState<number>(parseInt(searchParams.get('days') || default_days + ''));
 	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
 	const [loading, setLoading] = useState<boolean>(true);
-	const [data, setData] = useState<TicketProps[]>([]);
+	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
+	const [jiraSearch, setJiraSearch] = useState<string>('');
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const dispatch = useDispatch<AppDispatch>();
 
 	var getFunc = function() {
 		var jira_search = '';
@@ -23,12 +27,11 @@ function RecentTicketsPage() {
 		let past_date = new Date();
 		past_date.setDate(past_date.getDate() - days);
 		jira_search += getJiraDayString(past_date) + '"';
-		setData([]);
-		getTicketsApi(jira_search)
-			.then((data: TicketProps[]) => {
-				setLoading(false);
-				setData(data);
-			})
+		setJiraSearch(jira_search);
+		setLoading(!ticketsSelector[jira_search]);
+		dispatch(fetchTickets(jira_search)).then(() =>{
+			setLoading(false);
+		});
 	};
 	useEffect(() => {
 		if (loading) {
@@ -49,9 +52,9 @@ function RecentTicketsPage() {
 			getFunc();
 		}
 	}, [loading]);
-	let totalTimEstimate = data.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
-	let totalTimeOriginalEstimate = data.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
-	let totalTimeSpent = data.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
+	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
+	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			<Grid container spacing={2}>
@@ -96,7 +99,7 @@ function RecentTicketsPage() {
 			</Grid>
 			{
 				<TicketTable
-					data={data}
+					tickets={tickets}
 					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}

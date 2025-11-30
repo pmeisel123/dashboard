@@ -55,14 +55,14 @@ const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps
 };
 
 const TicketTable: React.FC<{
-	data: TicketProps[],
+	tickets: TicketProps[],
 	defaultEstimate: number | null,
 	loading: boolean,
 	totalTimEstimate: number,
 	totalTimeOriginalEstimate: number,
 	totalTimeSpent: number
 }> = (
-	{data, defaultEstimate, loading, totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent}
+	{tickets, defaultEstimate, loading, totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent}
 ) => {
 	const location = useLocation();
 	const localStorageName = 'TicketTableColumns.' + location.pathname;
@@ -232,7 +232,7 @@ const TicketTable: React.FC<{
 				}}
 				loading={loading}
 				getRowHeight={() => 'auto'}
-				rows={data}
+				rows={tickets}
 				columns={columns}
 				getRowClassName={getRowClassName}
 				slots={{

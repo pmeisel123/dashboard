@@ -10,8 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "paths": {
-      "/src/*": ["src/*"],
-      "@src/*": ["./src/*"]
+      "@src/*": ["./src/*"] 
     },
 
     /* Bundler mode */
@@ -20,7 +19,11 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "emitDeclarationOnly": true,
     "jsx": "react-jsx",
+    "composite": true,
+    "outDir": "./dist/app",
+    "rootDirs": ["./src", "./"], 
 
     /* Linting */
     "strict": true,
@@ -30,5 +33,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["."]
+  "include": ["src"]
 }

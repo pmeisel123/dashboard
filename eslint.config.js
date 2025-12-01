@@ -64,7 +64,14 @@ export default [
 				{ allowConstantExport: true },
 			],
 			"no-unused-vars": "off",
-			"@typescript-eslint/no-unused-vars": "error",
+			"@typescript-eslint/no-unused-vars": [
+				"warn",
+				{
+					"argsIgnorePattern": "^_",
+					"varsIgnorePattern": "^_",
+					"caughtErrorsIgnorePattern": "^_"
+				}
+			],
 			"react/react-in-jsx-scope": "off",
 			// Add other type-aware rules as needed
 			// e.g., '@typescript-eslint/no-floating-promises': 'error',

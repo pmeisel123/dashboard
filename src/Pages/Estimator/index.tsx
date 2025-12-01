@@ -9,11 +9,12 @@ import {
 } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useOutletContext } from "react-router-dom";
 
 const defaultDefaultDefaultEstimate = 2;
 
 function EstimatorPage() {
+	const { isDashboard } = useOutletContext<{isDashboard?: boolean}>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	let defaultDefaultEstimate: number = parseInt(
 		searchParams.get("defaultEstimate") ||
@@ -178,24 +179,28 @@ function EstimatorPage() {
 	);
 	return (
 		<>
-			<FormFields
-				search={search}
-				setSearch={setSearch}
-				parent={parent}
-				setParent={setParent}
-				defaultEstimate={defaultEstimate}
-				setDefaultEstimate={setDefaultEstimate}
-				estimatePadding={estimatePadding}
-				setEstimatePadding={setEstimatePadding}
-			/>
-			<UsersSelector
-				possibleUsersGroups={possibleUsersGroups}
-				group={group}
-				setGroup={setGroup}
-				users={users}
-				setUsers={setUsers}
-				setVisibleUsers={setVisibleUsers}
-			/>
+			{!isDashboard && (
+				<>
+				<FormFields
+					search={search}
+					setSearch={setSearch}
+					parent={parent}
+					setParent={setParent}
+					defaultEstimate={defaultEstimate}
+					setDefaultEstimate={setDefaultEstimate}
+					estimatePadding={estimatePadding}
+					setEstimatePadding={setEstimatePadding}
+				/>
+				<UsersSelector
+					possibleUsersGroups={possibleUsersGroups}
+					group={group}
+					setGroup={setGroup}
+					users={users}
+					setUsers={setUsers}
+					setVisibleUsers={setVisibleUsers}
+				/>
+				</>
+			)}
 			{(search || parent) && (
 				<TicketTable
 					tickets={tickets}
@@ -204,6 +209,7 @@ function EstimatorPage() {
 					totalTimEstimate={totalTimEstimate}
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
+					isDashboard={isDashboard}
 				/>
 			)}
 			{(search || parent) && !!tickets.length && (
@@ -213,6 +219,7 @@ function EstimatorPage() {
 					possibleUsersGroups={possibleUsersGroups}
 					totalTimEstimate={totalTimEstimate}
 					visibleUsers={visibleUsers}
+					isDashboard={isDashboard}
 				/>
 			)}
 		</>

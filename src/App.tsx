@@ -1,4 +1,4 @@
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme, Button } from "@mui/material";
 import { store } from "@src/Api";
 import { LeftNav, TopNav } from "@src/Components";
 import { pages } from "@src/Pages/const";
@@ -11,6 +11,7 @@ import {
 	Outlet,
 	RouterProvider,
 	useLocation,
+	useSearchParams
 } from "react-router-dom";
 import "./App.css";
 
@@ -34,6 +35,8 @@ function Main() {
 	const [hideTitle, setHideTitle] = useState<boolean>(
 		window.localStorage.getItem("hideTitle") == "true",
 	);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [isDashboard, setIsDashboard] = useState<boolean>(searchParams.get("isDashboard") == 'true');
 	const location = useLocation();
 	const [windowSize, setWindowSize] = useState({
 		width: window.innerWidth,
@@ -48,7 +51,12 @@ function Main() {
 		setHideTitle(!hideTitle);
 	};
 	useEffect(() => {
-		if (!isSmallOrLarger) {
+		if (isDashboard) {
+			const newSearchParams = new URLSearchParams(searchParams.toString());
+			newSearchParams.set("isDashboard", 'true');
+			setSearchParams(newSearchParams);
+			setSideWidth(0);
+		} else if (!isSmallOrLarger) {
 			let tmp_width = windowSize.width * 0.75;
 			if (tmp_width > defaultLeftWidth * 2) {
 				tmp_width = defaultLeftWidth * 2;
@@ -59,7 +67,16 @@ function Main() {
 		} else {
 			setSideWidth(0);
 		}
-	}, [leftNavOpen, isSmallOrLarger, windowSize]);
+	}, [leftNavOpen, isSmallOrLarger, windowSize, isDashboard]);
+	useEffect(() => {
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (isDashboard) {
+			newSearchParams.set("isDashboard", 'true');
+		} else {
+			newSearchParams.delete("isDashboard");
+		}
+		setSearchParams(newSearchParams);
+	}, [isDashboard])
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -94,23 +111,33 @@ function Main() {
 
 	return (
 		<>
+			{isDashboard && (
+				<Box sx={{position: 'absolute', top: 20, right: 30, zIndex: 99999, background: '#fff', outline: '1px solid red'}}>
+					<Button onClick={() => {setIsDashboard(false)}}>Exit Dashboard</Button>
+				</Box>
+			)}
+			{!isDashboard && (
+				<>
 			<TopNav
 				toggleLeftNav={toggleLeftNav}
 				toggleHideTitle={toggleHideTitle}
 				hideTitle={hideTitle}
+				setIsDashboard={setIsDashboard}
 			></TopNav>
 			<LeftNav
 				open={leftNavOpen}
 				setLeftNavOpen={setLeftNavOpen}
 				width={sideWidth}
 			></LeftNav>
+				</>
+			)}
 			<Box
 				sx={{
 					paddingLeft: isSmallOrLarger ? sideWidth + 20 + "px" : 0,
 					transition: "padding-left 0.1s",
 				}}
 			>
-				{!hideTitle && (
+				{!isDashboard && !hideTitle && (
 					<>
 						<Typography variant="h6" component="div">
 							{currentName}
@@ -124,7 +151,7 @@ function Main() {
 						</Typography>
 					</>
 				)}
-				<Outlet />
+				<Outlet context={{isDashboard: isDashboard}} />
 			</Box>
 		</>
 	);

@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import usersGroupReducer from "./usersSlice";
 import ticketsReducer from "./ticketsSlice";
+import usersGroupReducer from "./usersSlice";
 
 export const store = configureStore({
 	reducer: {

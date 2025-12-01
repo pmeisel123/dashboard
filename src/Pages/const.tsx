@@ -1,9 +1,9 @@
-import HomePage from "@src/Pages/Home";
 import EstimatorPage from "@src/Pages/Estimator";
-import WhoIsOutPage from "@src/Pages/WhoIsOut";
 import HolidayPage from "@src/Pages/Holiday";
+import HomePage from "@src/Pages/Home";
 import MyTicketsPage from "@src/Pages/MyTickets";
 import RecentTicketsPage from "@src/Pages/RecentTickets";
+import WhoIsOutPage from "@src/Pages/WhoIsOut";
 export const pages = [
 	{
 		path: "/",

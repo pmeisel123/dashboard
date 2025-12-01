@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { UsersGroupProps, UsersGroupPropsSlice } from "./types";
 import { getUsersAndGroupsApi } from "./users";
 

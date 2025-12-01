@@ -1,18 +1,18 @@
-import "./App.css";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { store } from "@src/Api";
+import { LeftNav, TopNav } from "@src/Components";
+import { pages } from "@src/Pages/const";
+import type { JSX } from "react";
+import { useEffect, useState } from "react";
+import { Provider } from "react-redux";
+import { matchRoutes } from "react-router";
 import {
 	createBrowserRouter,
-	RouterProvider,
 	Outlet,
+	RouterProvider,
 	useLocation,
 } from "react-router-dom";
-import { matchRoutes } from "react-router";
-import { Provider } from "react-redux";
-import { TopNav, LeftNav } from "@src/Components";
-import { useState, useEffect } from "react";
-import type { JSX } from "react";
-import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import { pages } from "@src/Pages/const";
-import { store } from "@src/Api";
+import "./App.css";
 
 const router = createBrowserRouter([
 	{

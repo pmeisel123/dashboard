@@ -8,10 +8,10 @@ import {
 	useMediaQuery,
 	useTheme,
 } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
 import { SavePageList } from "@src/Components";
 import { pages } from "@src/Pages/const";
 import type { FC } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 interface LeftNavProps {
 	open: boolean;

@@ -1,8 +1,8 @@
 import type {
-	GridColumnVisibilityModel,
-	GridSortModel,
 	GridColDef,
+	GridColumnVisibilityModel,
 	GridFilterModel,
+	GridSortModel,
 } from "@mui/x-data-grid";
 
 export interface tableSetingsProps {

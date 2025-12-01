@@ -16,6 +16,10 @@ export interface UsersGroupProps {
 	users: {[key: string]: UserProps},
 }
 
+export interface UsersGroupPropsSlice extends UsersGroupProps {
+	loaded: Date | null
+}
+
 // Ticket Props
 
 export interface TicketProps {

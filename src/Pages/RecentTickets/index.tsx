@@ -10,15 +10,22 @@ const default_days = 5;
 
 function RecentTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [days, setDays] = useState<number>(parseInt(searchParams.get('days') || default_days + ''));
-	const [search, setSearch] = useState<string>(searchParams.get('search') || '');
+	const getParamDays = () => {
+		return parseInt(searchParams.get('days') || default_days + '');
+	}
+	const getParamSearch = () => {
+		return searchParams.get('search') || '';
+	}
+
+	const [days, setDays] = useState<number>(getParamDays());
+	const [search, setSearch] = useState<string>(getParamSearch());
 	const [loading, setLoading] = useState<boolean>(true);
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [jiraSearch, setJiraSearch] = useState<string>('');
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const dispatch = useDispatch<AppDispatch>();
 
-	var getFunc = function() {
+	const getFunc = function() {
 		var jira_search = '';
 		if (search) {
 			jira_search = search + ' AND ';
@@ -28,11 +35,23 @@ function RecentTicketsPage() {
 		past_date.setDate(past_date.getDate() - days);
 		jira_search += getJiraDayString(past_date) + '"';
 		setJiraSearch(jira_search);
-		setLoading(!ticketsSelector[jira_search]);
+		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() =>{
 			setLoading(false);
 		});
 	};
+	useEffect(() => {
+		const new_days = getParamDays();
+		const new_search = getParamSearch();
+		if (
+			new_days != days ||
+			new_search != search
+		) {
+			setDays(new_days);
+			setSearch(new_search);
+		}
+		setLoading(true);
+0	}, [searchParams]);
 	useEffect(() => {
 		if (loading) {
 			const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -92,6 +111,10 @@ function RecentTicketsPage() {
 						onClick={() => {
 							setLoading(true);
 						}}
+						disabled={(
+							getParamDays() == days &&
+							getParamSearch() == search
+						)}
 					>
 						Update
 					</Button>

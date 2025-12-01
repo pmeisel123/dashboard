@@ -9,6 +9,7 @@ export const store = configureStore({
 	},
 });
 
+
 // Optional: Define types for your RootState and AppDispatch for TypeScript inference
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

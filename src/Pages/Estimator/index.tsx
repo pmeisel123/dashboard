@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import {fetchTickets, fetchUsersAndGroups} from '@src/Api';
+import {fetchTickets, fetchUsersAndGroups, isUserDataRecent} from '@src/Api';
 import type { TicketProps, RootState, AppDispatch} from '@src/Api'
 import {TicketTable, FormFields, Calendar, UsersSelector} from '@src/Components';
 import { useSearchParams } from 'react-router-dom';
@@ -61,13 +61,15 @@ function EstimatorPage() {
 			return;
 		}
 		setJiraSearch(jira_search);
-		setLoading(!ticketsSelector[jira_search]);
+		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() =>{
 			setLoading(false);
 		});
 	};
 	useEffect(() => {
-		dispatch(fetchUsersAndGroups());
+		if (!isUserDataRecent(possibleUsersGroups)) {
+			dispatch(fetchUsersAndGroups());
+		}
 		getFunc();
 	}, [dispatch]);
 	useEffect(() => {

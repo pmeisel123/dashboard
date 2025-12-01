@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import {fetchUsersAndGroups} from '@src/Api';
+import {fetchUsersAndGroups, isUserDataRecent} from '@src/Api';
 import type {RootState, AppDispatch} from '@src/Api'
 import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
 import {Table, TableBody, TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel, FormGroup} from '@mui/material';
@@ -33,7 +33,9 @@ function WhoIsOutPage() {
 	}, [searchParams]);
 
 	useEffect(() => {
-		dispatch(fetchUsersAndGroups());
+		if (!isUserDataRecent(possibleUsersGroups)) {
+			dispatch(fetchUsersAndGroups());
+		}
 	}, [dispatch]);
 	const today = new Date();
 	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));

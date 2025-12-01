@@ -16,11 +16,8 @@ import {
 	useGridApiRef,
 } from "@mui/x-data-grid";
 import type { CustomFieldsProps, TicketProps } from "@src/Api";
-import type {
-	tableSetingsProps,
-	updateGridModelProps,
-} from "@src/Components/const";
-import { defaultTableSettings, getTicketColumns } from "@src/Components/const";
+import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
+import { defaultTableSettings, getTicketColumns } from "@src/Components";
 import { formatDistanceToNow } from "date-fns";
 import type { FC } from "react";
 import { useEffect, useState } from "react";

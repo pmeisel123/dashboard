@@ -14,15 +14,12 @@ import {
 } from "@mui/x-data-grid";
 import type { UserProps, UsersGroupProps } from "@src/Api";
 import { getDayString } from "@src/Api";
-import type {
-	tableSetingsProps,
-	updateGridModelProps,
-} from "@src/Components/const";
+import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import {
 	allGroups,
 	defaultTableSettings,
 	getTicketColumns,
-} from "@src/Components/const";
+} from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";

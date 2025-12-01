@@ -21,6 +21,7 @@
 		"emitDeclarationOnly": true,
 		"composite": true,
 		"outDir": "./dist/node",
+		"rootDirs": ["./", "./src"],
 
 		/* Linting */
 		"strict": true,
@@ -30,6 +31,5 @@
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true
 	},
-	"include": ["vite.config.ts", "globals.ts"],
-	"exclude": ["src"]
+	"include": ["vite.config.ts", "globals.ts", "src/Api/types.ts"]
 }

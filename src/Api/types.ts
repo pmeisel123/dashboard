@@ -17,7 +17,7 @@ export interface UsersGroupProps {
 }
 
 export interface UsersGroupPropsSlice extends UsersGroupProps {
-	loaded: Date | null
+	loaded: number | null
 }
 
 // Ticket Props

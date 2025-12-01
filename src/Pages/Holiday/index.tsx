@@ -1,20 +1,30 @@
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom';
-import { Select, MenuItem, InputLabel} from '@mui/material';
-import {getHolidays, getDateStringWithDayOfWeek} from '@src/Api';
-import {Table, TableBody, TableCell,  TableContainer, TableHead, TableRow, Paper} from '@mui/material';
-import {DateRow} from './const';
-import { formatDistanceToNow } from 'date-fns';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Select, MenuItem, InputLabel } from "@mui/material";
+import { getHolidays, getDateStringWithDayOfWeek } from "@src/Api";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Paper,
+} from "@mui/material";
+import { DateRow } from "./const";
+import { formatDistanceToNow } from "date-fns";
 
-const HolidayPage = (() => {
-	const this_year = (new Date().getFullYear() + '');
+const HolidayPage = () => {
+	const this_year = new Date().getFullYear() + "";
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [year, setYear] = useState<string>(searchParams.get('year') || this_year);
+	const [year, setYear] = useState<string>(
+		searchParams.get("year") || this_year,
+	);
 	const year_as_int = parseInt(this_year);
 
 	const today = new Date();
 	const loadParams = () => {
-		setYear(searchParams.get('year') || this_year)
+		setYear(searchParams.get("year") || this_year);
 	};
 
 	useEffect(() => {
@@ -22,11 +32,11 @@ const HolidayPage = (() => {
 	}, [searchParams]);
 
 	let years_choices: string[] = [];
-	for(let val = year_as_int - 1; val <= year_as_int + 10; val++) {
-		years_choices.push(val + '');
+	for (let val = year_as_int - 1; val <= year_as_int + 10; val++) {
+		years_choices.push(val + "");
 	}
 
-	const getDate = ((date_string: string) => {
+	const getDate = (date_string: string) => {
 		let date = new Date(date_string);
 		const hours = today.getHours();
 		const minutes = today.getMinutes();
@@ -36,16 +46,16 @@ const HolidayPage = (() => {
 		date.setSeconds(seconds);
 
 		return date;
-	});
+	};
 
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (year != this_year) {
-			newSearchParams.set('year', year);
+			newSearchParams.set("year", year);
 		} else {
-			newSearchParams.delete('year');
+			newSearchParams.delete("year");
 		}
-		if(searchParams.toString() != newSearchParams.toString()) {
+		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
 	}, [year]);
@@ -59,13 +69,13 @@ const HolidayPage = (() => {
 				onChange={(event) => {
 					setYear(event.target.value);
 				}}
-				sx={{minWidth: 100}}
+				sx={{ minWidth: 100 }}
 			>
-				{
-					years_choices.map((year) => 
-						<MenuItem key={year} value={year}>{year}</MenuItem>
-					)
-				}
+				{years_choices.map((year) => (
+					<MenuItem key={year} value={year}>
+						{year}
+					</MenuItem>
+				))}
 			</Select>
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">
@@ -77,20 +87,28 @@ const HolidayPage = (() => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{
-							usHolidays.map((holiday) =>
-								<DateRow date={holiday.date} key={holiday.name}>
-									<TableCell>{holiday.name}</TableCell>
-									<TableCell>{getDateStringWithDayOfWeek(getDate(holiday.date))}</TableCell>
-									<TableCell>{formatDistanceToNow(getDate(holiday.date), { addSuffix: true })}</TableCell>
-								</DateRow>
-							)
-						}
+						{usHolidays.map((holiday) => (
+							<DateRow date={holiday.date} key={holiday.name}>
+								<TableCell>{holiday.name}</TableCell>
+								<TableCell>
+									{getDateStringWithDayOfWeek(
+										getDate(holiday.date),
+									)}
+								</TableCell>
+								<TableCell>
+									{formatDistanceToNow(
+										getDate(holiday.date),
+										{
+											addSuffix: true,
+										},
+									)}
+								</TableCell>
+							</DateRow>
+						))}
 					</TableBody>
 				</Table>
 			</TableContainer>
-				
 		</>
 	);
-});
+};
 export default HolidayPage;

@@ -1,1 +1,1 @@
-export {default as TicketTable} from './table';
+export { default as TicketTable } from "./table";

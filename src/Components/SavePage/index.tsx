@@ -1,1 +1,1 @@
-export {SavePageModal, SavePageList} from './savepage';
+export { SavePageModal, SavePageList } from "./savepage";

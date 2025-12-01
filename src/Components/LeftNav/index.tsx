@@ -1,1 +1,1 @@
-export {default as LeftNav} from './leftnav';
+export { default as LeftNav } from "./leftnav";

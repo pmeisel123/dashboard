@@ -1,23 +1,22 @@
-import * as MuiIcons from '@mui/icons-material';
-
+import * as MuiIcons from "@mui/icons-material";
 
 // Users Props
 export interface UserProps {
 	id: number;
-	icon: string  | null;
+	icon: string | null;
 	name: string;
 	email: string | null;
 	groups: string[] | null;
-	vacations: string[] | null
+	vacations: string[] | null;
 }
 
 export interface UsersGroupProps {
-	groups: string[],
-	users: {[key: string]: UserProps},
+	groups: string[];
+	users: { [key: string]: UserProps };
 }
 
 export interface UsersGroupPropsSlice extends UsersGroupProps {
-	loaded: number | null
+	loaded: number | null;
 }
 
 // Ticket Props
@@ -37,12 +36,12 @@ export interface TicketProps {
 	parentkey: string | null;
 	parentname: string | null;
 	isdone: boolean;
-	customFields: {[key: string]: string | null}
+	customFields: { [key: string]: string | null };
 }
 
 export interface CustomFieldsProps {
-	Name: string,
-	Type: 'Text' | 'Link'
-	LinkText?: string
-	LinkIcon?: keyof typeof MuiIcons
+	Name: string;
+	Type: "Text" | "Link";
+	LinkText?: string;
+	LinkIcon?: keyof typeof MuiIcons;
 }

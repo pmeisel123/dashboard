@@ -1,30 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-import { useSelector, useDispatch } from 'react-redux';
-import {fetchUsersAndGroups, isUserDataRecent} from '@src/Api';
-import type {RootState, AppDispatch} from '@src/Api'
-import {getHolidays, getHolidayDayString, getDateString} from '@src/Api';
-import {Table, TableBody, TableContainer, TableHead, TableRow, Paper, Checkbox, FormControlLabel, FormGroup} from '@mui/material';
-import {EstimatorCell} from '@src/Components';
-import { useSearchParams } from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
+import type { RootState, AppDispatch } from "@src/Api";
+import { getHolidays, getHolidayDayString, getDateString } from "@src/Api";
+import {
+	Table,
+	TableBody,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Paper,
+	Checkbox,
+	FormControlLabel,
+	FormGroup,
+} from "@mui/material";
+import { EstimatorCell } from "@src/Components";
+import { useSearchParams } from "react-router-dom";
 
 interface cellData {
-	day: Date,
-	holiday: string,
-	weekend: boolean,
-	whoisout: string[],
-	past: boolean,
-};
+	day: Date;
+	holiday: string;
+	weekend: boolean;
+	whoisout: string[];
+	past: boolean;
+}
 
 function WhoIsOutPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
-	let param_groups = searchParams.get('groups');
-	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
-	const dispatch = useDispatch<AppDispatch>()
+	const possibleUsersGroups = useSelector(
+		(state: RootState) => state.usersAndGroupsState,
+	);
+	let param_groups = searchParams.get("groups");
+	const [groups, setGroups] = useState<String[]>(
+		param_groups ? param_groups.split(/,/g) : [],
+	);
+	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
-		param_groups = searchParams.get('groups');
+		param_groups = searchParams.get("groups");
 		setGroups(param_groups ? param_groups.split(/,/g) : []);
 	};
 
@@ -38,20 +52,29 @@ function WhoIsOutPage() {
 		}
 	}, [dispatch]);
 	const today = new Date();
-	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+	const nextyear = new Date(
+		new Date().setFullYear(new Date().getFullYear() + 1),
+	);
 	// Get holidays for a specific year
-	const usHolidays = getHolidays(today.getFullYear().toString()).filter(holiday => {
-		return (holiday.end >= today);
-	});
-	const nextYearUsHolidays = getHolidays(nextyear.getFullYear().toString()).filter(holiday => {
-		return (holiday.start <= nextyear);
+	const usHolidays = getHolidays(today.getFullYear().toString()).filter(
+		(holiday) => {
+			return holiday.end >= today;
+		},
+	);
+	const nextYearUsHolidays = getHolidays(
+		nextyear.getFullYear().toString(),
+	).filter((holiday) => {
+		return holiday.start <= nextyear;
 	});
 
-	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce((newFormat, holiday) => {
-		newFormat[holiday.date] = holiday.name;
-		return newFormat;
-	}, {} as Record<string, string>);
-	let rows:cellData[][] = [];
+	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce(
+		(newFormat, holiday) => {
+			newFormat[holiday.date] = holiday.name;
+			return newFormat;
+		},
+		{} as Record<string, string>,
+	);
+	let rows: cellData[][] = [];
 
 	const current_day = new Date();
 	current_day.setDate(current_day.getDate() - current_day.getDay());
@@ -63,33 +86,41 @@ function WhoIsOutPage() {
 			users = {};
 			Object.keys(possibleUsersGroups.users).forEach((user_id) => {
 				const user = possibleUsersGroups.users[user_id];
-				if (user.groups && user.groups.some(item => groups.includes(item))) {
+				if (
+					user.groups &&
+					user.groups.some((item) => groups.includes(item))
+				) {
 					users[user_id] = user;
 				}
 			});
 		} else {
 			users = possibleUsersGroups.users;
 		}
-		let rows:cellData[][] = [];
-		for(var week = 0; week <= 10; week++) {
+		let rows: cellData[][] = [];
+		for (var week = 0; week <= 10; week++) {
 			let row: cellData[] = [];
-			for(var i = 0; i <= 6; i++) {
+			for (var i = 0; i <= 6; i++) {
 				let weekend = false;
-				let holiday = '';
+				let holiday = "";
 				let past = false;
 				let whoisout: string[] = [];
-				if(current_day.getDay() == 0 || current_day.getDay() == 6) {
-					weekend = true
+				if (current_day.getDay() == 0 || current_day.getDay() == 6) {
+					weekend = true;
 				} else if (current_day < today) {
 					past = true;
 				} else {
 					const holiday_string = getHolidayDayString(current_day);
 					if (allUsHolidays[holiday_string]) {
-						holiday = allUsHolidays[getHolidayDayString(current_day)];
+						holiday =
+							allUsHolidays[getHolidayDayString(current_day)];
 					} else {
 						Object.keys(users).forEach((user_id) => {
 							const user = possibleUsersGroups.users[user_id];
-							if (user && user.vacations && user.vacations.includes(holiday_string)) {
+							if (
+								user &&
+								user.vacations &&
+								user.vacations.includes(holiday_string)
+							) {
 								whoisout.push(user.name);
 							}
 						});
@@ -113,11 +144,11 @@ function WhoIsOutPage() {
 		rows = getRows();
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (groups.length) {
-			newSearchParams.set('groups', groups.join(','));
+			newSearchParams.set("groups", groups.join(","));
 		} else {
-			newSearchParams.delete('groups');
+			newSearchParams.delete("groups");
 		}
-		if(searchParams.toString() != newSearchParams.toString()) {
+		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
 	}, [groups]);
@@ -137,24 +168,28 @@ function WhoIsOutPage() {
 	return (
 		<>
 			<FormGroup>
-				<div style={{ display: 'flex', flexDirection: 'row', minHeight: '3em' }}>
-					{
-						possibleUsersGroups.groups.map((option, index) => (
-							<FormControlLabel
-								key={index}
-								control={
-									<Checkbox
-										checked={groups.includes(option)}
-										onChange={handleChange}
-										name={option}
-										value={option}
-									/>
-								}
-								label={option}
-								sx={{display: "inline"}}
-							/>
-						))
-					}
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						minHeight: "3em",
+					}}
+				>
+					{possibleUsersGroups.groups.map((option, index) => (
+						<FormControlLabel
+							key={index}
+							control={
+								<Checkbox
+									checked={groups.includes(option)}
+									onChange={handleChange}
+									name={option}
+									value={option}
+								/>
+							}
+							label={option}
+							sx={{ display: "inline" }}
+						/>
+					))}
 				</div>
 			</FormGroup>
 			<TableContainer component={Paper}>
@@ -176,33 +211,41 @@ function WhoIsOutPage() {
 								{row.map((cell) => (
 									<EstimatorCell
 										key={getDateString(cell.day)}
-										isOff={!!cell.past || !!cell.holiday || !!cell.weekend}
+										isOff={
+											!!cell.past ||
+											!!cell.holiday ||
+											!!cell.weekend
+										}
 										isDone={false}
 										isPartial={false}
 									>
-										{getDateString(cell.day)}<br />
-										{
-											cell.holiday ? 
-												<>
-													{cell.holiday}
-												</> :
-												<>
-													{cell.whoisout.map((item, index) => (
-														<React.Fragment key={index}>
-															<br />{item}
+										{getDateString(cell.day)}
+										<br />
+										{cell.holiday ? (
+											<>{cell.holiday}</>
+										) : (
+											<>
+												{cell.whoisout.map(
+													(item, index) => (
+														<React.Fragment
+															key={index}
+														>
+															<br />
+															{item}
 														</React.Fragment>
-													))}
-												</>
-									 	}
-								 	</EstimatorCell>
-							 	))}
+													),
+												)}
+											</>
+										)}
+									</EstimatorCell>
+								))}
 							</TableRow>
 						))}
 					</TableBody>
 				</Table>
 			</TableContainer>
 		</>
-	)
+	);
 }
 
 export default WhoIsOutPage;

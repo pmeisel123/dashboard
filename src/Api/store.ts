@@ -1,6 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit';
-import usersGroupReducer from './usersSlice';
-import ticketsReducer from './ticketsSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import usersGroupReducer from "./usersSlice";
+import ticketsReducer from "./ticketsSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -8,7 +8,6 @@ export const store = configureStore({
 		ticketsState: ticketsReducer,
 	},
 });
-
 
 // Optional: Define types for your RootState and AppDispatch for TypeScript inference
 export type RootState = ReturnType<typeof store.getState>;

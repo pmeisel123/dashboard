@@ -1,7 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import react from "@vitejs/plugin-react";
 import path from "path";
-import {API_KEY, API_URL, API_USERNAME, VACATION_KEY, DONE_STATUS, CUSTOM_FIELDS} from './globals'
+import { defineConfig } from "vite";
+import {
+	API_KEY,
+	API_URL,
+	API_USERNAME,
+	CUSTOM_FIELDS,
+	DONE_STATUS,
+	VACATION_KEY,
+} from "./globals";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,31 +19,23 @@ export default defineConfig({
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
 	},
 	server: {
-		host: '0.0.0.0',
+		host: "0.0.0.0",
 		port: 3000,
-		allowedHosts: ['www.cybersquad.net'],
+		allowedHosts: ["www.cybersquad.net"],
 		proxy: {
-			'/jira': {
+			"/jira": {
 				target: API_URL,
 				changeOrigin: true,
 				headers: {
-					'Authorization': 'Basic ' + btoa(API_USERNAME + ':' + API_KEY)
+					Authorization:
+						"Basic " + btoa(API_USERNAME + ":" + API_KEY),
 				},
-				rewrite: (path) => path.replace(/^\/jira/, '')
+				rewrite: (path) => path.replace(/^\/jira/, ""),
 			},
 		},
 		fs: {
-			deny: [
-				'.env',
-				'.env.*',
-				'*.{crt,pem}',
-				'**/.git/**',
-			],
-			allow: [
-				'src',
-				'node_modules',
-				'index.html',
-			]
+			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],
+			allow: ["src", "node_modules", "index.html"],
 		},
 	},
 	resolve: {
@@ -46,11 +45,11 @@ export default defineConfig({
 	},
 	plugins: [react()],
 	optimizeDeps: {
-		include: ['@mui/x-data-grid'],
+		include: ["@mui/x-data-grid"],
 	},
 	build: {
 		commonjsOptions: {
 			esmExternals: true,
 		},
-	}
-})
+	},
+});

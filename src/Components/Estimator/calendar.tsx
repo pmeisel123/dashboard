@@ -6,8 +6,12 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import type { UsersGroupProps } from "@src/Api";
-import { getDateString, getHolidayDayString, getHolidays } from "@src/Api";
+import {
+	getDateString,
+	getHolidayDayString,
+	getHolidays,
+	type UsersGroupProps,
+} from "@src/Api";
 import { allGroups } from "@src/Components";
 import type { FC } from "react";
 import { EstimatorCell } from "./const";

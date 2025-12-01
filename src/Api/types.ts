@@ -16,11 +16,10 @@ export interface UsersGroupProps {
 }
 
 export interface UsersGroupPropsSlice extends UsersGroupProps {
-	loaded: number | null;
+	loaded: number | null; // ms since epoch
 }
 
 // Ticket Props
-
 export interface TicketProps {
 	id: number;
 	key: string;

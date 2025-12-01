@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom'; // From react-router-dom
 import {SavePageModal} from '@src/Components';
+import type { FC } from 'react';
 
 interface TopNavBarProps {
 	toggleLeftNav: () => void; // Function to open/close Left Nav
@@ -13,7 +14,7 @@ interface TopNavBarProps {
 	hideTitle: boolean;
 }
 
-const TopNavBar: React.FC<TopNavBarProps> = ({ toggleLeftNav, toggleHideTitle, hideTitle }) => {
+const TopNavBar: FC<TopNavBarProps> = ({ toggleLeftNav, toggleHideTitle, hideTitle }) => {
   return (
 <>
     <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>

@@ -6,6 +6,7 @@ import type {TicketProps, CustomFieldsProps} from '@src/Api'
 import { formatDistanceToNow } from 'date-fns';
 import * as icons from '@mui/icons-material';
 import { useEffect, useState } from 'react';
+import type { FC } from 'react';
 import type { tableSetingsProps, updateGridModelProps } from '@src/Components/const';
 import { getTicketColumns, defaultTableSettings } from '@src/Components/const';
 
@@ -23,7 +24,7 @@ declare module '@mui/x-data-grid' {
 	}
 }
 
-const RenderEstimate: React.FC<{value: number | null, defaultEstimate: number | null}> = ({value, defaultEstimate}) => {
+const RenderEstimate: FC<{value: number | null, defaultEstimate: number | null}> = ({value, defaultEstimate}) => {
 	if (value != null) {
 		return <>{value}</>; 
 	}
@@ -54,7 +55,7 @@ const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps
 	);
 };
 
-const TicketTable: React.FC<{
+const TicketTable: FC<{
 	tickets: TicketProps[],
 	defaultEstimate: number | null,
 	loading: boolean,

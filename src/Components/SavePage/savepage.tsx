@@ -5,6 +5,7 @@ import Modal from '@mui/material/Modal';
 import MuiLink from '@mui/material/Link';
 import { Link, useLocation } from "react-router-dom";
 import Delete from '@mui/icons-material/Delete';
+import type { FC } from 'react';
 
 // Define the style for the modal content
 const style = {
@@ -76,7 +77,7 @@ export const SavePageModal = (props: BasicModalProps) => {
 	);
 }
 
-export const SavePageList: React.FC<{width?:number, parentHandleClick?: Function}> = ({ width, parentHandleClick }) => {
+export const SavePageList: FC<{width?:number, parentHandleClick?: Function}> = ({ width, parentHandleClick }) => {
 	const [savedViews, setSaveViews] = useState<{[key: string]: string}>({});
 	const handleClick = () => {
 		if (parentHandleClick) {

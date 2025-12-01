@@ -1,15 +1,16 @@
 import { TextField, Select, MenuItem, InputLabel, Button, Grid} from '@mui/material';
 import { useState, useEffect } from 'react';
+import type {FC, Dispatch, SetStateAction } from 'react';
 
-const FormFields: React.FC<{
+const FormFields: FC<{
 	search: string,
-	setSearch: React.Dispatch<React.SetStateAction<string>>,
+	setSearch: Dispatch<SetStateAction<string>>,
 	defaultEstimate: number,
-	setDefaultEstimate: React.Dispatch<React.SetStateAction<number>>
+	setDefaultEstimate: Dispatch<SetStateAction<number>>
 	parent: string,
-	setParent: React.Dispatch<React.SetStateAction<string>>,
+	setParent: Dispatch<SetStateAction<string>>,
 	estimatePadding: number,
-	setEstimatePadding: React.Dispatch<React.SetStateAction<number>>,
+	setEstimatePadding: Dispatch<SetStateAction<number>>,
 }> = ({search, setSearch, defaultEstimate, setDefaultEstimate, parent, setParent, estimatePadding, setEstimatePadding}) => {
 	const [localSearch, setLocalSearch] = useState<string>(search);
 	const [localParent, setLocalParent] = useState<string>(parent);

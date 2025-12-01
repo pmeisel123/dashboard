@@ -2,7 +2,7 @@ import {Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMediaQ
 import { Link, useLocation } from 'react-router-dom';
 import {SavePageList} from '@src/Components';
 import { pages } from '@src/Pages/const';
-
+import type { FC } from 'react';
 
 interface LeftNavProps {
 	open: boolean;
@@ -10,7 +10,7 @@ interface LeftNavProps {
 	width: number;
 }
 
-const LeftNav: React.FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
+const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 	const location = useLocation();
 	const theme = useTheme();
 	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up('sm'));

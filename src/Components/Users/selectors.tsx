@@ -3,11 +3,12 @@ import { Select, MenuItem, InputLabel, FormControl, Grid} from '@mui/material';
 import { DataGrid, useGridApiRef, gridFilteredSortedRowEntriesSelector} from '@mui/x-data-grid';
 import type { GridFilterItem, GridColDef, GridRenderCellParams, GridFilterOperator, GridColumnVisibilityModel, GridSortModel, GridFilterModel } from '@mui/x-data-grid';
 import {getDayString} from '@src/Api';
-import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
+import type {Dispatch, FC, SetStateAction} from 'react';
 import type { tableSetingsProps, updateGridModelProps } from '@src/Components/const';
 import { getTicketColumns, defaultTableSettings, allGroups } from '@src/Components/const';
 import { useLocation } from "react-router-dom";
+
 
 
 
@@ -28,13 +29,13 @@ export const UserHasGroup = (possibleUsersGroups: UsersGroupProps, user_id: stri
 	return possibleUsersGroups.users[user_id].groups.includes(group);
 } 
 
-export const UsersSelector: React.FC<{
+export const UsersSelector: FC<{
 	possibleUsersGroups: UsersGroupProps,
 	group: string
-	setGroup: React.Dispatch<React.SetStateAction<string>>,
+	setGroup: Dispatch<SetStateAction<string>>,
 	users: Set<string>,
-	setUsers: React.Dispatch<React.SetStateAction<Set<string>>>,
-	setVisibleUsers: React.Dispatch<React.SetStateAction<Set<string>>>,
+	setUsers: Dispatch<SetStateAction<Set<string>>>,
+	setVisibleUsers: Dispatch<SetStateAction<Set<string>>>,
 }> = ({possibleUsersGroups, group, setGroup, users, setUsers, setVisibleUsers}) => {
 	const location = useLocation();
 	const localStorageName = 'TicketTableColumns.' + location.pathname;
@@ -107,10 +108,10 @@ export const UsersSelector: React.FC<{
 			renderCell: (params: GridRenderCellParams<UserProps>) => (
 				<>
 					{params.value && params.value.map((value:string, index: number) => (
-						<React.Fragment key={index}>
+						<Fragment key={index}>
 							{(!!index) && <>, </>}
 							{getDayString(new Date(value))}
-						</React.Fragment>
+						</Fragment>
 					))}
 				</>
 			),
@@ -206,12 +207,12 @@ export const UsersSelector: React.FC<{
 	)
 };
 
-export const UserSelector: React.FC<{
+export const UserSelector: FC<{
 	possibleUsersGroups: UsersGroupProps,
 	group: string
-	setGroup: React.Dispatch<React.SetStateAction<string>>,
+	setGroup: Dispatch<SetStateAction<string>>,
 	user: string,
-	setUser: React.Dispatch<React.SetStateAction<string>>,
+	setUser: Dispatch<SetStateAction<string>>,
 }> = ({possibleUsersGroups, group, setGroup, user, setUser}) => {
 	if (!Object.values(possibleUsersGroups.users).length) {
 		return (

@@ -3,6 +3,7 @@ import type {UsersGroupProps} from '@src/Api';
 import {Table, TableBody, TableContainer, TableHead, TableRow, Paper} from '@mui/material';
 import {EstimatorCell} from './const';
 import { allGroups } from '@src/Components/const';
+import type {FC} from 'react';
 
 interface cellData {
 	day: Date,
@@ -12,7 +13,7 @@ interface cellData {
 	title: string,
 };
 
-const Calendar: React.FC<{
+const Calendar: FC<{
 	possibleUsersGroups: UsersGroupProps,
 	users: Set<string>,
 	group: string,

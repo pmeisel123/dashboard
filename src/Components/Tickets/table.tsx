@@ -17,7 +17,8 @@ declare const __CUSTOM_FIELDS__: {[key: string]: CustomFieldsProps};
 
 
 declare module '@mui/x-data-grid' {
-	interface FooterPropsOverrides {
+	interface FooterPropsOverrides { // eslint-disable-line no-unused-vars
+		// this interface is used by const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps['footer']>,) => { 
 		totalTimEstimate: number | null;
 		totalTimeOriginalEstimate: number | null;
 		totalTimeSpent: number | null;

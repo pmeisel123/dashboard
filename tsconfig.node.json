@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "paths": {
       "/src/*": ["src/*"],
-      "@src/*": ["./src/*"],
+      "@src/*": ["./src/*"]
     },
 
     /* Bundler mode */

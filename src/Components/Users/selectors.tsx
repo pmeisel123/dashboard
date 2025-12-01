@@ -1,7 +1,7 @@
 import type {UsersGroupProps, UserProps} from '@src/Api';
 import { Select, MenuItem, InputLabel, FormControl, Grid} from '@mui/material';
 import { DataGrid, useGridApiRef, gridFilteredSortedRowEntriesSelector} from '@mui/x-data-grid';
-import type { GridFilterItem, GridColDef, GridRenderCellParams, GridFilterOperator, GridColumnVisibilityModel, GridSortModel, GridFilterModel } from '@mui/x-data-grid';
+import type { GridColDef, GridRenderCellParams, GridFilterOperator, GridColumnVisibilityModel, GridSortModel, GridFilterModel } from '@mui/x-data-grid';
 import {getDayString} from '@src/Api';
 import { useEffect, useState, Fragment } from 'react';
 import type {Dispatch, FC, SetStateAction} from 'react';
@@ -45,7 +45,7 @@ export const UsersSelector: FC<{
 	const customOperator: GridFilterOperator<UsersGroupProps, string[]> = {
 		label: 'has',
 		value: 'Contains',
-		getApplyFilterFn: (_filterItem: GridFilterItem) => {
+		getApplyFilterFn: () => {
 			if (!group) {
 				setGroup(allGroups);
 			}

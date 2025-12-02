@@ -13,10 +13,11 @@ import {
 import { getDateStringWithDayOfWeek, getHolidays } from "@src/Api";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useOutletContext } from "react-router-dom";
 import { DateRow } from "./const";
 
 const HolidayPage = () => {
+	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const this_year = new Date().getFullYear() + "";
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [year, setYear] = useState<string>(
@@ -64,21 +65,23 @@ const HolidayPage = () => {
 	const usHolidays = getHolidays(year);
 	return (
 		<>
-			<InputLabel id="Year">Year</InputLabel>
-			<Select
-				label="Year"
-				value={year}
-				onChange={(event) => {
-					setYear(event.target.value);
-				}}
-				sx={{ minWidth: 100 }}
-			>
-				{years_choices.map((year) => (
-					<MenuItem key={year} value={year}>
-						{year}
-					</MenuItem>
-				))}
-			</Select>
+			{!isDashboard && (<>
+				<InputLabel id="Year">Year</InputLabel>
+				<Select
+					label="Year"
+					value={year}
+					onChange={(event) => {
+						setYear(event.target.value);
+					}}
+					sx={{ minWidth: 100 }}
+				>
+					{years_choices.map((year) => (
+						<MenuItem key={year} value={year}>
+							{year}
+						</MenuItem>
+					))}
+				</Select>
+			</>)}
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">
 					<TableHead>

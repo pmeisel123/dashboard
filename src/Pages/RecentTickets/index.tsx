@@ -11,11 +11,12 @@ import { fetchTickets, getJiraDayString } from "@src/Api";
 import { TicketTable } from "@src/Components";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useOutletContext } from "react-router-dom";
 
 const default_days = 5;
 
 function RecentTicketsPage() {
+	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const getParamDays = () => {
 		return parseInt(searchParams.get("days") || default_days + "");
@@ -99,49 +100,51 @@ function RecentTicketsPage() {
 	);
 	return (
 		<>
-			<Grid container spacing={2}>
-				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="search">Search</InputLabel>
-					<TextField
-						id="search"
-						value={search}
-						onChange={(event) => {
-							setSearch(event.target.value);
-						}}
-					/>
+			{!isDashboard && (
+				<Grid container spacing={2}>
+					<Grid size={{ xs: 12, md: 3 }}>
+						<InputLabel id="search">Search</InputLabel>
+						<TextField
+							id="search"
+							value={search}
+							onChange={(event) => {
+								setSearch(event.target.value);
+							}}
+						/>
+					</Grid>
+					<Grid size={{ xs: 12, md: 3 }}>
+						<InputLabel id="Days Agao">Days Ago</InputLabel>
+						<Select
+							label="Days Ago"
+							value={days}
+							onChange={(event) => {
+								setDays(event.target.value);
+							}}
+							sx={{ minWidth: 100 }}
+						>
+							{[...Array(31).keys()].map((days: number) => (
+								<MenuItem key={days} value={days}>
+									{days}
+								</MenuItem>
+							))}
+						</Select>
+					</Grid>
+					<Grid size={2}>
+						<InputLabel id="parent">&nbsp;</InputLabel>
+						<Button
+							variant="contained"
+							onClick={() => {
+								setLoading(true);
+							}}
+							disabled={
+								getParamDays() == days && getParamSearch() == search
+							}
+						>
+							Update
+						</Button>
+					</Grid>
 				</Grid>
-				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="Days Agao">Days Ago</InputLabel>
-					<Select
-						label="Days Ago"
-						value={days}
-						onChange={(event) => {
-							setDays(event.target.value);
-						}}
-						sx={{ minWidth: 100 }}
-					>
-						{[...Array(31).keys()].map((days: number) => (
-							<MenuItem key={days} value={days}>
-								{days}
-							</MenuItem>
-						))}
-					</Select>
-				</Grid>
-				<Grid size={2}>
-					<InputLabel id="parent">&nbsp;</InputLabel>
-					<Button
-						variant="contained"
-						onClick={() => {
-							setLoading(true);
-						}}
-						disabled={
-							getParamDays() == days && getParamSearch() == search
-						}
-					>
-						Update
-					</Button>
-				</Grid>
-			</Grid>
+			)}
 			{
 				<TicketTable
 					tickets={tickets}
@@ -150,6 +153,7 @@ function RecentTicketsPage() {
 					totalTimEstimate={totalTimEstimate}
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
+					isDashboard={isDashboard}
 				/>
 			}
 		</>

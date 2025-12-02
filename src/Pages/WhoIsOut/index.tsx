@@ -21,7 +21,7 @@ import {
 } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useOutletContext } from "react-router-dom";
 
 interface cellData {
 	day: Date;
@@ -32,6 +32,7 @@ interface cellData {
 }
 
 function WhoIsOutPage() {
+	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const possibleUsersGroups = useSelector(
 		(state: RootState) => state.usersAndGroupsState,
@@ -172,31 +173,33 @@ function WhoIsOutPage() {
 
 	return (
 		<>
-			<FormGroup>
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "row",
-						minHeight: "3em",
-					}}
-				>
-					{possibleUsersGroups.groups.map((option, index) => (
-						<FormControlLabel
-							key={index}
-							control={
-								<Checkbox
-									checked={groups.includes(option)}
-									onChange={handleChange}
-									name={option}
-									value={option}
-								/>
-							}
-							label={option}
-							sx={{ display: "inline" }}
-						/>
-					))}
-				</div>
-			</FormGroup>
+			{!isDashboard && (
+				<FormGroup>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							minHeight: "3em",
+						}}
+					>
+						{possibleUsersGroups.groups.map((option, index) => (
+							<FormControlLabel
+								key={index}
+								control={
+									<Checkbox
+										checked={groups.includes(option)}
+										onChange={handleChange}
+										name={option}
+										value={option}
+									/>
+								}
+								label={option}
+								sx={{ display: "inline" }}
+							/>
+						))}
+					</div>
+				</FormGroup>
+			)}
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">
 					<TableHead>

@@ -30,12 +30,14 @@ const Calendar: FC<{
 	group: string;
 	totalTimEstimate: number;
 	visibleUsers: Set<string>;
+	isDashboard?: boolean;
 }> = ({
 	possibleUsersGroups,
 	users,
 	group,
 	totalTimEstimate,
 	visibleUsers,
+	isDashboard,
 }) => {
 	if (!Object.keys(possibleUsersGroups.users).length) {
 		return <></>;
@@ -173,56 +175,66 @@ const Calendar: FC<{
 	return (
 		<>
 			<strong>Work will be completed on {last_day}</strong>
-			<br />
-			<TableContainer component={Paper}>
-				<Table aria-label="simple table">
-					<TableHead>
-						<TableRow>
-							<EstimatorCell isOff={true}>S</EstimatorCell>
-							<EstimatorCell>M</EstimatorCell>
-							<EstimatorCell>T</EstimatorCell>
-							<EstimatorCell>W</EstimatorCell>
-							<EstimatorCell>T</EstimatorCell>
-							<EstimatorCell>F</EstimatorCell>
-							<EstimatorCell isOff={true}>S</EstimatorCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{rows.map((row) => (
-							<TableRow key={getDateString(row[0].day)}>
-								{row.map((cell) => (
-									<EstimatorCell
-										key={getDateString(cell.day)}
-										title={cell.title}
-										isOff={!cell.working}
-										isDone={
-											!!cell.working && !cell.workleft
-										}
-										isPartial={
-											cell.working &&
-											cell.working != user_count
-												? true
-												: false
-										}
-									>
-										{getDateString(cell.day)}
-										<br />
-										{cell.description ? (
-											<>{cell.description}</>
-										) : (
-											<>
-												Working: {cell.working}
-												<br />
-												Work Left: {cell.workleft}
-											</>
-										)}
+			{!isDashboard && (
+				<>
+					<br />
+					<TableContainer component={Paper}>
+						<Table aria-label="simple table">
+							<TableHead>
+								<TableRow>
+									<EstimatorCell isOff={true}>
+										S
 									</EstimatorCell>
+									<EstimatorCell>M</EstimatorCell>
+									<EstimatorCell>T</EstimatorCell>
+									<EstimatorCell>W</EstimatorCell>
+									<EstimatorCell>T</EstimatorCell>
+									<EstimatorCell>F</EstimatorCell>
+									<EstimatorCell isOff={true}>
+										S
+									</EstimatorCell>
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{rows.map((row) => (
+									<TableRow key={getDateString(row[0].day)}>
+										{row.map((cell) => (
+											<EstimatorCell
+												key={getDateString(cell.day)}
+												title={cell.title}
+												isOff={!cell.working}
+												isDone={
+													!!cell.working &&
+													!cell.workleft
+												}
+												isPartial={
+													cell.working &&
+													cell.working != user_count
+														? true
+														: false
+												}
+											>
+												{getDateString(cell.day)}
+												<br />
+												{cell.description ? (
+													<>{cell.description}</>
+												) : (
+													<>
+														Working: {cell.working}
+														<br />
+														Work Left:{" "}
+														{cell.workleft}
+													</>
+												)}
+											</EstimatorCell>
+										))}
+									</TableRow>
 								))}
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</TableContainer>
+							</TableBody>
+						</Table>
+					</TableContainer>
+				</>
+			)}
 		</>
 	);
 };

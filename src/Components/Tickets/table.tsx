@@ -93,6 +93,7 @@ const TicketTable: FC<{
 	totalTimEstimate: number;
 	totalTimeOriginalEstimate: number;
 	totalTimeSpent: number;
+	isDashboard?: boolean;
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -100,6 +101,7 @@ const TicketTable: FC<{
 	totalTimEstimate,
 	totalTimeOriginalEstimate,
 	totalTimeSpent,
+	isDashboard,
 }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
@@ -316,6 +318,27 @@ const TicketTable: FC<{
 	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
 		return params.row.isdone ? "MuiDataGrid-row-done" : "";
 	};
+	const getVisibility = () => {
+		if (isDashboard) {
+			let hide_columns = columns.reduce((tmp, column) => {
+				let field_name = column.field as string;
+				tmp[field_name] = [
+					"key",
+					"parentkey",
+					"assignee",
+					"status",
+					"parentkey",
+					"timeestimate",
+					"summary",
+					"creator",
+				].includes(field_name);
+				return tmp;
+			}, {} as GridColumnVisibilityModel);
+			return hide_columns;
+		} else {
+			return columnModel.GridColumnVisibilityModel;
+		}
+	};
 	return (
 		<Box sx={{ width: "100%" }}>
 			<DataGrid
@@ -350,7 +373,7 @@ const TicketTable: FC<{
 					includeHeaders: false,
 					includeOutliers: true,
 				}}
-				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
+				columnVisibilityModel={getVisibility()}
 				sortModel={columnModel.GridSortModel}
 				filterModel={columnModel.GridFilterModel}
 				onColumnVisibilityModelChange={

@@ -9,12 +9,12 @@ import {
 } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams, useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const defaultDefaultDefaultEstimate = 2;
 
 function EstimatorPage() {
-	const { isDashboard } = useOutletContext<{isDashboard?: boolean}>();
+	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	let defaultDefaultEstimate: number = parseInt(
 		searchParams.get("defaultEstimate") ||
@@ -181,24 +181,24 @@ function EstimatorPage() {
 		<>
 			{!isDashboard && (
 				<>
-				<FormFields
-					search={search}
-					setSearch={setSearch}
-					parent={parent}
-					setParent={setParent}
-					defaultEstimate={defaultEstimate}
-					setDefaultEstimate={setDefaultEstimate}
-					estimatePadding={estimatePadding}
-					setEstimatePadding={setEstimatePadding}
-				/>
-				<UsersSelector
-					possibleUsersGroups={possibleUsersGroups}
-					group={group}
-					setGroup={setGroup}
-					users={users}
-					setUsers={setUsers}
-					setVisibleUsers={setVisibleUsers}
-				/>
+					<FormFields
+						search={search}
+						setSearch={setSearch}
+						parent={parent}
+						setParent={setParent}
+						defaultEstimate={defaultEstimate}
+						setDefaultEstimate={setDefaultEstimate}
+						estimatePadding={estimatePadding}
+						setEstimatePadding={setEstimatePadding}
+					/>
+					<UsersSelector
+						possibleUsersGroups={possibleUsersGroups}
+						group={group}
+						setGroup={setGroup}
+						users={users}
+						setUsers={setUsers}
+						setVisibleUsers={setVisibleUsers}
+					/>
 				</>
 			)}
 			{(search || parent) && (

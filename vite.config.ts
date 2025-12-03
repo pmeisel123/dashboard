@@ -8,6 +8,7 @@ import {
 	CUSTOM_FIELDS,
 	DONE_STATUS,
 	VACATION_KEY,
+	DAHSBOARDS
 } from "./globals";
 
 // https://vite.dev/config/
@@ -17,6 +18,7 @@ export default defineConfig({
 		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
 		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
+		__DASHBOARDS__: JSON.stringify(DAHSBOARDS || {}),
 	},
 	server: {
 		host: "0.0.0.0",
@@ -31,6 +33,11 @@ export default defineConfig({
 						"Basic " + btoa(API_USERNAME + ":" + API_KEY),
 				},
 				rewrite: (path) => path.replace(/^\/jira/, ""),
+				configure: (proxy, _options) => {
+					proxy.on('proxyRes', (proxyRes, req, res) => {
+						console.log('Received Response from Target:', req.url);
+					});
+				}
 			},
 		},
 		fs: {

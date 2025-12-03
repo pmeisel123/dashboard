@@ -93,7 +93,9 @@ const TicketTable: FC<{
 	totalTimEstimate: number;
 	totalTimeOriginalEstimate: number;
 	totalTimeSpent: number;
-	isDashboard?: boolean;
+	isDashboard?: boolean	;
+	defaultSort?: string;
+	defaultSortDirection?: ('asc' | 'desc')
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -102,6 +104,8 @@ const TicketTable: FC<{
 	totalTimeOriginalEstimate,
 	totalTimeSpent,
 	isDashboard,
+	defaultSort,
+	defaultSortDirection
 }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
@@ -312,6 +316,23 @@ const TicketTable: FC<{
 
 	useEffect(() => {
 		let columnModel = getTicketColumns(localStorageName, columns);
+
+		if (
+			defaultSort &&
+			(
+				isDashboard ||
+				!columnModel ||
+				!columnModel.GridSortModel ||
+				!columnModel.GridSortModel.length
+			)
+		) {
+			if (defaultSortDirection == 'desc') {
+				columnModel.GridSortModel = [{field: defaultSort, sort: 'desc'}]
+			} else {
+				columnModel.GridSortModel = [{field: defaultSort, sort: 'asc'}]
+			}
+		}
+		console.log(columnModel);
 		setColumnModel(columnModel);
 	}, []);
 
@@ -331,6 +352,8 @@ const TicketTable: FC<{
 					"timeestimate",
 					"summary",
 					"creator",
+					"created",
+					"updated",
 				].includes(field_name);
 				return tmp;
 			}, {} as GridColumnVisibilityModel);

@@ -154,6 +154,8 @@ function RecentTicketsPage() {
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
+					defaultSort={'created'}
+					defaultSortDirection={'desc'}
 				/>
 			}
 		</>

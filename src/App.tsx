@@ -121,7 +121,7 @@ function Main() {
 
 	return (
 		<>
-			{isDashboard && (
+			{isDashboard && false && (
 				<>
 					<Box sx={{ height: "60px" }}>
 						Dashboard:

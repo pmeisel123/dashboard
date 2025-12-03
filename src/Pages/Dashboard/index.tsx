@@ -1,6 +1,6 @@
 import { Box, Button } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
-import type { Dispatch, FC, SetStateAction } from "react";
+import type { Dispatch, FC, SetStateAction, lazy } from "react";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -33,6 +33,7 @@ const ListDashboard: FC<{
 	);
 };
 
+
 function DashboardPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [dashboard, setDashboard] = useState<string>(
@@ -50,7 +51,23 @@ function DashboardPage() {
 		}
 	}, [dashboard]);
 	if (dashboard && __DASHBOARDS__[dashboard]) {
-		return <>{dashboard}</>;
+		let url = __DASHBOARDS__[dashboard].pages[0].url;
+		if (url.match(/\?/)) {
+			url += '&';
+		} else {
+			url += '?';
+		}
+		url += "isDashboard=true";
+		return <>
+			<iframe
+				width="100%"
+				height="100%"
+				src={url}
+				frameBorder="0"
+				allowFullScreen="true"
+				allow="fullscreen"
+			/>
+		</>;
 	}
 	return <ListDashboard setDashboard={setDashboard}></ListDashboard>;
 }

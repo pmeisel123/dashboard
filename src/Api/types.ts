@@ -45,13 +45,13 @@ export interface CustomFieldsProps {
 	LinkIcon?: keyof typeof MuiIcons;
 }
 
-
 export interface DashboardPageProps {
-	url: string,
+	name: string;
+	url: string;
 }
 
 export interface DashboardProps {
-	key: string,
-	name?: string,
-	pages: DashboardPageProps[]
+	key: string;
+	name: string;
+	pages: DashboardPageProps[];
 }

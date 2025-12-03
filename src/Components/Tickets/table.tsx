@@ -93,9 +93,9 @@ const TicketTable: FC<{
 	totalTimEstimate: number;
 	totalTimeOriginalEstimate: number;
 	totalTimeSpent: number;
-	isDashboard?: boolean	;
+	isDashboard?: boolean;
 	defaultSort?: string;
-	defaultSortDirection?: ('asc' | 'desc')
+	defaultSortDirection?: "asc" | "desc";
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -105,7 +105,7 @@ const TicketTable: FC<{
 	totalTimeSpent,
 	isDashboard,
 	defaultSort,
-	defaultSortDirection
+	defaultSortDirection,
 }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
@@ -319,17 +319,19 @@ const TicketTable: FC<{
 
 		if (
 			defaultSort &&
-			(
-				isDashboard ||
+			(isDashboard ||
 				!columnModel ||
 				!columnModel.GridSortModel ||
-				!columnModel.GridSortModel.length
-			)
+				!columnModel.GridSortModel.length)
 		) {
-			if (defaultSortDirection == 'desc') {
-				columnModel.GridSortModel = [{field: defaultSort, sort: 'desc'}]
+			if (defaultSortDirection == "desc") {
+				columnModel.GridSortModel = [
+					{ field: defaultSort, sort: "desc" },
+				];
 			} else {
-				columnModel.GridSortModel = [{field: defaultSort, sort: 'asc'}]
+				columnModel.GridSortModel = [
+					{ field: defaultSort, sort: "asc" },
+				];
 			}
 		}
 		console.log(columnModel);

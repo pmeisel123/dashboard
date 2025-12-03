@@ -51,7 +51,6 @@ function EstimatorPage() {
 		new Set(user_param.split(",")),
 	);
 	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
-	const hasFetchedTickets = useRef("");
 	const freezeParams = useRef(false);
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -108,12 +107,8 @@ function EstimatorPage() {
 		getFunc();
 	}, [dispatch]);
 	useEffect(() => {
-		if (
-			(search || parent) &&
-			hasFetchedTickets.current != search + " -- " + parent
-		) {
+		if (search || parent) {
 			getFunc();
-			hasFetchedTickets.current = search + " -- " + parent;
 		}
 	}, [search, parent]);
 	useEffect(() => {

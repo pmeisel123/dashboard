@@ -6,9 +6,9 @@ import {
 	API_URL,
 	API_USERNAME,
 	CUSTOM_FIELDS,
+	DASHBOARDS,
 	DONE_STATUS,
 	VACATION_KEY,
-	DASHBOARDS
 } from "./globals";
 
 // https://vite.dev/config/
@@ -34,10 +34,10 @@ export default defineConfig({
 				},
 				rewrite: (path) => path.replace(/^\/jira/, ""),
 				configure: (proxy) => {
-					proxy.on('proxyRes', (_proxyRes, req) => {
-						console.log('Received Response from Target:', req.url);
+					proxy.on("proxyRes", (_proxyRes, req) => {
+						console.log("Received Response from Target:", req.url);
 					});
-				}
+				},
 			},
 		},
 		fs: {

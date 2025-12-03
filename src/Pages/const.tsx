@@ -1,3 +1,4 @@
+import Dashboard from "@src/Pages/Dashboard";
 import EstimatorPage from "@src/Pages/Estimator";
 import HolidayPage from "@src/Pages/Holiday";
 import HomePage from "@src/Pages/Home";
@@ -75,5 +76,11 @@ export const pages = [
 				automaticlly pull/format the vacation data
 			</>
 		),
+	},
+	{
+		path: "/dashboard",
+		name: "Dashboard",
+		element: <Dashboard />,
+		description: <>Being Built</>,
 	},
 ];

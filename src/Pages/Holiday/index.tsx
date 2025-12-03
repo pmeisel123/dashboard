@@ -13,7 +13,7 @@ import {
 import { getDateStringWithDayOfWeek, getHolidays } from "@src/Api";
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
-import { useSearchParams, useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import { DateRow } from "./const";
 
 const HolidayPage = () => {
@@ -65,23 +65,25 @@ const HolidayPage = () => {
 	const usHolidays = getHolidays(year);
 	return (
 		<>
-			{!isDashboard && (<>
-				<InputLabel id="Year">Year</InputLabel>
-				<Select
-					label="Year"
-					value={year}
-					onChange={(event) => {
-						setYear(event.target.value);
-					}}
-					sx={{ minWidth: 100 }}
-				>
-					{years_choices.map((year) => (
-						<MenuItem key={year} value={year}>
-							{year}
-						</MenuItem>
-					))}
-				</Select>
-			</>)}
+			{!isDashboard && (
+				<>
+					<InputLabel id="Year">Year</InputLabel>
+					<Select
+						label="Year"
+						value={year}
+						onChange={(event) => {
+							setYear(event.target.value);
+						}}
+						sx={{ minWidth: 100 }}
+					>
+						{years_choices.map((year) => (
+							<MenuItem key={year} value={year}>
+								{year}
+							</MenuItem>
+						))}
+					</Select>
+				</>
+			)}
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">
 					<TableHead>

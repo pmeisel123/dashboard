@@ -11,7 +11,7 @@ import { fetchTickets, getJiraDayString } from "@src/Api";
 import { TicketTable } from "@src/Components";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams, useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const default_days = 5;
 
@@ -137,7 +137,8 @@ function RecentTicketsPage() {
 								setLoading(true);
 							}}
 							disabled={
-								getParamDays() == days && getParamSearch() == search
+								getParamDays() == days &&
+								getParamSearch() == search
 							}
 						>
 							Update
@@ -154,8 +155,8 @@ function RecentTicketsPage() {
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
-					defaultSort={'created'}
-					defaultSortDirection={'desc'}
+					defaultSort={"created"}
+					defaultSortDirection={"desc"}
 				/>
 			}
 		</>

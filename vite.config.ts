@@ -33,8 +33,8 @@ export default defineConfig({
 						"Basic " + btoa(API_USERNAME + ":" + API_KEY),
 				},
 				rewrite: (path) => path.replace(/^\/jira/, ""),
-				configure: (proxy, _options) => {
-					proxy.on('proxyRes', (proxyRes, req, res) => {
+				configure: (proxy) => {
+					proxy.on('proxyRes', (_proxyRes, req) => {
 						console.log('Received Response from Target:', req.url);
 					});
 				}

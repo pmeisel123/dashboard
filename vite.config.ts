@@ -8,7 +8,7 @@ import {
 	CUSTOM_FIELDS,
 	DONE_STATUS,
 	VACATION_KEY,
-	DAHSBOARDS
+	DASHBOARDS
 } from "./globals";
 
 // https://vite.dev/config/
@@ -18,7 +18,7 @@ export default defineConfig({
 		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
 		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
-		__DASHBOARDS__: JSON.stringify(DAHSBOARDS || {}),
+		__DASHBOARDS__: JSON.stringify(DASHBOARDS || {}),
 	},
 	server: {
 		host: "0.0.0.0",

@@ -1,18 +1,18 @@
 import {
 	Box,
-	Button,
 	Typography,
 	useMediaQuery,
 	useTheme,
 } from "@mui/material";
 import { store } from "@src/Api";
-import { LeftNav, TopNav } from "@src/Components";
+import { LeftNav, TopNav, Progress, Duck } from "@src/Components";
 import { pages } from "@src/Pages/const";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { matchRoutes } from "react-router";
 import {
+	useNavigate,
 	createBrowserRouter,
 	Outlet,
 	RouterProvider,
@@ -32,6 +32,7 @@ const router = createBrowserRouter([
 const defaultLeftWidth = 150;
 
 function Main() {
+	const navigate = useNavigate();
 	const theme = useTheme();
 	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up("sm"));
 	const [leftNavOpen, setLeftNavOpen] = useState<boolean>(isSmallOrLarger);
@@ -44,6 +45,9 @@ function Main() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isDashboard, setIsDashboard] = useState<boolean>(
 		searchParams.get("isDashboard") == "true",
+	);
+	const [dashboard, setDashboard] = useState<string>(
+		searchParams.get("dashboard") || "",
 	);
 	const location = useLocation();
 	const [windowSize, setWindowSize] = useState({
@@ -66,6 +70,8 @@ function Main() {
 			newSearchParams.set("isDashboard", "true");
 			setSearchParams(newSearchParams);
 			setSideWidth(0);
+		} else if( dashboard != "") {
+			setSideWidth(0);
 		} else if (!isSmallOrLarger) {
 			let tmp_width = windowSize.width * 0.75;
 			if (tmp_width > defaultLeftWidth * 2) {
@@ -77,7 +83,11 @@ function Main() {
 		} else {
 			setSideWidth(0);
 		}
-	}, [leftNavOpen, isSmallOrLarger, windowSize, isDashboard]);
+	}, [leftNavOpen, isSmallOrLarger, windowSize, isDashboard, dashboard]);
+	useEffect(() => {
+		setDashboard(searchParams.get('dashboard') || '');
+		setIsDashboard(searchParams.get("isDashboard") == "true");
+	}, [searchParams]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (isDashboard) {
@@ -118,41 +128,19 @@ function Main() {
 		}
 		document.title = title;
 	}, [location]);
+	const changeUrl = (url: string) => {
+		navigate(url);
+	};
+	(window as any).changeUrl = changeUrl;
 
 	return (
 		<>
-			{isDashboard && false && (
-				<>
-					<Box sx={{ height: "60px" }}>
-						Dashboard:
-						<Box
-							sx={{
-								position: "absolute",
-								top: 10,
-								right: 30,
-								zIndex: 99999,
-								background: "#fff",
-								outline: "1px solid red",
-							}}
-						>
-							<Button
-								onClick={() => {
-									setIsDashboard(false);
-								}}
-							>
-								Exit Dashboard
-							</Button>
-						</Box>
-					</Box>
-				</>
-			)}
-			{!isDashboard && (
+			{!isDashboard && !dashboard && (
 				<>
 					<TopNav
 						toggleLeftNav={toggleLeftNav}
 						toggleHideTitle={toggleHideTitle}
 						hideTitle={hideTitle}
-						setIsDashboard={setIsDashboard}
 					></TopNav>
 					<LeftNav
 						open={leftNavOpen}
@@ -167,7 +155,7 @@ function Main() {
 					transition: "padding-left 0.1s",
 				}}
 			>
-				{!isDashboard && !hideTitle && (
+				{!isDashboard && !dashboard && !hideTitle && (
 					<>
 						<Typography variant="h6" component="div">
 							{currentName}
@@ -181,8 +169,13 @@ function Main() {
 						</Typography>
 					</>
 				)}
-				<Outlet context={{ isDashboard: isDashboard }} />
+				{
+					isDashboard && (
+					<Progress />
+				)}
+				<Outlet context={{ isDashboard: (isDashboard || !!dashboard) }} />
 			</Box>
+			<Duck />
 		</>
 	);
 }

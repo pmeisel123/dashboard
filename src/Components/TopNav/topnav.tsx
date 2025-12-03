@@ -11,14 +11,12 @@ import { Link } from "react-router-dom"; // From react-router-dom
 interface TopNavBarProps {
 	toggleLeftNav: () => void; // Function to open/close Left Nav
 	toggleHideTitle: () => void; // Function to hide/show Title on pages
-	setIsDashboard: (_value: boolean) => void;
 	hideTitle: boolean;
 }
 
 const TopNavBar: FC<TopNavBarProps> = ({
 	toggleLeftNav,
 	toggleHideTitle,
-	setIsDashboard,
 	hideTitle,
 }) => {
 	return (
@@ -51,13 +49,6 @@ const TopNavBar: FC<TopNavBarProps> = ({
 						title="Hide/Show the Page Titles and Description on every page"
 					>
 						{hideTitle ? "Show" : "Hide"} Page Titles
-					</Button>
-					<Button
-						color="inherit"
-						onClick={() => setIsDashboard(true)}
-						title="Dashboard Model"
-					>
-						Dashboard Mode
 					</Button>
 					<Button color="inherit" component={Link} to="/">
 						Home

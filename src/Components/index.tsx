@@ -6,3 +6,5 @@ export * from "./SavePage";
 export * from "./Tickets";
 export * from "./TopNav";
 export * from "./Users";
+export * from "./Dashboard";
+export * from "./Duck";

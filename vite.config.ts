@@ -1,16 +1,19 @@
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
+import * as fs from 'fs';
 import {
 	API_KEY,
 	API_URL,
 	API_USERNAME,
 	CUSTOM_FIELDS,
 	DASHBOARDS,
+	DASHBOARD_SPEED_SECONDS,
 	DONE_STATUS,
 	VACATION_KEY,
 } from "./globals";
 
+const ducks = fs.readdirSync('./src/assets/ducks/');
 // https://vite.dev/config/
 export default defineConfig({
 	define: {
@@ -19,6 +22,8 @@ export default defineConfig({
 		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
 		__DASHBOARDS__: JSON.stringify(DASHBOARDS || {}),
+		__DASHBOARD_SPEED_SECONDS__: JSON.stringify(DASHBOARD_SPEED_SECONDS || {}),
+		__DUCKS__: JSON.stringify(ducks),
 	},
 	server: {
 		host: "0.0.0.0",

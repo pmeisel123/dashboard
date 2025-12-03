@@ -81,6 +81,6 @@ export const pages = [
 		path: "/dashboard",
 		name: "Dashboard",
 		element: <Dashboard />,
-		description: <>Being Built</>,
+		description: <>List dashboards configured in globals.ts</>,
 	},
 ];

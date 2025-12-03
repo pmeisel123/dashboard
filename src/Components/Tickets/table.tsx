@@ -334,7 +334,6 @@ const TicketTable: FC<{
 				];
 			}
 		}
-		console.log(columnModel);
 		setColumnModel(columnModel);
 	}, []);
 

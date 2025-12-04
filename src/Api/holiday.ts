@@ -1,11 +1,103 @@
 import holidays from "date-holidays";
+import { HebrewCalendar, Location } from '@hebcal/core';
+import type { CalOptions } from '@hebcal/core';
+import type { HolidayProps } from './types';
 
-export const getHolidays = (year: string) => {
+const JewishHolidaysList = (year: string) => {
+	const loc = Location.lookup('San Francisco');
+
+	const options: CalOptions = {
+	  year: parseInt(year),
+	  isHebrewYear: false,
+	  candlelighting: false,
+	  location: loc,
+	  sedrot: false,
+	  omer: false,
+	};
+
+	const events = HebrewCalendar.calendar(options);
+	const holidays: HolidayProps[] = [];
+	events.forEach((event) => {
+		const secular = getHolidayDayString(event.greg());
+		holidays.push({
+			name: event.desc,
+			date: secular,
+			type: 'Jewish',
+		});
+	})
+	return holidays;
+};
+
+const HOLIDAY_RENAME: {[key: string]:string} = {
+	'Columbus Day': "Indigenous Peoples' Day",
+	"Washington's Birthday": "Presidents' Day",
+}
+
+const renameHoliday = (name: string) => {
+	if (name in HOLIDAY_RENAME) {
+		return HOLIDAY_RENAME[name];
+	}
+	return name;
+}
+
+export const getHolidays = (year: string): HolidayProps[] => {
 	const hd = new holidays("US"); // For United States
-	const usHolidays = hd.getHolidays(year).filter((holiday) => {
-		return holiday.type === "public" || holiday.type === "bank";
+	const holidaysUs: HolidayProps[] = [];
+	hd.getHolidays(year).forEach((holiday) => {
+		if (holiday.type === "public" || holiday.type === "bank") {
+			let name = renameHoliday(holiday.name);
+			holidaysUs.push({
+				name: name,
+				date: holiday.date,
+				type: 'US',
+			});
+		}
+	});
+	return holidaysUs;
+};
+
+export const getAllUsHolidays = (year?: string): HolidayProps[] => {
+	if (!year) {
+		year = (new Date()).getUTCFullYear() + '';
+	}
+	if (allHolidays[year]) {
+		return allHolidays[year];
+	}
+	const hd = new holidays("US"); // For United States
+	const usHolidays: HolidayProps[] = [];
+	hd.getHolidays(year).forEach((holiday) => {
+		let name = renameHoliday(holiday.name);
+		usHolidays.push({
+			name: name,
+			date: holiday.date,
+			type: 'US',
+		});
 	});
 	return usHolidays;
+};
+
+let allHolidays: {[year: string]: HolidayProps[]} = {};
+
+export const getAllHolidays = (year?: string): HolidayProps[] => {
+	if (!year) {
+		year = (new Date()).getUTCFullYear() + '';
+	}
+	if (allHolidays[year]) {
+		return allHolidays[year];
+	}
+	const hd = new holidays("US"); // For United States
+	const usHolidays: HolidayProps[] = [];
+	hd.getHolidays(year).forEach((holiday) => {
+		let name = renameHoliday(holiday.name);
+		usHolidays.push({
+			name: name,
+			date: holiday.date,
+			type: 'US',
+		});
+	});
+	const jewishHolidays = JewishHolidaysList(year);
+	allHolidays[year] = [...usHolidays, ...jewishHolidays];
+	return allHolidays[year];
 };
 
 export const getHolidayDayString = (dateObj: Date) => {

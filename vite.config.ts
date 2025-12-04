@@ -11,6 +11,7 @@ import {
 	DASHBOARD_SPEED_SECONDS,
 	DONE_STATUS,
 	VACATION_KEY,
+	DASHBOARD_DUCKS
 } from "./globals";
 
 const ducks = fs.readdirSync('./src/assets/ducks/');
@@ -24,6 +25,7 @@ export default defineConfig({
 		__DASHBOARDS__: JSON.stringify(DASHBOARDS || {}),
 		__DASHBOARD_SPEED_SECONDS__: JSON.stringify(DASHBOARD_SPEED_SECONDS || {}),
 		__DUCKS__: JSON.stringify(ducks),
+		__DASHBOARD_DUCKS__: JSON.stringify(DASHBOARD_DUCKS),
 	},
 	server: {
 		host: "0.0.0.0",

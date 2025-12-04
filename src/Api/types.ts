@@ -55,3 +55,9 @@ export interface DashboardProps {
 	name: string;
 	pages: DashboardPageProps[];
 }
+
+export interface HolidayProps {
+	name: string,
+	date: string,
+	type: string,
+}

@@ -58,19 +58,20 @@ function WhoIsOutPage() {
 		}
 	}, [dispatch]);
 	const today = new Date();
+	today.setHours(0, 0, 0, 0);
 	const nextyear = new Date(
 		new Date().setFullYear(new Date().getFullYear() + 1),
 	);
 	// Get holidays for a specific year
 	const usHolidays = getHolidays(today.getFullYear().toString()).filter(
 		(holiday) => {
-			return holiday.end >= today;
+			return new Date(holiday.date) >= today;
 		},
 	);
 	const nextYearUsHolidays = getHolidays(
 		nextyear.getFullYear().toString(),
 	).filter((holiday) => {
-		return holiday.start <= nextyear;
+		return new Date(holiday.date) <= nextyear;
 	});
 
 	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce(

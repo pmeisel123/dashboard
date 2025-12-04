@@ -7,6 +7,7 @@ import {
 import { store } from "@src/Api";
 import { LeftNav, TopNav, Progress, Duck } from "@src/Components";
 import { pages } from "@src/Pages/const";
+import DucksPage from "@src/Pages/Ducks";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
@@ -21,11 +22,17 @@ import {
 } from "react-router-dom";
 import "./App.css";
 
+declare const __DASHBOARD_DUCKS__: boolean;
 const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Main />,
-		children: pages,
+		children: [...pages, {
+			path: '/ducks',
+			name: 'Ducks',
+			element: <DucksPage />,
+			description: <>DUCKS!</>
+		}],
 	},
 ]);
 
@@ -175,7 +182,9 @@ function Main() {
 				)}
 				<Outlet context={{ isDashboard: (isDashboard || !!dashboard) }} />
 			</Box>
-			<Duck />
+			{!dashboard && (__DASHBOARD_DUCKS__ || !isDashboard) && (
+				<Duck />
+			)}
 		</>
 	);
 }

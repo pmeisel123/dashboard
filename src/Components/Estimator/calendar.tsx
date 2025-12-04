@@ -50,13 +50,13 @@ const Calendar: FC<{
 	// Get holidays for a specific year
 	const usHolidays = getHolidays(today.getFullYear().toString()).filter(
 		(holiday) => {
-			return holiday.end >= today;
+			return new Date(holiday.date) >= today;
 		},
 	);
 	const nextYearUsHolidays = getHolidays(
 		nextyear.getFullYear().toString(),
 	).filter((holiday) => {
-		return holiday.start <= nextyear;
+		return new Date(holiday.date) <= nextyear;
 	});
 
 	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce(

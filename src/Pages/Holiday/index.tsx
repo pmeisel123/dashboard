@@ -10,11 +10,28 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import { getDateStringWithDayOfWeek, getHolidays } from "@src/Api";
+import { getDateStringWithDayOfWeek, getHolidays, getAllUsHolidays } from "@src/Api";
+import { cleanHolidayName, getHolidayDuck } from '@src/Components/Duck/const';
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
+import type { FC } from "react";
+
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { DateRow } from "./const";
+
+const HolidayDuck: FC<{day: string, name: string}> = ({day, name}) => {
+	const [duck_title, holiday_duck] = getHolidayDuck(day);
+	if (!holiday_duck) {
+		return;
+	}
+	if (duck_title != cleanHolidayName(name)) {
+		// console.log(duck_title, cleanHolidayName(name), day);
+		return;
+	}
+	return (
+		<img style={{height: '30px', width: '30px', position: 'absolute', margin: '-5px 0 0 5px'}} src={'/src/assets/ducks/' + holiday_duck} />
+	);
+};
 
 const HolidayPage = () => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
@@ -23,6 +40,10 @@ const HolidayPage = () => {
 	const [year, setYear] = useState<string>(
 		searchParams.get("year") || this_year,
 	);
+	const [extended, setExtended] = useState<boolean>(
+		searchParams.get("extended") == 'true'
+	);
+	const with_ducks = searchParams.get('withDucks') != null;
 	const year_as_int = parseInt(this_year);
 
 	const today = new Date();
@@ -58,11 +79,16 @@ const HolidayPage = () => {
 		} else {
 			newSearchParams.delete("year");
 		}
+		if (extended) {
+			newSearchParams.set("extended", 'true');
+		} else {
+			newSearchParams.delete("extended");
+		}
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
 	}, [year]);
-	const usHolidays = getHolidays(year);
+	const usHolidays = extended ? getAllUsHolidays(year) : getHolidays(year);
 	return (
 		<>
 			{!isDashboard && (
@@ -96,7 +122,12 @@ const HolidayPage = () => {
 					<TableBody>
 						{usHolidays.map((holiday) => (
 							<DateRow date={holiday.date} key={holiday.name}>
-								<TableCell>{holiday.name}</TableCell>
+								<TableCell>
+									{holiday.name}
+									{with_ducks && (
+										<HolidayDuck day={holiday.date} name={holiday.name} />
+									)}
+								</TableCell>
 								<TableCell>
 									{getDateStringWithDayOfWeek(
 										getDate(holiday.date),

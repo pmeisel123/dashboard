@@ -150,15 +150,15 @@ export const UsersSelector: FC<{
 				<>
 					{params.value &&
 						params.value
-						.filter(
-							(date: string) => new Date(date) >= midnight,
-						)
-						.map((value: string, index: number) => (
-							<Fragment key={index}>
-								{!!index && <>, </>}
-								{getDayString(new Date(value))}
-							</Fragment>
-						))}
+							.filter(
+								(date: string) => new Date(date) >= midnight,
+							)
+							.map((value: string, index: number) => (
+								<Fragment key={index}>
+									{!!index && <>, </>}
+									{getDayString(new Date(value))}
+								</Fragment>
+							))}
 				</>
 			),
 		},

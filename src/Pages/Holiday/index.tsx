@@ -10,17 +10,22 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import { getDateStringWithDayOfWeek, getHolidays, getAllUsHolidays, getAllHolidays } from "@src/Api";
 import type { HolidayProps } from "@src/Api";
-import { cleanHolidayName, getHolidayDuck } from '@src/Components/Duck/const';
+import {
+	getAllHolidays,
+	getAllUsHolidays,
+	getDateStringWithDayOfWeek,
+	getHolidays,
+} from "@src/Api";
+import { cleanHolidayName, getHolidayDuck } from "@src/Components/Duck/const";
 import { formatDistanceToNow } from "date-fns";
-import { useEffect, useState } from "react";
 import type { FC } from "react";
+import { useEffect, useState } from "react";
 
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import { DateRow } from "./const";
 
-const HolidayDuck: FC<{day: string, name: string}> = ({day, name}) => {
+const HolidayDuck: FC<{ day: string; name: string }> = ({ day, name }) => {
 	const [duck_title, holiday_duck] = getHolidayDuck(day);
 	if (!holiday_duck) {
 		return;
@@ -30,7 +35,15 @@ const HolidayDuck: FC<{day: string, name: string}> = ({day, name}) => {
 		return;
 	}
 	return (
-		<img style={{height: '30px', width: '30px', position: 'absolute', margin: '-5px 0 0 5px'}} src={'/src/assets/ducks/' + holiday_duck} />
+		<img
+			style={{
+				height: "30px",
+				width: "30px",
+				position: "absolute",
+				margin: "-5px 0 0 5px",
+			}}
+			src={"/src/assets/ducks/" + holiday_duck}
+		/>
 	);
 };
 
@@ -42,19 +55,19 @@ const HolidayPage = () => {
 		searchParams.get("year") || this_year,
 	);
 	const [extended, setExtended] = useState<boolean>(
-		searchParams.get("extended") == 'true'
+		searchParams.get("extended") == "true",
 	);
 	const [withJewish, setWithJewish] = useState<boolean>(
-		searchParams.get("withJewish") == 'true'
+		searchParams.get("withJewish") == "true",
 	);
-	const with_ducks = searchParams.get('withDucks') != null;
+	const with_ducks = searchParams.get("withDucks") != null;
 	const year_as_int = parseInt(this_year);
 
 	const today = new Date();
 	const loadParams = () => {
 		setYear(searchParams.get("year") || this_year);
-		setExtended(searchParams.get("extended") == 'true');
-		setWithJewish(searchParams.get("withJewish") == 'true');
+		setExtended(searchParams.get("extended") == "true");
+		setWithJewish(searchParams.get("withJewish") == "true");
 	};
 
 	useEffect(() => {
@@ -86,12 +99,12 @@ const HolidayPage = () => {
 			newSearchParams.delete("year");
 		}
 		if (extended) {
-			newSearchParams.set("extended", 'true');
+			newSearchParams.set("extended", "true");
 		} else {
 			newSearchParams.delete("extended");
 		}
 		if (withJewish) {
-			newSearchParams.set("withJewish", 'true');
+			newSearchParams.set("withJewish", "true");
 		} else {
 			newSearchParams.delete("withJewish");
 		}
@@ -101,11 +114,11 @@ const HolidayPage = () => {
 	}, [year]);
 	let holidays: HolidayProps[];
 	if (withJewish) {
-		holidays =  getAllHolidays(year);
+		holidays = getAllHolidays(year);
 	} else if (extended) {
 		holidays = getAllUsHolidays(year);
 	} else {
-		holidays = getHolidays(year)
+		holidays = getHolidays(year);
 	}
 	return (
 		<>
@@ -139,11 +152,17 @@ const HolidayPage = () => {
 					</TableHead>
 					<TableBody>
 						{holidays.map((holiday) => (
-							<DateRow date={holiday.date} key={holiday.name + holiday.date}>
+							<DateRow
+								date={holiday.date}
+								key={holiday.name + holiday.date}
+							>
 								<TableCell>
 									{holiday.name}
 									{with_ducks && (
-										<HolidayDuck day={holiday.date} name={holiday.name} />
+										<HolidayDuck
+											day={holiday.date}
+											name={holiday.name}
+										/>
 									)}
 								</TableCell>
 								<TableCell>

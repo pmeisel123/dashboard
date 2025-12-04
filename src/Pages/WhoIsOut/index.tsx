@@ -14,9 +14,9 @@ import {
 import type { AppDispatch, RootState } from "@src/Api";
 import {
 	fetchUsersAndGroups,
+	getAllUsHolidays,
 	getDateString,
 	getHolidayDayString,
-	getAllUsHolidays,
 	isUserDataRecent,
 } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
@@ -69,14 +69,14 @@ function WhoIsOutPage() {
 			return new Date(holiday.date) >= today;
 		},
 	);
-	
+
 	const nextYearUsHolidays = getAllUsHolidays(
 		nextyear.getFullYear().toString(),
 	).filter((holiday) => {
 		return new Date(holiday.date) <= nextyear;
 	});
 
-	const allNonBankHolidays:{[key: string]: string} = {};
+	const allNonBankHolidays: { [key: string]: string } = {};
 	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce(
 		(newFormat, holiday) => {
 			if (!holiday.bank) {
@@ -126,8 +126,7 @@ function WhoIsOutPage() {
 				} else {
 					const holiday_string = getHolidayDayString(current_day);
 					if (allUsHolidays[holiday_string]) {
-						holiday =
-							allUsHolidays[holiday_string];
+						holiday = allUsHolidays[holiday_string];
 					} else {
 						Object.keys(users).forEach((user_id) => {
 							const user = possibleUsersGroups.users[user_id];
@@ -142,8 +141,7 @@ function WhoIsOutPage() {
 					}
 					if (allNonBankHolidays[holiday_string]) {
 						non_bank_holiday = true;
-						holiday =
-							allNonBankHolidays[holiday_string];
+						holiday = allNonBankHolidays[holiday_string];
 					}
 				}
 				row.push({
@@ -236,7 +234,8 @@ function WhoIsOutPage() {
 										key={getDateString(cell.day)}
 										isOff={
 											!!cell.past ||
-											(!!cell.holiday && !cell.nonBankholiday) ||
+											(!!cell.holiday &&
+												!cell.nonBankholiday) ||
 											!!cell.weekend
 										}
 										isDone={false}
@@ -245,19 +244,14 @@ function WhoIsOutPage() {
 										{getDateString(cell.day)}
 										<br />
 										{cell.holiday}
-										{!!cell.holiday && !!cell.whoisout.length && (
-											<br />
-										)}
-										{cell.whoisout.map(
-											(item, index) => (
-												<React.Fragment
-													key={index}
-												>
-													<br />
-													{item}
-												</React.Fragment>
-											),
-										)}
+										{!!cell.holiday &&
+											!!cell.whoisout.length && <br />}
+										{cell.whoisout.map((item, index) => (
+											<React.Fragment key={index}>
+												<br />
+												{item}
+											</React.Fragment>
+										))}
 									</EstimatorCell>
 								))}
 							</TableRow>

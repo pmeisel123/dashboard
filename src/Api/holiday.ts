@@ -60,8 +60,9 @@ export const getHolidays = (year: string): HolidayProps[] => {
 			let name = renameHoliday(holiday.name);
 			holidaysUs.push({
 				name: name,
-				date: holiday.date,
+				date: getHolidayDayString(new Date(holiday.date)),
 				type: 'US',
+				bank: true,
 			});
 		}
 	});
@@ -78,8 +79,9 @@ export const getAllUsHolidays = (year?: string): HolidayProps[] => {
 		let name = renameHoliday(holiday.name);
 		usHolidays.push({
 			name: name,
-			date: holiday.date,
+			date: getHolidayDayString(new Date(holiday.date)),
 			type: 'US',
+			bank: (holiday.type === "public" || holiday.type === "bank"),
 		});
 	});
 	return usHolidays;

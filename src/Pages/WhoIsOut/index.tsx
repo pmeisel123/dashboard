@@ -16,7 +16,7 @@ import {
 	fetchUsersAndGroups,
 	getDateString,
 	getHolidayDayString,
-	getHolidays,
+	getAllUsHolidays,
 	isUserDataRecent,
 } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
@@ -26,6 +26,7 @@ import { useOutletContext, useSearchParams } from "react-router-dom";
 interface cellData {
 	day: Date;
 	holiday: string;
+	nonBankholiday: boolean;
 	weekend: boolean;
 	whoisout: string[];
 	past: boolean;
@@ -57,25 +58,31 @@ function WhoIsOutPage() {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);
-	const today = new Date();
+	const today = new Date('2025-10-25');
 	today.setHours(0, 0, 0, 0);
 	const nextyear = new Date(
 		new Date().setFullYear(new Date().getFullYear() + 1),
 	);
 	// Get holidays for a specific year
-	const usHolidays = getHolidays(today.getFullYear().toString()).filter(
+	const usHolidays = getAllUsHolidays(today.getFullYear().toString()).filter(
 		(holiday) => {
 			return new Date(holiday.date) >= today;
 		},
 	);
-	const nextYearUsHolidays = getHolidays(
+	
+	const nextYearUsHolidays = getAllUsHolidays(
 		nextyear.getFullYear().toString(),
 	).filter((holiday) => {
 		return new Date(holiday.date) <= nextyear;
 	});
 
+	const allNonBankHolidays:{[key: string]: string} = {};
 	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce(
 		(newFormat, holiday) => {
+			if (!holiday.bank) {
+				allNonBankHolidays[holiday.date] = holiday.name;
+				return newFormat;
+			}
 			newFormat[holiday.date] = holiday.name;
 			return newFormat;
 		},
@@ -83,7 +90,7 @@ function WhoIsOutPage() {
 	);
 	let rows: cellData[][] = [];
 
-	const current_day = new Date();
+	const current_day = today;
 	current_day.setDate(current_day.getDate() - current_day.getDay());
 	current_day.setHours(0, 0, 0, 0);
 
@@ -108,6 +115,7 @@ function WhoIsOutPage() {
 			let row: cellData[] = [];
 			for (var i = 0; i <= 6; i++) {
 				let weekend = false;
+				let non_bank_holiday = false;
 				let holiday = "";
 				let past = false;
 				let whoisout: string[] = [];
@@ -119,7 +127,7 @@ function WhoIsOutPage() {
 					const holiday_string = getHolidayDayString(current_day);
 					if (allUsHolidays[holiday_string]) {
 						holiday =
-							allUsHolidays[getHolidayDayString(current_day)];
+							allUsHolidays[holiday_string];
 					} else {
 						Object.keys(users).forEach((user_id) => {
 							const user = possibleUsersGroups.users[user_id];
@@ -132,10 +140,16 @@ function WhoIsOutPage() {
 							}
 						});
 					}
+					if (allNonBankHolidays[holiday_string]) {
+						non_bank_holiday = true;
+						holiday =
+							allNonBankHolidays[holiday_string];
+					}
 				}
 				row.push({
 					day: new Date(current_day),
 					holiday: holiday,
+					nonBankholiday: non_bank_holiday,
 					weekend: weekend,
 					whoisout: whoisout,
 					past: past,
@@ -222,29 +236,27 @@ function WhoIsOutPage() {
 										key={getDateString(cell.day)}
 										isOff={
 											!!cell.past ||
-											!!cell.holiday ||
+											(!!cell.holiday && !cell.nonBankholiday) ||
 											!!cell.weekend
 										}
 										isDone={false}
-										isPartial={false}
+										isPartial={cell.nonBankholiday}
 									>
 										{getDateString(cell.day)}
 										<br />
-										{cell.holiday ? (
-											<>{cell.holiday}</>
-										) : (
-											<>
-												{cell.whoisout.map(
-													(item, index) => (
-														<React.Fragment
-															key={index}
-														>
-															<br />
-															{item}
-														</React.Fragment>
-													),
-												)}
-											</>
+										{cell.holiday}
+										{!!cell.holiday && !!cell.whoisout.length && (
+											<br />
+										)}
+										{cell.whoisout.map(
+											(item, index) => (
+												<React.Fragment
+													key={index}
+												>
+													<br />
+													{item}
+												</React.Fragment>
+											),
 										)}
 									</EstimatorCell>
 								))}

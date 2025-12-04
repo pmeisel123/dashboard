@@ -123,7 +123,8 @@ export const UsersSelector: FC<{
 			);
 		},
 	};
-
+	const midnight = new Date();
+	midnight.setHours(0, 0, 0, 0);
 	const columns: GridColDef<any>[] = [
 		{
 			field: "icon",
@@ -148,7 +149,11 @@ export const UsersSelector: FC<{
 			renderCell: (params: GridRenderCellParams<UserProps>) => (
 				<>
 					{params.value &&
-						params.value.map((value: string, index: number) => (
+						params.value
+						.filter(
+							(date: string) => new Date(date) >= midnight,
+						)
+						.map((value: string, index: number) => (
 							<Fragment key={index}>
 								{!!index && <>, </>}
 								{getDayString(new Date(value))}

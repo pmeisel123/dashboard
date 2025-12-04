@@ -10,7 +10,8 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import { getDateStringWithDayOfWeek, getHolidays, getAllUsHolidays } from "@src/Api";
+import { getDateStringWithDayOfWeek, getHolidays, getAllUsHolidays, getAllHolidays } from "@src/Api";
+import type { HolidayProps } from "@src/Api";
 import { cleanHolidayName, getHolidayDuck } from '@src/Components/Duck/const';
 import { formatDistanceToNow } from "date-fns";
 import { useEffect, useState } from "react";
@@ -43,12 +44,17 @@ const HolidayPage = () => {
 	const [extended, setExtended] = useState<boolean>(
 		searchParams.get("extended") == 'true'
 	);
+	const [withJewish, setWithJewish] = useState<boolean>(
+		searchParams.get("withJewish") == 'true'
+	);
 	const with_ducks = searchParams.get('withDucks') != null;
 	const year_as_int = parseInt(this_year);
 
 	const today = new Date();
 	const loadParams = () => {
 		setYear(searchParams.get("year") || this_year);
+		setExtended(searchParams.get("extended") == 'true');
+		setWithJewish(searchParams.get("withJewish") == 'true');
 	};
 
 	useEffect(() => {
@@ -84,11 +90,23 @@ const HolidayPage = () => {
 		} else {
 			newSearchParams.delete("extended");
 		}
+		if (withJewish) {
+			newSearchParams.set("withJewish", 'true');
+		} else {
+			newSearchParams.delete("withJewish");
+		}
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
 	}, [year]);
-	const usHolidays = extended ? getAllUsHolidays(year) : getHolidays(year);
+	let holidays: HolidayProps[];
+	if (withJewish) {
+		holidays =  getAllHolidays(year);
+	} else if (extended) {
+		holidays = getAllUsHolidays(year);
+	} else {
+		holidays = getHolidays(year)
+	}
 	return (
 		<>
 			{!isDashboard && (
@@ -120,8 +138,8 @@ const HolidayPage = () => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{usHolidays.map((holiday) => (
-							<DateRow date={holiday.date} key={holiday.name}>
+						{holidays.map((holiday) => (
+							<DateRow date={holiday.date} key={holiday.name + holiday.date}>
 								<TableCell>
 									{holiday.name}
 									{with_ducks && (

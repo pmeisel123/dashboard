@@ -25,12 +25,6 @@ const holiday_images: {[key: string]: string[]} = {
 
 export const cleanHolidayName = (holiday: string) => {
 	const new_name = holiday.replace(/:.*/, '').replace(/'s .*/, '').replace(/ Day/, '').replace(/ [IV0-9].*/, '');
-	if (new_name == "Day after Thanksgiving") {
-		return 'Black Friday';
-	}
-	if (new_name == "Pesach") {
-		return 'Passover';
-	}
 	return new_name;
 }
 
@@ -66,12 +60,6 @@ const getHolidays = (year?: string) => {
 			let cyberMonday = new Date(holiday.date);
 			cyberMonday.setDate(cyberMonday.getDate() + 4);
 			hol[getHolidayDayString(cyberMonday)] = 'Cyber Monday';
-		}
-		if (hol[holiday.date] == "Day after Thanksgiving") {
-			hol[holiday.date] = 'Black Friday';
-		}
-		if (hol[holiday.date] == "Pesach") {
-			hol[holiday.date] = 'Passover';
 		}
 		return hol;
 	}, {});

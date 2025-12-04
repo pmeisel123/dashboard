@@ -19,8 +19,17 @@ const JewishHolidaysList = (year: string) => {
 	const holidays: HolidayProps[] = [];
 	events.forEach((event) => {
 		const secular = getHolidayDayString(event.greg());
+		const name= renameHoliday(event.desc);
+		/*if (name.match(/Rosh Chodesh/)) {
+			return;
+		}
+		*/
+		if (!event.getCategories().includes('major')) {
+			return;
+		}
+		console.log(name, event.getCategories());
 		holidays.push({
-			name: event.desc,
+			name: name,
 			date: secular,
 			type: 'Jewish',
 		});
@@ -31,6 +40,9 @@ const JewishHolidaysList = (year: string) => {
 const HOLIDAY_RENAME: {[key: string]:string} = {
 	'Columbus Day': "Indigenous Peoples' Day",
 	"Washington's Birthday": "Presidents' Day",
+	"Day after Thanksgiving": 'Black Friday',
+	"Pesach": 'Passover',
+
 }
 
 const renameHoliday = (name: string) => {
@@ -59,9 +71,6 @@ export const getHolidays = (year: string): HolidayProps[] => {
 export const getAllUsHolidays = (year?: string): HolidayProps[] => {
 	if (!year) {
 		year = (new Date()).getUTCFullYear() + '';
-	}
-	if (allHolidays[year]) {
-		return allHolidays[year];
 	}
 	const hd = new holidays("US"); // For United States
 	const usHolidays: HolidayProps[] = [];
@@ -97,6 +106,7 @@ export const getAllHolidays = (year?: string): HolidayProps[] => {
 	});
 	const jewishHolidays = JewishHolidaysList(year);
 	allHolidays[year] = [...usHolidays, ...jewishHolidays];
+	allHolidays[year].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 	return allHolidays[year];
 };
 

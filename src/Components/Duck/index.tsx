@@ -1,1 +1,2 @@
-export * from "./icon";
+export {Duck} from "./icon";
+

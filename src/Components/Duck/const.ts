@@ -61,6 +61,12 @@ const getHolidays = (year?: string) => {
 			cyberMonday.setDate(cyberMonday.getDate() + 4);
 			hol[getHolidayDayString(cyberMonday)] = 'Cyber Monday';
 		}
+		if (hol[holiday.date] == "Day after Thanksgiving") {
+			hol[holiday.date] = 'Black Friday';
+		}
+		if (hol[holiday.date] == "Pesach") {
+			hol[holiday.date] = 'Passover';
+		}
 		return hol;
 	}, {});
 

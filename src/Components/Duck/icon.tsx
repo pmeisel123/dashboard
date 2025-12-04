@@ -1,24 +1,23 @@
-import { Box } from "@mui/material";
-import { getHolidayDayString } from "@src/Api";
+import {Box} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getHolidayDuck } from "./const";
+import { getHolidayDayString} from "@src/Api";
+import { getHolidayDuck } from './const'; 
 declare const __DUCKS__: string[];
 const max_silly = __DUCKS__.length * 4;
 
+
 export const Duck = () => {
-	let default_duck = "ducky.png";
-	let default_duck_title = "ducky.png";
+	let default_duck = 'ducky.png';
+	let default_duck_title = 'ducky.png';
 	const [searchParams] = useSearchParams();
 	const [duck, setDuck] = useState<string>(default_duck);
-	const [silly, setSilly] = useState<number>(
-		parseInt(searchParams.get("silly") || max_silly + ""),
-	);
-	const [duckTitle, setDuckTitle] = useState<string>("");
+	const [silly, setSilly] = useState<number>(parseInt(searchParams.get('silly') || (max_silly + '')));
+	const [duckTitle, setDuckTitle] = useState<string>('');
 	let today = getHolidayDayString(new Date());
 	const randomSilly = () => {
-		if (searchParams.get("silly") != null) {
-			setSilly(parseInt(searchParams.get("silly") || max_silly + ""));
+		if (searchParams.get('silly') != null) {
+			setSilly(parseInt(searchParams.get('silly') || (max_silly + '')));
 		} else {
 			setSilly(Math.floor(Math.random() * max_silly));
 		}
@@ -30,7 +29,7 @@ export const Duck = () => {
 		}, 10000);
 		return () => {
 			clearInterval(duckInterval);
-		};
+		}; 
 	}, []);
 
 	useEffect(() => {
@@ -40,7 +39,7 @@ export const Duck = () => {
 			default_duck = holiday_duck;
 		}
 		if (__DUCKS__.length > silly && __DUCKS__[silly]) {
-			setDuck(__DUCKS__[silly]);
+			setDuck(__DUCKS__[silly])
 			setDuckTitle("silly " + silly);
 		} else {
 			setDuck(default_duck);
@@ -49,15 +48,8 @@ export const Duck = () => {
 	}, [silly]);
 
 	return (
-		<Box
-			sx={{ position: "fixed", bottom: "10px", right: "10px" }}
-			title={duckTitle}
-			key={silly}
-		>
-			<img
-				style={{ height: "45px", width: "45px", opacity: 0.25 }}
-				src={"/src/assets/ducks/" + duck}
-			/>
+		<Box sx={{position: 'fixed', bottom: '10px', right: '10px'}}  title={duckTitle} key={silly}>
+			<img style={{height: '45px', width: '45px', opacity: 0.25}} src={'/src/assets/ducks/' + duck} />
 		</Box>
 	);
 };

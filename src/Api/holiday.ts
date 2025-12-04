@@ -1,55 +1,55 @@
-import type { CalOptions } from "@hebcal/core";
-import { HebrewCalendar, Location } from "@hebcal/core";
 import holidays from "date-holidays";
-import type { HolidayProps } from "./types";
+import { HebrewCalendar, Location } from '@hebcal/core';
+import type { CalOptions } from '@hebcal/core';
+import type { HolidayProps } from './types';
 
 const JewishHolidaysList = (year: string) => {
-	const loc = Location.lookup("San Francisco");
+	const loc = Location.lookup('San Francisco');
 
 	const options: CalOptions = {
-		year: parseInt(year),
-		isHebrewYear: false,
-		candlelighting: false,
-		location: loc,
-		sedrot: false,
-		omer: false,
+	  year: parseInt(year),
+	  isHebrewYear: false,
+	  candlelighting: false,
+	  location: loc,
+	  sedrot: false,
+	  omer: false,
 	};
 
 	const events = HebrewCalendar.calendar(options);
 	const holidays: HolidayProps[] = [];
 	events.forEach((event) => {
 		const secular = getHolidayDayString(event.greg());
-		const name = renameHoliday(event.desc);
+		const name= renameHoliday(event.desc);
 		/*if (name.match(/Rosh Chodesh/)) {
 			return;
 		}
 		*/
-		if (!event.getCategories().includes("major")) {
+		if (!event.getCategories().includes('major')) {
 			return;
 		}
-		console.log(name, event.getCategories());
 		holidays.push({
 			name: name,
 			date: secular,
-			type: "Jewish",
+			type: 'Jewish',
 		});
-	});
+	})
 	return holidays;
 };
 
-const HOLIDAY_RENAME: { [key: string]: string } = {
-	"Columbus Day": "Indigenous Peoples' Day",
+const HOLIDAY_RENAME: {[key: string]:string} = {
+	'Columbus Day': "Indigenous Peoples' Day",
 	"Washington's Birthday": "Presidents' Day",
-	"Day after Thanksgiving": "Black Friday",
-	Pesach: "Passover",
-};
+	"Day after Thanksgiving": 'Black Friday',
+	"Pesach": 'Passover',
+
+}
 
 const renameHoliday = (name: string) => {
 	if (name in HOLIDAY_RENAME) {
 		return HOLIDAY_RENAME[name];
 	}
 	return name;
-};
+}
 
 export const getHolidays = (year: string): HolidayProps[] => {
 	const hd = new holidays("US"); // For United States
@@ -60,7 +60,7 @@ export const getHolidays = (year: string): HolidayProps[] => {
 			holidaysUs.push({
 				name: name,
 				date: getHolidayDayString(new Date(holiday.date)),
-				type: "US",
+				type: 'US',
 				bank: true,
 			});
 		}
@@ -70,7 +70,7 @@ export const getHolidays = (year: string): HolidayProps[] => {
 
 export const getAllUsHolidays = (year?: string): HolidayProps[] => {
 	if (!year) {
-		year = new Date().getUTCFullYear() + "";
+		year = (new Date()).getUTCFullYear() + '';
 	}
 	const hd = new holidays("US"); // For United States
 	const usHolidays: HolidayProps[] = [];
@@ -79,18 +79,18 @@ export const getAllUsHolidays = (year?: string): HolidayProps[] => {
 		usHolidays.push({
 			name: name,
 			date: getHolidayDayString(new Date(holiday.date)),
-			type: "US",
-			bank: holiday.type === "public" || holiday.type === "bank",
+			type: 'US',
+			bank: (holiday.type === "public" || holiday.type === "bank"),
 		});
 	});
 	return usHolidays;
 };
 
-let allHolidays: { [year: string]: HolidayProps[] } = {};
+let allHolidays: {[year: string]: HolidayProps[]} = {};
 
 export const getAllHolidays = (year?: string): HolidayProps[] => {
 	if (!year) {
-		year = new Date().getUTCFullYear() + "";
+		year = (new Date()).getUTCFullYear() + '';
 	}
 	if (allHolidays[year]) {
 		return allHolidays[year];
@@ -102,14 +102,12 @@ export const getAllHolidays = (year?: string): HolidayProps[] => {
 		usHolidays.push({
 			name: name,
 			date: holiday.date,
-			type: "US",
+			type: 'US',
 		});
 	});
 	const jewishHolidays = JewishHolidaysList(year);
 	allHolidays[year] = [...usHolidays, ...jewishHolidays];
-	allHolidays[year].sort(
-		(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-	);
+	allHolidays[year].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 	return allHolidays[year];
 };
 

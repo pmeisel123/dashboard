@@ -57,8 +57,8 @@ export interface DashboardProps {
 }
 
 export interface HolidayProps {
-	name: string;
-	date: string;
-	type: string;
-	bank?: boolean;
+	name: string,
+	date: string,
+	type: string,
+	bank?: boolean,
 }

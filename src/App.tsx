@@ -1,11 +1,6 @@
-import {
-	Box,
-	Typography,
-	useMediaQuery,
-	useTheme,
-} from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { store } from "@src/Api";
-import { LeftNav, TopNav, Progress, Duck } from "@src/Components";
+import { Duck, LeftNav, Progress, TopNav } from "@src/Components";
 import { pages } from "@src/Pages/const";
 import DucksPage from "@src/Pages/Ducks";
 import type { JSX } from "react";
@@ -13,11 +8,11 @@ import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { matchRoutes } from "react-router";
 import {
-	useNavigate,
 	createBrowserRouter,
 	Outlet,
 	RouterProvider,
 	useLocation,
+	useNavigate,
 	useSearchParams,
 } from "react-router-dom";
 import "./App.css";
@@ -27,12 +22,15 @@ const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Main />,
-		children: [...pages, {
-			path: '/ducks',
-			name: 'Ducks',
-			element: <DucksPage />,
-			description: <>DUCKS!</>
-		}],
+		children: [
+			...pages,
+			{
+				path: "/ducks",
+				name: "Ducks",
+				element: <DucksPage />,
+				description: <>DUCKS!</>,
+			},
+		],
 	},
 ]);
 
@@ -77,7 +75,7 @@ function Main() {
 			newSearchParams.set("isDashboard", "true");
 			setSearchParams(newSearchParams);
 			setSideWidth(0);
-		} else if( dashboard != "") {
+		} else if (dashboard != "") {
 			setSideWidth(0);
 		} else if (!isSmallOrLarger) {
 			let tmp_width = windowSize.width * 0.75;
@@ -92,7 +90,7 @@ function Main() {
 		}
 	}, [leftNavOpen, isSmallOrLarger, windowSize, isDashboard, dashboard]);
 	useEffect(() => {
-		setDashboard(searchParams.get('dashboard') || '');
+		setDashboard(searchParams.get("dashboard") || "");
 		setIsDashboard(searchParams.get("isDashboard") == "true");
 	}, [searchParams]);
 	useEffect(() => {
@@ -176,15 +174,10 @@ function Main() {
 						</Typography>
 					</>
 				)}
-				{
-					isDashboard && (
-					<Progress />
-				)}
-				<Outlet context={{ isDashboard: (isDashboard || !!dashboard) }} />
+				{isDashboard && <Progress />}
+				<Outlet context={{ isDashboard: isDashboard || !!dashboard }} />
 			</Box>
-			{!dashboard && (__DASHBOARD_DUCKS__ || !isDashboard) && (
-				<Duck />
-			)}
+			{!dashboard && (__DASHBOARD_DUCKS__ || !isDashboard) && <Duck />}
 		</>
 	);
 }

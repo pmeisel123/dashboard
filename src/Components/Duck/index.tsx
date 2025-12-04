@@ -1,2 +1,1 @@
-export {Duck} from "./icon";
-
+export { Duck } from "./icon";

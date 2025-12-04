@@ -88,8 +88,7 @@ const getHolidays = (year?: string) => {
 		holidays[getHolidayDayString(new Date(year + "-01-0" + i))] =
 			"New Year";
 	}
-	holidays[getHolidayDayString(new Date(year + "-5-04"))] =
-		"May the forth";
+	holidays[getHolidayDayString(new Date(year + "-5-04"))] = "May the forth";
 	for (i = 1; i <= 12; i++) {
 		let month = i + "";
 		if (i < 10) {

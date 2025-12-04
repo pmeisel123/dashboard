@@ -21,6 +21,7 @@ const holiday_images: { [key: string]: string[] } = {
 	"Erev Yom Kippur": ["rosh.png"],
 	"Yom Kippur": ["rosh.png"],
 	"Presidents'": ["lincoln.png"],
+	"May the forth'": ["jedi.png"],
 };
 
 export const cleanHolidayName = (holiday: string) => {
@@ -87,6 +88,8 @@ const getHolidays = (year?: string) => {
 		holidays[getHolidayDayString(new Date(year + "-01-0" + i))] =
 			"New Year";
 	}
+	holidays[getHolidayDayString(new Date(year + "-5-04"))] =
+		"May the forth";
 	for (i = 1; i <= 12; i++) {
 		let month = i + "";
 		if (i < 10) {

@@ -14,9 +14,23 @@ export const Duck = () => {
 	const [silly, setSilly] = useState<number>(
 		parseInt(searchParams.get("silly") || max_silly + ""),
 	);
+	const [orderSilly] = useState<boolean>(
+		searchParams.get("orderSilly") == "true",
+	);
 	const [duckTitle, setDuckTitle] = useState<string>("");
 	let today = getHolidayDayString(new Date());
 	const randomSilly = () => {
+		if (orderSilly) {
+			setSilly((silly) => {
+				if (silly >= __DUCKS__.length - 1) {
+					return 0;
+				} else {
+					return silly + 1;
+				}
+			});
+			return;
+		}
+		console.log("here");
 		if (searchParams.get("silly") != null) {
 			setSilly(parseInt(searchParams.get("silly") || max_silly + ""));
 		} else {
@@ -24,7 +38,9 @@ export const Duck = () => {
 		}
 	};
 	useEffect(() => {
-		randomSilly();
+		if (orderSilly) {
+			randomSilly();
+		}
 		const duckInterval = setInterval(() => {
 			randomSilly();
 		}, 10000);
@@ -55,7 +71,7 @@ export const Duck = () => {
 			key={silly}
 		>
 			<img
-				style={{ height: "45px", width: "45px", opacity: 0.25 }}
+				style={{ maxHeight: "64px", maxWidth: "64px", opacity: 0.25 }}
 				src={"/src/assets/ducks/" + duck}
 			/>
 		</Box>

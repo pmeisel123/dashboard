@@ -75,11 +75,11 @@ export interface GitBranch {
 }
 
 export interface GitBranches {
-	[key: string]: GitBranch[]
+	[key: string]: GitBranch[];
 }
 
 export interface GitBranchesSlice {
-	gitBranches: GitBranches,
+	gitBranches: GitBranches;
 	loaded: number | null; // ms since epoch
 }
 
@@ -98,7 +98,7 @@ export interface TicketCache {
 }
 
 export interface BranchesAndTicket {
-	branches: GitBranches,
-	tickets: TicketCache,
+	branches: GitBranches;
+	tickets: TicketCache;
 	loaded: number | null; // ms since epoch
 }

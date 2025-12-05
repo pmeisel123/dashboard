@@ -10,15 +10,15 @@ import type {
 	GridSortModel,
 } from "@mui/x-data-grid";
 import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@mui/x-data-grid";
-import type { AppDispatch, RootState, CustomFieldsProps, TicketProps } from "@src/Api";
-import { isGitDataRecent, fetchBranches } from "@src/Api";
+import type { AppDispatch, CustomFieldsProps, RootState, TicketProps } from "@src/Api";
+import { fetchBranches, isGitDataRecent } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import { defaultTableSettings, getTicketColumns } from "@src/Components";
 import { formatDistanceToNow } from "date-fns";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 declare const __API_URL__: string;
 const API_URL = __API_URL__;

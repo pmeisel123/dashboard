@@ -1,4 +1,4 @@
-import type { GitBranch, ReportNamePaths, TicketCache, BranchesAndTicket } from "./types";
+import type { BranchesAndTicket, GitBranch, ReportNamePaths, TicketCache } from "./types";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -99,5 +99,5 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 		tickets: ticketBranches,
 		branches: branches,
 		loaded: null,
-	}
+	};
 };

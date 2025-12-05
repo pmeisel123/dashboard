@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
+import gitBranchReducer from "./gitSlice";
 import ticketsReducer from "./ticketsSlice";
 import usersGroupReducer from "./usersSlice";
-import gitBranchReducer from "./gitSlice";
 
 export const store = configureStore({
 	reducer: {
 		usersAndGroupsState: usersGroupReducer,
 		ticketsState: ticketsReducer,
-		gitBranchState: gitBranchReducer
+		gitBranchState: gitBranchReducer,
 	},
 });
 

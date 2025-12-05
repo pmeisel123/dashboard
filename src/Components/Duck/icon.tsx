@@ -30,7 +30,6 @@ export const Duck = () => {
 			});
 			return;
 		}
-		console.log("here");
 		if (searchParams.get("silly") != null) {
 			setSilly(
 				parseInt(

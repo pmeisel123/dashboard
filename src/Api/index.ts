@@ -5,3 +5,4 @@ export * from "./ticketsSlice";
 export type * from "./types";
 export * from "./users";
 export * from "./usersSlice";
+export * from "./git";

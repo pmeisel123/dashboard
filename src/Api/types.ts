@@ -62,3 +62,12 @@ export interface HolidayProps {
 	type: string;
 	bank?: boolean;
 }
+
+// Git Props
+export interface GitBranch {
+	"name": string,
+	commit: {
+		sha: string,
+		url: string,
+	},
+}

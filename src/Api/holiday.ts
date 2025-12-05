@@ -39,7 +39,7 @@ const JewishHolidaysList = (year: string) => {
 const HOLIDAY_RENAME: { [key: string]: string } = {
 	"Columbus Day": "Indigenous Peoples' Day",
 	"Washington's Birthday": "Presidents' Day",
-	"Day after Thanksgiving": "Black Friday",
+	"Day after Thanksgiving Day": "Black Friday",
 	Pesach: "Passover",
 };
 

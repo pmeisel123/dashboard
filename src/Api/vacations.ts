@@ -19,9 +19,13 @@ export const getVacationApi = async () => {
 		if (key) {
 			results[key] = rowArray
 				.filter(
-					(date: string) => new Date(date + " 01:00:00") >= midnight,
+					(date: string) =>
+						new Date(date + " 01:00:00") >=
+						midnight,
 				)
-				.map((date: string) => getHolidayDayString(new Date(date)))
+				.map((date: string) =>
+					getHolidayDayString(new Date(date)),
+				)
 				.sort();
 		}
 	});

@@ -87,37 +87,62 @@ export const UsersSelector: FC<{
 		InputComponent: () => {
 			return (
 				<FormControl size="small">
-					<InputLabel id="UserGroup">Group</InputLabel>
+					<InputLabel id="UserGroup">
+						Group
+					</InputLabel>
 					<Select
 						label="Group"
 						value={group}
 						onChange={(event) => {
-							if (event.target.value) {
-								handleColumnModelChange({
-									column: "GridFilterModel",
-									newModel: {
-										items: [
-											{
-												field: "groups",
-												operator: "Contains",
-												value: event.target.value,
-											},
-										],
+							if (
+								event.target
+									.value
+							) {
+								handleColumnModelChange(
+									{
+										column: "GridFilterModel",
+										newModel: {
+											items: [
+												{
+													field: "groups",
+													operator: "Contains",
+													value: event
+														.target
+														.value,
+												},
+											],
+										},
 									},
-								});
-								setGroup(event.target.value);
+								);
+								setGroup(
+									event
+										.target
+										.value,
+								);
 							}
 						}}
 						sx={{ minWidth: 100 }}
 					>
-						<MenuItem key={allGroups} value={allGroups}>
+						<MenuItem
+							key={allGroups}
+							value={allGroups}
+						>
 							{allGroups}
 						</MenuItem>
-						{possibleUsersGroups.groups.map((value: string) => (
-							<MenuItem key={value} value={value}>
-								{value}
-							</MenuItem>
-						))}
+						{possibleUsersGroups.groups.map(
+							(value: string) => (
+								<MenuItem
+									key={
+										value
+									}
+									value={
+										value
+									}
+								>
+									{value}
+								</MenuItem>
+							),
+						)}
 					</Select>
 				</FormControl>
 			);
@@ -129,8 +154,13 @@ export const UsersSelector: FC<{
 		{
 			field: "icon",
 			headerName: "Icon",
-			renderCell: (params: GridRenderCellParams<UserProps>) => (
-				<img src={params.value} style={{ maxWidth: "30px" }} />
+			renderCell: (
+				params: GridRenderCellParams<UserProps>,
+			) => (
+				<img
+					src={params.value}
+					style={{ maxWidth: "30px" }}
+				/>
 			),
 			width: 30,
 		},
@@ -146,19 +176,44 @@ export const UsersSelector: FC<{
 			field: "vacations",
 			headerName: "Vacations",
 			flex: 3,
-			renderCell: (params: GridRenderCellParams<UserProps>) => (
+			renderCell: (
+				params: GridRenderCellParams<UserProps>,
+			) => (
 				<>
 					{params.value &&
 						params.value
 							.filter(
-								(date: string) => new Date(date) >= midnight,
+								(
+									date: string,
+								) =>
+									new Date(
+										date,
+									) >=
+									midnight,
 							)
-							.map((value: string, index: number) => (
-								<Fragment key={index}>
-									{!!index && <>, </>}
-									{getDayString(new Date(value))}
-								</Fragment>
-							))}
+							.map(
+								(
+									value: string,
+									index: number,
+								) => (
+									<Fragment
+										key={
+											index
+										}
+									>
+										{!!index && (
+											<>
+												,{" "}
+											</>
+										)}
+										{getDayString(
+											new Date(
+												value,
+											),
+										)}
+									</Fragment>
+								),
+							)}
 				</>
 			),
 		},
@@ -172,7 +227,10 @@ export const UsersSelector: FC<{
 			...columnModel,
 			[column]: newModel,
 		};
-		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
+		localStorage.setItem(
+			localStorageName,
+			JSON.stringify(newColumnModel),
+		);
 		setColumnModel(newColumnModel);
 	};
 
@@ -195,7 +253,9 @@ export const UsersSelector: FC<{
 	const handleFilterChange = (newModel: GridFilterModel) => {
 		if (
 			newModel.items.length &&
-			!newModel.items.some((filter) => filter.field === "groups")
+			!newModel.items.some(
+				(filter) => filter.field === "groups",
+			)
 		) {
 			setGroup(allGroups);
 		}
@@ -214,7 +274,11 @@ export const UsersSelector: FC<{
 		}
 		if (local_group != allGroups) {
 			columnModel.GridFilterModel.items = [
-				{ field: "groups", operator: "Contains", value: local_group },
+				{
+					field: "groups",
+					operator: "Contains",
+					value: local_group,
+				},
 			];
 		}
 		setColumnModel(columnModel);
@@ -253,19 +317,34 @@ export const UsersSelector: FC<{
 								{
 									field: "groups",
 									operator: "Contains",
-									value: { group },
+									value: {
+										group,
+									},
 								},
 							],
 						},
 					},
 				}}
-				onRowSelectionModelChange={(newRowSelectionModel) => {
-					if (Object.values(possibleUsersGroups.users).length) {
-						setUsers(newRowSelectionModel.ids as Set<string>);
+				onRowSelectionModelChange={(
+					newRowSelectionModel,
+				) => {
+					if (
+						Object.values(
+							possibleUsersGroups.users,
+						).length
+					) {
+						setUsers(
+							newRowSelectionModel.ids as Set<string>,
+						);
 					}
 				}}
-				rowSelectionModel={{ type: "include", ids: new Set(users) }}
-				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
+				rowSelectionModel={{
+					type: "include",
+					ids: new Set(users),
+				}}
+				columnVisibilityModel={
+					columnModel.GridColumnVisibilityModel
+				}
 				sortModel={columnModel.GridSortModel}
 				filterModel={columnModel.GridFilterModel}
 				onColumnVisibilityModelChange={
@@ -290,7 +369,9 @@ export const UserSelector: FC<{
 		return (
 			<Grid container spacing={2} sx={{ paddingBottom: 1 }}>
 				<Grid>
-					<InputLabel id="UserGroup">Group</InputLabel>
+					<InputLabel id="UserGroup">
+						Group
+					</InputLabel>
 					<Select
 						label="Group"
 						value="x"
@@ -305,14 +386,21 @@ export const UserSelector: FC<{
 				<Grid>
 					{group && (
 						<>
-							<InputLabel id="user">User</InputLabel>
+							<InputLabel id="user">
+								User
+							</InputLabel>
 							<Select
 								label="user"
 								value="x"
-								sx={{ minWidth: 200 }}
+								sx={{
+									minWidth: 200,
+								}}
 								disabled
 							>
-								<MenuItem key="" value="x">
+								<MenuItem
+									key=""
+									value="x"
+								>
 									Loading...
 								</MenuItem>
 							</Select>
@@ -335,7 +423,8 @@ export const UserSelector: FC<{
 							!UserHasGroup(
 								possibleUsersGroups,
 								user,
-								event.target.value,
+								event.target
+									.value,
 							)
 						) {
 							setUser("");
@@ -343,44 +432,77 @@ export const UserSelector: FC<{
 					}}
 					sx={{ minWidth: 200 }}
 				>
-					<MenuItem key={allGroups} value={allGroups}>
+					<MenuItem
+						key={allGroups}
+						value={allGroups}
+					>
 						All
 					</MenuItem>
-					{possibleUsersGroups.groups.map((value: string) => (
-						<MenuItem key={value} value={value}>
-							{value}
-						</MenuItem>
-					))}
+					{possibleUsersGroups.groups.map(
+						(value: string) => (
+							<MenuItem
+								key={value}
+								value={value}
+							>
+								{value}
+							</MenuItem>
+						),
+					)}
 				</Select>
 			</Grid>
 			<Grid>
 				{group && (
 					<>
-						<InputLabel id="user">User</InputLabel>
+						<InputLabel id="user">
+							User
+						</InputLabel>
 						<Select
 							label="user"
 							value={user}
 							onChange={(event) => {
-								setUser(event.target.value);
+								setUser(
+									event
+										.target
+										.value,
+								);
 							}}
 							sx={{ minWidth: 200 }}
 						>
-							{Object.keys(possibleUsersGroups.users)
-								.filter((user_id) =>
-									UserHasGroup(
-										possibleUsersGroups,
+							{Object.keys(
+								possibleUsersGroups.users,
+							)
+								.filter(
+									(
 										user_id,
-										group,
-									),
+									) =>
+										UserHasGroup(
+											possibleUsersGroups,
+											user_id,
+											group,
+										),
 								)
-								.map((user_id: string) => (
-									<MenuItem key={user_id} value={user_id}>
-										{
-											possibleUsersGroups.users[user_id]
-												.name
-										}
-									</MenuItem>
-								))}
+								.map(
+									(
+										user_id: string,
+									) => (
+										<MenuItem
+											key={
+												user_id
+											}
+											value={
+												user_id
+											}
+										>
+											{
+												possibleUsersGroups
+													.users[
+													user_id
+												]
+													.name
+											}
+										</MenuItem>
+									),
+								)}
 						</Select>
 					</>
 				)}

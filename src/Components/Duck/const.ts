@@ -43,7 +43,10 @@ const getHolidays = (year?: string) => {
 	}
 	const holidays = getAllHolidays(year).reduce(
 		(hol: { [key: string]: string }, holiday) => {
-			if (hol[holiday.date] && hol[holiday.date] in holiday_images) {
+			if (
+				hol[holiday.date] &&
+				hol[holiday.date] in holiday_images
+			) {
 				return hol;
 			}
 			const clean_name = cleanHolidayName(holiday.name);
@@ -59,13 +62,18 @@ const getHolidays = (year?: string) => {
 			if (hol[holiday.date] == "Thanksgiving") {
 				const week = new Date(holiday.date);
 				week.setDate(week.getDate() - 4);
-				while (getHolidayDayString(week) != holiday.date) {
-					hol[getHolidayDayString(week)] = "Thanksgiving";
+				while (
+					getHolidayDayString(week) !=
+					holiday.date
+				) {
+					hol[getHolidayDayString(week)] =
+						"Thanksgiving";
 					week.setDate(week.getDate() + 1);
 				}
 				let cyberMonday = new Date(holiday.date);
 				cyberMonday.setDate(cyberMonday.getDate() + 4);
-				hol[getHolidayDayString(cyberMonday)] = "Cyber Monday";
+				hol[getHolidayDayString(cyberMonday)] =
+					"Cyber Monday";
 			}
 			if (hol[holiday.date] == "Day after Thanksgiving") {
 				hol[holiday.date] = "Black Friday";
@@ -88,7 +96,8 @@ const getHolidays = (year?: string) => {
 		holidays[getHolidayDayString(new Date(year + "-01-0" + i))] =
 			"New Year";
 	}
-	holidays[getHolidayDayString(new Date(year + "-5-04"))] = "May the forth";
+	holidays[getHolidayDayString(new Date(year + "-5-04"))] =
+		"May the forth";
 	for (i = 1; i <= 12; i++) {
 		let month = i + "";
 		if (i < 10) {
@@ -96,7 +105,8 @@ const getHolidays = (year?: string) => {
 		}
 		const thirteenth = new Date(year + "-" + month + "-13");
 		if (thirteenth.getDay() == 4) {
-			holidays[getHolidayDayString(thirteenth)] = "Friday the 13th";
+			holidays[getHolidayDayString(thirteenth)] =
+				"Friday the 13th";
 		}
 	}
 	globalHolidays[year] = holidays;
@@ -116,7 +126,12 @@ export const getHolidayDuck = (day?: string) => {
 		if (holiday_day in holiday_images) {
 			const day_images = holiday_images[holiday_day];
 			const day_image =
-				day_images[Math.floor(Math.random() * day_images.length)];
+				day_images[
+					Math.floor(
+						Math.random() *
+							day_images.length,
+					)
+				];
 			const duck_title = holidays[day];
 			return [duck_title, day_image];
 		}

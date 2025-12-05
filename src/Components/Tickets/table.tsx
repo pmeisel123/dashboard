@@ -75,7 +75,8 @@ const CustomFooterStatusComponent = (
 					totalTimEstimate: {totalTimEstimate}
 				</Typography>
 				<Typography variant="body2">
-					totalTimeOriginalEstimate: {totalTimeOriginalEstimate}
+					totalTimeOriginalEstimate:{" "}
+					{totalTimeOriginalEstimate}
 				</Typography>
 				<Typography variant="body2">
 					totalTimeSpent: {totalTimeSpent}
@@ -119,9 +120,15 @@ const TicketTable: FC<{
 		{
 			field: "key",
 			headerName: "key",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => (
 				<Link
-					href={(API_URL + "/browse/" + params.value) as string}
+					href={
+						(API_URL +
+							"/browse/" +
+							params.value) as string
+					}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -133,7 +140,9 @@ const TicketTable: FC<{
 		{
 			field: "parentkey",
 			headerName: "parent",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => {
 				if (params.value) {
 					return (
 						<>
@@ -141,24 +150,36 @@ const TicketTable: FC<{
 								href={
 									(API_URL +
 										"/browse/" +
-										params.row.parentkey) as string
+										params
+											.row
+											.parentkey) as string
 								}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{params.row.parentkey}
+								{
+									params
+										.row
+										.parentkey
+								}
 							</Link>
 							: &#x200b;
 							<Link
 								href={
 									(API_URL +
 										"/browse/" +
-										params.row.parentkey) as string
+										params
+											.row
+											.parentkey) as string
 								}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{params.row.parentname}
+								{
+									params
+										.row
+										.parentname
+								}
 							</Link>
 						</>
 					);
@@ -181,21 +202,23 @@ const TicketTable: FC<{
 		{
 			field: "created",
 			headerName: "created",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
-				<>{Ago(params.value)}</>
-			),
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => <>{Ago(params.value)}</>,
 		},
 		{
 			field: "updated",
 			headerName: "updated",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
-				<>{Ago(params.value)}</>
-			),
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => <>{Ago(params.value)}</>,
 		},
 		{
 			field: "timeestimate",
 			headerName: "Estimate",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => (
 				<RenderEstimate
 					value={params.value}
 					defaultEstimate={defaultEstimate}
@@ -205,7 +228,9 @@ const TicketTable: FC<{
 		{
 			field: "timeoriginalestimate",
 			headerName: "Original Estimate",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => (
 				<RenderEstimate
 					value={params.value}
 					defaultEstimate={defaultEstimate}
@@ -215,8 +240,10 @@ const TicketTable: FC<{
 		{ field: "timespent", headerName: "Spent" },
 	];
 	Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-		let custom_field_name = __CUSTOM_FIELDS__[custom_field_key].Name;
-		let custom_field_type = __CUSTOM_FIELDS__[custom_field_key].Type;
+		let custom_field_name =
+			__CUSTOM_FIELDS__[custom_field_key].Name;
+		let custom_field_type =
+			__CUSTOM_FIELDS__[custom_field_key].Type;
 		let custom_field_link_text =
 			__CUSTOM_FIELDS__[custom_field_key].LinkText;
 		let custom_field_link_icon =
@@ -226,9 +253,13 @@ const TicketTable: FC<{
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				renderCell: (
+					params: GridRenderCellParams<TicketProps>,
+				) => {
 					const value: string | null =
-						params.row.customFields[custom_field_key];
+						params.row.customFields[
+							custom_field_key
+						];
 					if (value) {
 						return <>{value}</>;
 					}
@@ -241,18 +272,29 @@ const TicketTable: FC<{
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				renderCell: (
+					params: GridRenderCellParams<TicketProps>,
+				) => {
 					const value: string | null =
-						params.row.customFields[custom_field_key];
+						params.row.customFields[
+							custom_field_key
+						];
 					if (value) {
 						if (custom_field_link_icon) {
-							const IconComponent = icons[custom_field_link_icon];
+							const IconComponent =
+								icons[
+									custom_field_link_icon
+								];
 							return (
 								<Link
-									href={value}
+									href={
+										value
+									}
 									target="_blank"
 									rel="noopener noreferrer"
-									title={custom_field_name}
+									title={
+										custom_field_name
+									}
 									color="inherit"
 								>
 									<IconComponent />
@@ -261,10 +303,14 @@ const TicketTable: FC<{
 						} else {
 							return (
 								<Link
-									href={value}
+									href={
+										value
+									}
 									target="_blank"
 									rel="noopener noreferrer"
-									title={custom_field_name}
+									title={
+										custom_field_name
+									}
 								>
 									{custom_field_link_text
 										? custom_field_link_text
@@ -287,7 +333,10 @@ const TicketTable: FC<{
 			...columnModel,
 			[column]: newModel,
 		};
-		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
+		localStorage.setItem(
+			localStorageName,
+			JSON.stringify(newColumnModel),
+		);
 		setColumnModel(newColumnModel);
 	};
 
@@ -337,7 +386,9 @@ const TicketTable: FC<{
 		setColumnModel(columnModel);
 	}, []);
 
-	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
+	const getRowClassName = (
+		params: GridRowParams<TicketProps>,
+	): string => {
 		return params.row.isdone ? "MuiDataGrid-row-done" : "";
 	};
 	const getVisibility = () => {
@@ -368,7 +419,8 @@ const TicketTable: FC<{
 			<DataGrid
 				sx={{
 					"& .MuiDataGrid-row-done": {
-						backgroundColor: theme.palette.grey.A400,
+						backgroundColor:
+							theme.palette.grey.A400,
 					},
 				}}
 				loading={loading}

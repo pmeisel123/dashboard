@@ -64,11 +64,11 @@ function WhoIsOutPage() {
 		new Date().setFullYear(new Date().getFullYear() + 1),
 	);
 	// Get holidays for a specific year
-	const usHolidays = getAllUsHolidays(today.getFullYear().toString()).filter(
-		(holiday) => {
-			return new Date(holiday.date) >= today;
-		},
-	);
+	const usHolidays = getAllUsHolidays(
+		today.getFullYear().toString(),
+	).filter((holiday) => {
+		return new Date(holiday.date) >= today;
+	});
 
 	const nextYearUsHolidays = getAllUsHolidays(
 		nextyear.getFullYear().toString(),
@@ -98,15 +98,22 @@ function WhoIsOutPage() {
 	const getRows = () => {
 		if (groups.length) {
 			users = {};
-			Object.keys(possibleUsersGroups.users).forEach((user_id) => {
-				const user = possibleUsersGroups.users[user_id];
-				if (
-					user.groups &&
-					user.groups.some((item) => groups.includes(item))
-				) {
-					users[user_id] = user;
-				}
-			});
+			Object.keys(possibleUsersGroups.users).forEach(
+				(user_id) => {
+					const user =
+						possibleUsersGroups.users[
+							user_id
+						];
+					if (
+						user.groups &&
+						user.groups.some((item) =>
+							groups.includes(item),
+						)
+					) {
+						users[user_id] = user;
+					}
+				},
+			);
 		} else {
 			users = possibleUsersGroups.users;
 		}
@@ -119,29 +126,55 @@ function WhoIsOutPage() {
 				let holiday = "";
 				let past = false;
 				let whoisout: string[] = [];
-				if (current_day.getDay() == 0 || current_day.getDay() == 6) {
+				if (
+					current_day.getDay() == 0 ||
+					current_day.getDay() == 6
+				) {
 					weekend = true;
 				} else if (current_day < today) {
 					past = true;
 				} else {
-					const holiday_string = getHolidayDayString(current_day);
+					const holiday_string =
+						getHolidayDayString(
+							current_day,
+						);
 					if (allUsHolidays[holiday_string]) {
-						holiday = allUsHolidays[holiday_string];
+						holiday =
+							allUsHolidays[
+								holiday_string
+							];
 					} else {
-						Object.keys(users).forEach((user_id) => {
-							const user = possibleUsersGroups.users[user_id];
-							if (
-								user &&
-								user.vacations &&
-								user.vacations.includes(holiday_string)
-							) {
-								whoisout.push(user.name);
-							}
-						});
+						Object.keys(users).forEach(
+							(user_id) => {
+								const user =
+									possibleUsersGroups
+										.users[
+										user_id
+									];
+								if (
+									user &&
+									user.vacations &&
+									user.vacations.includes(
+										holiday_string,
+									)
+								) {
+									whoisout.push(
+										user.name,
+									);
+								}
+							},
+						);
 					}
-					if (allNonBankHolidays[holiday_string]) {
+					if (
+						allNonBankHolidays[
+							holiday_string
+						]
+					) {
 						non_bank_holiday = true;
-						holiday = allNonBankHolidays[holiday_string];
+						holiday =
+							allNonBankHolidays[
+								holiday_string
+							];
 					}
 				}
 				row.push({
@@ -161,7 +194,9 @@ function WhoIsOutPage() {
 	};
 	useEffect(() => {
 		rows = getRows();
-		const newSearchParams = new URLSearchParams(searchParams.toString());
+		const newSearchParams = new URLSearchParams(
+			searchParams.toString(),
+		);
 		if (groups.length) {
 			newSearchParams.set("groups", groups.join(","));
 		} else {
@@ -180,7 +215,9 @@ function WhoIsOutPage() {
 			setGroups((prev) => [...prev, value]);
 		} else {
 			// Remove the value if unchecked
-			setGroups((prev) => prev.filter((item) => item !== value));
+			setGroups((prev) =>
+				prev.filter((item) => item !== value),
+			);
 		}
 	};
 
@@ -195,21 +232,37 @@ function WhoIsOutPage() {
 							minHeight: "3em",
 						}}
 					>
-						{possibleUsersGroups.groups.map((option, index) => (
-							<FormControlLabel
-								key={index}
-								control={
-									<Checkbox
-										checked={groups.includes(option)}
-										onChange={handleChange}
-										name={option}
-										value={option}
-									/>
-								}
-								label={option}
-								sx={{ display: "inline" }}
-							/>
-						))}
+						{possibleUsersGroups.groups.map(
+							(option, index) => (
+								<FormControlLabel
+									key={
+										index
+									}
+									control={
+										<Checkbox
+											checked={groups.includes(
+												option,
+											)}
+											onChange={
+												handleChange
+											}
+											name={
+												option
+											}
+											value={
+												option
+											}
+										/>
+									}
+									label={
+										option
+									}
+									sx={{
+										display: "inline",
+									}}
+								/>
+							),
+						)}
 					</div>
 				</FormGroup>
 			)}
@@ -217,43 +270,95 @@ function WhoIsOutPage() {
 				<Table aria-label="simple table">
 					<TableHead>
 						<TableRow>
-							<EstimatorCell isOff={true}>S</EstimatorCell>
-							<EstimatorCell>M</EstimatorCell>
-							<EstimatorCell>T</EstimatorCell>
-							<EstimatorCell>W</EstimatorCell>
-							<EstimatorCell>T</EstimatorCell>
-							<EstimatorCell>F</EstimatorCell>
-							<EstimatorCell isOff={true}>S</EstimatorCell>
+							<EstimatorCell
+								isOff={true}
+							>
+								S
+							</EstimatorCell>
+							<EstimatorCell>
+								M
+							</EstimatorCell>
+							<EstimatorCell>
+								T
+							</EstimatorCell>
+							<EstimatorCell>
+								W
+							</EstimatorCell>
+							<EstimatorCell>
+								T
+							</EstimatorCell>
+							<EstimatorCell>
+								F
+							</EstimatorCell>
+							<EstimatorCell
+								isOff={true}
+							>
+								S
+							</EstimatorCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{rows.map((row) => (
-							<TableRow key={getDateString(row[0].day)}>
-								{row.map((cell) => (
-									<EstimatorCell
-										key={getDateString(cell.day)}
-										isOff={
-											!!cell.past ||
-											(!!cell.holiday &&
-												!cell.nonBankholiday) ||
-											!!cell.weekend
-										}
-										isDone={false}
-										isPartial={cell.nonBankholiday}
-									>
-										{getDateString(cell.day)}
-										<br />
-										{cell.holiday}
-										{!!cell.holiday &&
-											!!cell.whoisout.length && <br />}
-										{cell.whoisout.map((item, index) => (
-											<React.Fragment key={index}>
-												<br />
-												{item}
-											</React.Fragment>
-										))}
-									</EstimatorCell>
-								))}
+							<TableRow
+								key={getDateString(
+									row[0]
+										.day,
+								)}
+							>
+								{row.map(
+									(
+										cell,
+									) => (
+										<EstimatorCell
+											key={getDateString(
+												cell.day,
+											)}
+											isOff={
+												!!cell.past ||
+												(!!cell.holiday &&
+													!cell.nonBankholiday) ||
+												!!cell.weekend
+											}
+											isDone={
+												false
+											}
+											isPartial={
+												cell.nonBankholiday
+											}
+										>
+											{getDateString(
+												cell.day,
+											)}
+											<br />
+											{
+												cell.holiday
+											}
+											{!!cell.holiday &&
+												!!cell
+													.whoisout
+													.length && (
+													<br />
+												)}
+											{cell.whoisout.map(
+												(
+													item,
+													index,
+												) => (
+													<React.Fragment
+														key={
+															index
+														}
+													>
+														<br />
+														{
+															item
+														}
+													</React.Fragment>
+												),
+											)}
+										</EstimatorCell>
+									),
+								)}
 							</TableRow>
 						))}
 					</TableBody>

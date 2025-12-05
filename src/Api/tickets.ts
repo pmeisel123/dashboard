@@ -23,7 +23,9 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let fields = issue.fields;
 		let id: number = issue.id;
 		let key: string = issue.key;
-		let assignee: string | null = getNameFromPerson(fields.assignee);
+		let assignee: string | null = getNameFromPerson(
+			fields.assignee,
+		);
 		let creator: string | null = getNameFromPerson(fields.creator);
 		let status: string | null = null;
 		if (fields.status) {
@@ -33,11 +35,13 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let created: Date | null = fields.created;
 		let updated: Date | null = fields.updated;
 		let timeestimate: number | null = fields.timeestimate;
-		let timeoriginalestimate: number | null = fields.timeoriginalestimate;
+		let timeoriginalestimate: number | null =
+			fields.timeoriginalestimate;
 		let timespent: number | null = fields.timespent;
 		let parentkey: string | null = null;
 		let parentname: string | null = null;
-		let isdone: boolean = !!status && __DONE_STATUS__.includes(status);
+		let isdone: boolean =
+			!!status && __DONE_STATUS__.includes(status);
 		if (isdone) {
 			timeestimate = 0;
 		}
@@ -47,16 +51,23 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		}
 		let custom_fields: { [key: string]: string | null } = {};
 		if (__CUSTOM_FIELDS__) {
-			Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-				let custom_field_value = fields[custom_field_key] || "";
-				if (
-					typeof custom_field_value == "object" &&
-					custom_field_value != null
-				) {
-					custom_field_value = fields[custom_field_key].name || "";
-				}
-				custom_fields[custom_field_key] = custom_field_value;
-			});
+			Object.keys(__CUSTOM_FIELDS__).forEach(
+				(custom_field_key) => {
+					let custom_field_value =
+						fields[custom_field_key] || "";
+					if (
+						typeof custom_field_value ==
+							"object" &&
+						custom_field_value != null
+					) {
+						custom_field_value =
+							fields[custom_field_key]
+								.name || "";
+					}
+					custom_fields[custom_field_key] =
+						custom_field_value;
+				},
+			);
 		}
 		return {
 			id: id,
@@ -68,7 +79,8 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			created: created,
 			updated: updated,
 			timeestimate: convertEstimateToDays(timeestimate),
-			timeoriginalestimate: convertEstimateToDays(timeoriginalestimate),
+			timeoriginalestimate:
+				convertEstimateToDays(timeoriginalestimate),
 			timespent: convertEstimateToDays(timespent),
 			parentkey: parentkey,
 			parentname: parentname,
@@ -110,7 +122,10 @@ export const getTicketsApi = async (search: string): Promise<TicketProps[]> => {
 			});
 		}
 		if (ajax_result.nextPageToken && !ajax_result.isLast) {
-			url = main_url + "&nextPageToken=" + ajax_result.nextPageToken;
+			url =
+				main_url +
+				"&nextPageToken=" +
+				ajax_result.nextPageToken;
 			last = ajax_result.isLast;
 		} else {
 			last = true;

@@ -50,7 +50,9 @@ function EstimatorPage() {
 	const [users, setUsers] = useState<Set<string>>(
 		new Set(user_param.split(",")),
 	);
-	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
+	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(
+		new Set(),
+	);
 	const freezeParams = useRef(false);
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -115,9 +117,14 @@ function EstimatorPage() {
 		if (freezeParams.current) {
 			return;
 		}
-		const newSearchParams = new URLSearchParams(searchParams.toString());
+		const newSearchParams = new URLSearchParams(
+			searchParams.toString(),
+		);
 		if (defaultEstimate != defaultDefaultDefaultEstimate) {
-			newSearchParams.set("defaultEstimate", defaultEstimate + "");
+			newSearchParams.set(
+				"defaultEstimate",
+				defaultEstimate + "",
+			);
 		} else {
 			newSearchParams.delete("defaultEstimate");
 		}
@@ -132,7 +139,10 @@ function EstimatorPage() {
 			newSearchParams.delete("parent");
 		}
 		if (estimatePadding != 0) {
-			newSearchParams.set("estimatePadding", estimatePadding + "");
+			newSearchParams.set(
+				"estimatePadding",
+				estimatePadding + "",
+			);
 		} else {
 			newSearchParams.delete("estimatePadding");
 		}
@@ -147,7 +157,10 @@ function EstimatorPage() {
 			Object.keys(possibleUsersGroups.users).length
 		) {
 			if (users.size) {
-				newSearchParams.set("users", [...users].join(","));
+				newSearchParams.set(
+					"users",
+					[...users].join(","),
+				);
 			} else {
 				newSearchParams.delete("users");
 			}
@@ -160,12 +173,15 @@ function EstimatorPage() {
 
 	let totalTimEstimate =
 		tickets.reduce(
-			(sum, row) => sum + (row.timeestimate || defaultEstimate),
+			(sum, row) =>
+				sum + (row.timeestimate || defaultEstimate),
 			0,
 		) + estimatePadding;
 	let totalTimeOriginalEstimate =
 		tickets.reduce(
-			(sum, row) => sum + (row.timeoriginalestimate || defaultEstimate),
+			(sum, row) =>
+				sum +
+				(row.timeoriginalestimate || defaultEstimate),
 			0,
 		) + estimatePadding;
 	let totalTimeSpent = tickets.reduce(
@@ -181,18 +197,30 @@ function EstimatorPage() {
 						setSearch={setSearch}
 						parent={parent}
 						setParent={setParent}
-						defaultEstimate={defaultEstimate}
-						setDefaultEstimate={setDefaultEstimate}
-						estimatePadding={estimatePadding}
-						setEstimatePadding={setEstimatePadding}
+						defaultEstimate={
+							defaultEstimate
+						}
+						setDefaultEstimate={
+							setDefaultEstimate
+						}
+						estimatePadding={
+							estimatePadding
+						}
+						setEstimatePadding={
+							setEstimatePadding
+						}
 					/>
 					<UsersSelector
-						possibleUsersGroups={possibleUsersGroups}
+						possibleUsersGroups={
+							possibleUsersGroups
+						}
 						group={group}
 						setGroup={setGroup}
 						users={users}
 						setUsers={setUsers}
-						setVisibleUsers={setVisibleUsers}
+						setVisibleUsers={
+							setVisibleUsers
+						}
 					/>
 				</>
 			)}
@@ -202,7 +230,9 @@ function EstimatorPage() {
 					defaultEstimate={defaultEstimate}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
-					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
+					totalTimeOriginalEstimate={
+						totalTimeOriginalEstimate
+					}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
 				/>
@@ -211,7 +241,9 @@ function EstimatorPage() {
 				<Calendar
 					users={users}
 					group={group}
-					possibleUsersGroups={possibleUsersGroups}
+					possibleUsersGroups={
+						possibleUsersGroups
+					}
 					totalTimEstimate={totalTimEstimate}
 					visibleUsers={visibleUsers}
 					isDashboard={isDashboard}

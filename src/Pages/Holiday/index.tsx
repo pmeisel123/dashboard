@@ -92,7 +92,9 @@ const HolidayPage = () => {
 	};
 
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
+		const newSearchParams = new URLSearchParams(
+			searchParams.toString(),
+		);
 		if (year != this_year) {
 			newSearchParams.set("year", year);
 		} else {
@@ -129,12 +131,18 @@ const HolidayPage = () => {
 						label="Year"
 						value={year}
 						onChange={(event) => {
-							setYear(event.target.value);
+							setYear(
+								event.target
+									.value,
+							);
 						}}
 						sx={{ minWidth: 100 }}
 					>
 						{years_choices.map((year) => (
-							<MenuItem key={year} value={year}>
+							<MenuItem
+								key={year}
+								value={year}
+							>
 								{year}
 							</MenuItem>
 						))}
@@ -145,34 +153,55 @@ const HolidayPage = () => {
 				<Table aria-label="simple table">
 					<TableHead>
 						<TableRow>
-							<TableCell>Name</TableCell>
-							<TableCell>Date</TableCell>
-							<TableCell>When</TableCell>
+							<TableCell>
+								Name
+							</TableCell>
+							<TableCell>
+								Date
+							</TableCell>
+							<TableCell>
+								When
+							</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{holidays.map((holiday) => (
 							<DateRow
-								date={holiday.date}
-								key={holiday.name + holiday.date}
+								date={
+									holiday.date
+								}
+								key={
+									holiday.name +
+									holiday.date
+								}
 							>
 								<TableCell>
-									{holiday.name}
+									{
+										holiday.name
+									}
 									{with_ducks && (
 										<HolidayDuck
-											day={holiday.date}
-											name={holiday.name}
+											day={
+												holiday.date
+											}
+											name={
+												holiday.name
+											}
 										/>
 									)}
 								</TableCell>
 								<TableCell>
 									{getDateStringWithDayOfWeek(
-										getDate(holiday.date),
+										getDate(
+											holiday.date,
+										),
 									)}
 								</TableCell>
 								<TableCell>
 									{formatDistanceToNow(
-										getDate(holiday.date),
+										getDate(
+											holiday.date,
+										),
 										{
 											addSuffix: true,
 										},

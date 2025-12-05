@@ -15,7 +15,9 @@ function HomePage() {
 					>
 						<ListItemText
 							primary={page.name}
-							secondary={page.description}
+							secondary={
+								page.description
+							}
 						/>
 					</ListItemButton>
 				</ListItem>

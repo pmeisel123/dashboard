@@ -32,7 +32,12 @@ export const Duck = () => {
 		}
 		console.log("here");
 		if (searchParams.get("silly") != null) {
-			setSilly(parseInt(searchParams.get("silly") || max_silly + ""));
+			setSilly(
+				parseInt(
+					searchParams.get("silly") ||
+						max_silly + "",
+				),
+			);
 		} else {
 			setSilly(Math.floor(Math.random() * max_silly));
 		}
@@ -66,12 +71,20 @@ export const Duck = () => {
 
 	return (
 		<Box
-			sx={{ position: "fixed", bottom: "10px", right: "10px" }}
+			sx={{
+				position: "fixed",
+				bottom: "10px",
+				right: "10px",
+			}}
 			title={duckTitle}
 			key={silly}
 		>
 			<img
-				style={{ maxHeight: "64px", maxWidth: "64px", opacity: 0.25 }}
+				style={{
+					maxHeight: "64px",
+					maxWidth: "64px",
+					opacity: 0.25,
+				}}
 				src={"/src/assets/ducks/" + duck}
 			/>
 		</Box>

@@ -80,7 +80,10 @@ function RecentTicketsPage() {
 			} else {
 				newSearchParams.delete("search");
 			}
-			if (searchParams.toString() != newSearchParams.toString()) {
+			if (
+				searchParams.toString() !=
+				newSearchParams.toString()
+			) {
 				setSearchParams(newSearchParams);
 			}
 			getFunc();
@@ -103,42 +106,77 @@ function RecentTicketsPage() {
 			{!isDashboard && (
 				<Grid container spacing={2}>
 					<Grid size={{ xs: 12, md: 3 }}>
-						<InputLabel id="search">Search</InputLabel>
+						<InputLabel id="search">
+							Search
+						</InputLabel>
 						<TextField
 							id="search"
 							value={search}
 							onChange={(event) => {
-								setSearch(event.target.value);
+								setSearch(
+									event
+										.target
+										.value,
+								);
 							}}
 						/>
 					</Grid>
 					<Grid size={{ xs: 12, md: 3 }}>
-						<InputLabel id="Days Agao">Days Ago</InputLabel>
+						<InputLabel id="Days Agao">
+							Days Ago
+						</InputLabel>
 						<Select
 							label="Days Ago"
 							value={days}
 							onChange={(event) => {
-								setDays(event.target.value);
+								setDays(
+									event
+										.target
+										.value,
+								);
 							}}
 							sx={{ minWidth: 100 }}
 						>
-							{[...Array(31).keys()].map((days: number) => (
-								<MenuItem key={days} value={days}>
-									{days}
-								</MenuItem>
-							))}
+							{[
+								...Array(
+									31,
+								).keys(),
+							].map(
+								(
+									days: number,
+								) => (
+									<MenuItem
+										key={
+											days
+										}
+										value={
+											days
+										}
+									>
+										{
+											days
+										}
+									</MenuItem>
+								),
+							)}
 						</Select>
 					</Grid>
 					<Grid size={2}>
-						<InputLabel id="parent">&nbsp;</InputLabel>
+						<InputLabel id="parent">
+							&nbsp;
+						</InputLabel>
 						<Button
 							variant="contained"
 							onClick={() => {
-								setLoading(true);
+								setLoading(
+									true,
+								);
 							}}
 							disabled={
-								getParamDays() == days &&
-								getParamSearch() == search
+								getParamDays() ==
+									days &&
+								getParamSearch() ==
+									search
 							}
 						>
 							Update
@@ -152,7 +190,9 @@ function RecentTicketsPage() {
 					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
-					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
+					totalTimeOriginalEstimate={
+						totalTimeOriginalEstimate
+					}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
 					defaultSort={"created"}

@@ -50,7 +50,8 @@ export const getTicketColumns = (
 		let visible = columnModel.GridColumnVisibilityModel;
 		if (
 			visible &&
-			Object.keys(visible).length >= Object.keys(columns).length &&
+			Object.keys(visible).length >=
+				Object.keys(columns).length &&
 			Object.values(visible).every((value) => !value)
 		) {
 			let column_name = "__";

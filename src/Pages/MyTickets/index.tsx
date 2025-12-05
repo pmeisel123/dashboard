@@ -17,10 +17,14 @@ function MyTicketsPage() {
 		(state: RootState) => state.usersAndGroupsState,
 	);
 	const [group, setGroup] = useState<string>(
-		searchParams.get("group") || window.localStorage.getItem("group") || "",
+		searchParams.get("group") ||
+			window.localStorage.getItem("group") ||
+			"",
 	);
 	const [user, setUser] = useState<string>(
-		searchParams.get("user") || window.localStorage.getItem("user") || "",
+		searchParams.get("user") ||
+			window.localStorage.getItem("user") ||
+			"",
 	);
 	const [loading, setLoading] = useState<boolean>(true);
 	const ticketsSelector = useSelector(
@@ -78,7 +82,9 @@ function MyTicketsPage() {
 		}
 	}, [user]);
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
+		const newSearchParams = new URLSearchParams(
+			searchParams.toString(),
+		);
 		if (
 			group == window.localStorage.getItem("group") &&
 			user == window.localStorage.getItem("user")
@@ -128,7 +134,9 @@ function MyTicketsPage() {
 					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
-					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
+					totalTimeOriginalEstimate={
+						totalTimeOriginalEstimate
+					}
 					totalTimeSpent={totalTimeSpent}
 				/>
 			)}

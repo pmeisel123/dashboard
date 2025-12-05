@@ -40,9 +40,11 @@ function Main() {
 	const navigate = useNavigate();
 	const theme = useTheme();
 	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up("sm"));
-	const [leftNavOpen, setLeftNavOpen] = useState<boolean>(isSmallOrLarger);
+	const [leftNavOpen, setLeftNavOpen] =
+		useState<boolean>(isSmallOrLarger);
 	const [sideWidth, setSideWidth] = useState<number>(defaultLeftWidth);
-	const [currentDescription, setCurrentDescription] = useState<JSX.Element>();
+	const [currentDescription, setCurrentDescription] =
+		useState<JSX.Element>();
 	const [currentName, setName] = useState<String>();
 	const [hideTitle, setHideTitle] = useState<boolean>(
 		window.localStorage.getItem("hideTitle") == "true",
@@ -64,7 +66,10 @@ function Main() {
 		setLeftNavOpen(!leftNavOpen);
 	};
 	const toggleHideTitle = () => {
-		window.localStorage.setItem("hideTitle", (!hideTitle).toString());
+		window.localStorage.setItem(
+			"hideTitle",
+			(!hideTitle).toString(),
+		);
 		setHideTitle(!hideTitle);
 	};
 	useEffect(() => {
@@ -94,7 +99,9 @@ function Main() {
 		setIsDashboard(searchParams.get("isDashboard") == "true");
 	}, [searchParams]);
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
+		const newSearchParams = new URLSearchParams(
+			searchParams.toString(),
+		);
 		if (isDashboard) {
 			newSearchParams.set("isDashboard", "true");
 		} else {
@@ -123,7 +130,11 @@ function Main() {
 			pathname: window.location.pathname,
 		});
 		let title = "Dashboard";
-		if (window.location.pathname != "/" && route && route.length == 1) {
+		if (
+			window.location.pathname != "/" &&
+			route &&
+			route.length == 1
+		) {
 			setCurrentDescription(route[0].route.description);
 			setName(route[0].route.name);
 			title += " - " + route[0].route.name;
@@ -144,7 +155,9 @@ function Main() {
 				<>
 					<TopNav
 						toggleLeftNav={toggleLeftNav}
-						toggleHideTitle={toggleHideTitle}
+						toggleHideTitle={
+							toggleHideTitle
+						}
 						hideTitle={hideTitle}
 					></TopNav>
 					<LeftNav
@@ -156,28 +169,44 @@ function Main() {
 			)}
 			<Box
 				sx={{
-					paddingLeft: isSmallOrLarger ? sideWidth + 20 + "px" : 0,
+					paddingLeft: isSmallOrLarger
+						? sideWidth + 20 + "px"
+						: 0,
 					transition: "padding-left 0.1s",
 				}}
 			>
 				{!isDashboard && !dashboard && !hideTitle && (
 					<>
-						<Typography variant="h6" component="div">
+						<Typography
+							variant="h6"
+							component="div"
+						>
 							{currentName}
 						</Typography>
 						<Typography
 							variant="subtitle2"
 							color="text.secondary"
-							sx={{ padding: "10px 25px 25px 25px" }}
+							sx={{
+								padding: "10px 25px 25px 25px",
+							}}
 						>
 							{currentDescription}
 						</Typography>
 					</>
 				)}
 				{isDashboard && <Progress />}
-				<Outlet context={{ isDashboard: isDashboard || !!dashboard }} />
+				<Outlet
+					context={{
+						isDashboard:
+							isDashboard ||
+							!!dashboard,
+					}}
+				/>
 			</Box>
-			{!dashboard && (__DASHBOARD_DUCKS__ || !isDashboard) && <Duck />}
+			{!dashboard &&
+				(__DASHBOARD_DUCKS__ || !isDashboard) && (
+					<Duck />
+				)}
 		</>
 	);
 }

@@ -72,21 +72,44 @@ export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 				// ajax_result.forEach((user: any) => {
 				if (user.accountType != "app") {
 					let formatted: UserProps | null =
-						getUserDataFromAjaxResponse(user);
+						getUserDataFromAjaxResponse(
+							user,
+						);
 					if (formatted != null) {
-						await getUserGroupApi(user.accountId).then((data) => {
-							groups = [...new Set(groups.concat(data))];
+						await getUserGroupApi(
+							user.accountId,
+						).then((data) => {
+							groups = [
+								...new Set(
+									groups.concat(
+										data,
+									),
+								),
+							];
 							formatted.groups = data;
 						});
 
-						let vacation_key: string | null = formatted.name;
-						if (__VACATION_KEY__ == "email") {
-							vacation_key = formatted.email;
+						let vacation_key:
+							| string
+							| null = formatted.name;
+						if (
+							__VACATION_KEY__ ==
+							"email"
+						) {
+							vacation_key =
+								formatted.email;
 						}
-						if (vacation_key && vacations[vacation_key]) {
-							formatted.vacations = vacations[vacation_key];
+						if (
+							vacation_key &&
+							vacations[vacation_key]
+						) {
+							formatted.vacations =
+								vacations[
+									vacation_key
+								];
 						}
-						results[formatted.id] = formatted;
+						results[formatted.id] =
+							formatted;
 					}
 				}
 			}

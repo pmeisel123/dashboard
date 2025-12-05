@@ -1,8 +1,8 @@
 import react from "@vitejs/plugin-react";
 import * as fs from "fs";
 import path from "path";
+import type { ProxyOptions } from "vite";
 import { defineConfig } from "vite";
-import type { ProxyOptions} from "vite";
 import {
 	API_KEY,
 	API_URL,
@@ -12,31 +12,35 @@ import {
 	DASHBOARD_DUCKS,
 	DASHBOARD_SPEED_SECONDS,
 	DONE_STATUS,
-	VACATION_KEY,
 	GITKEY,
 	GITREPOS,
+	VACATION_KEY,
 } from "./globals";
 
-const git_proxies: {[key: string]: ProxyOptions} = {};
-const git_proxies_name_path: {[key: string]:string}  = {};
+const git_proxies: { [key: string]: ProxyOptions } = {};
+const git_proxies_name_path: { [key: string]: string } = {};
 GITREPOS.forEach((repo, index: number) => {
-	const repo_path = '/git_' + index;
+	const repo_path = "/git_" + index;
 	const repo_name = repo.name;
-	const repo_target = repo.url.replace('https://github.com/', 'https://api.github.com/repos/');
+	const repo_target = repo.url.replace(
+		"https://github.com/",
+		"https://api.github.com/repos/",
+	);
 
 	git_proxies_name_path[repo_name] = repo_path;
 
 	git_proxies[repo_path] = {
-	    target: repo_target,
-	    changeOrigin: true,
-	    secure: false,
-	    headers: {
-	      Accept: 'application/vnd.github+json',
-	      Authorization: 'Bearer ' + GITKEY,
-	      'X-GitHub-Api-Version': '2022-11-28',
-	      'User-Agent': 'validator'
-	    },
-	    rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
+		target: repo_target,
+		changeOrigin: true,
+		secure: false,
+		headers: {
+			Accept: "application/vnd.github+json",
+			Authorization: "Bearer " + GITKEY,
+			"X-GitHub-Api-Version": "2022-11-28",
+			"User-Agent": "validator",
+		},
+		rewrite: (path) =>
+			path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
 console.log(git_proxies);
@@ -66,16 +70,27 @@ export default defineConfig({
 				changeOrigin: true,
 				headers: {
 					Authorization:
-						"Basic " + btoa(API_USERNAME + ":" + API_KEY),
+						"Basic " +
+						btoa(
+							API_USERNAME +
+								":" +
+								API_KEY,
+						),
 				},
 				rewrite: (path) => path.replace(/^\/jira/, ""),
 				configure: (proxy) => {
-					proxy.on("proxyRes", (_proxyRes, req) => {
-						console.log("Received Response from Target:", req.url);
-					});
+					proxy.on(
+						"proxyRes",
+						(_proxyRes, req) => {
+							console.log(
+								"Received Response from Target:",
+								req.url,
+							);
+						},
+					);
 				},
 			},
-			...git_proxies
+			...git_proxies,
 		},
 		fs: {
 			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],

@@ -43,43 +43,64 @@ const FormFields: FC<{
 		<>
 			<Grid container spacing={2}>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="search">Search</InputLabel>
+					<InputLabel id="search">
+						Search
+					</InputLabel>
 					<TextField
 						id="search"
 						value={localSearch}
 						onChange={(event) => {
-							setLocalSearch(event.target.value);
+							setLocalSearch(
+								event.target
+									.value,
+							);
 						}}
 					/>
 				</Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="parent">Parent Ticket ID</InputLabel>
+					<InputLabel id="parent">
+						Parent Ticket ID
+					</InputLabel>
 					<TextField
 						id="parent"
 						value={localParent}
 						onChange={(event) => {
-							setLocalParent(event.target.value);
+							setLocalParent(
+								event.target
+									.value,
+							);
 						}}
 					/>
 				</Grid>
 				<Grid size={2}>
-					<InputLabel id="parent">&nbsp;</InputLabel>
+					<InputLabel id="parent">
+						&nbsp;
+					</InputLabel>
 					<Button
 						variant="contained"
 						onClick={() => {
 							setParent(localParent);
 							if (!localSearch) {
 								setSearch("");
-							} else if (localSearch.match(/[^a-z]/i)) {
-								setSearch(localSearch);
+							} else if (
+								localSearch.match(
+									/[^a-z]/i,
+								)
+							) {
+								setSearch(
+									localSearch,
+								);
 							} else {
 								setSearch(
-									'textfields ~ "' + localSearch + '*"',
+									'textfields ~ "' +
+										localSearch +
+										'*"',
 								);
 							}
 						}}
 						disabled={
-							search == localSearch && parent == localParent
+							search == localSearch &&
+							parent == localParent
 						}
 					>
 						Update
@@ -95,12 +116,24 @@ const FormFields: FC<{
 						labelId="default_estimate"
 						value={defaultEstimate + ""}
 						onChange={(event) => {
-							setDefaultEstimate(parseInt(event.target.value));
+							setDefaultEstimate(
+								parseInt(
+									event
+										.target
+										.value,
+								),
+							);
 						}}
-						inputProps={{ "aria-label": "Number dropdown" }}
+						inputProps={{
+							"aria-label":
+								"Number dropdown",
+						}}
 					>
 						{values.map((value) => (
-							<MenuItem key={value} value={value}>
+							<MenuItem
+								key={value}
+								value={value}
+							>
 								{value}
 							</MenuItem>
 						))}
@@ -114,12 +147,24 @@ const FormFields: FC<{
 						labelId="estimatePadding"
 						value={estimatePadding + ""}
 						onChange={(event) => {
-							setEstimatePadding(parseFloat(event.target.value));
+							setEstimatePadding(
+								parseFloat(
+									event
+										.target
+										.value,
+								),
+							);
 						}}
-						inputProps={{ "aria-label": "Number dropdown" }}
+						inputProps={{
+							"aria-label":
+								"Number dropdown",
+						}}
 					>
 						{estimateSteps.map((value) => (
-							<MenuItem key={value} value={value}>
+							<MenuItem
+								key={value}
+								value={value}
+							>
 								{value}
 							</MenuItem>
 						))}

@@ -75,12 +75,18 @@ const Calendar: FC<{
 	if (!user_count) {
 		if (group && group != allGroups) {
 			local_users = new Set(
-				Object.keys(possibleUsersGroups.users).filter((key) => {
-					return (
-						possibleUsersGroups.users[key].groups &&
-						possibleUsersGroups.users[key].groups.includes(group)
-					);
-				}),
+				Object.keys(possibleUsersGroups.users).filter(
+					(key) => {
+						return (
+							possibleUsersGroups
+								.users[key]
+								.groups &&
+							possibleUsersGroups.users[
+								key
+							].groups.includes(group)
+						);
+					},
+				),
 			);
 		} else {
 			local_users = visibleUsers;
@@ -105,37 +111,55 @@ const Calendar: FC<{
 			let working = 0;
 			if (!remainingTimEstimate) {
 				description = "-";
-			} else if (current_day.getDay() == 0 || current_day.getDay() == 6) {
+			} else if (
+				current_day.getDay() == 0 ||
+				current_day.getDay() == 6
+			) {
 				description = "Weekend";
 			} else if (current_day < today) {
 				working = 0;
 			} else {
-				const holiday_string = getHolidayDayString(current_day);
+				const holiday_string =
+					getHolidayDayString(current_day);
 				if (allUsHolidays[holiday_string]) {
 					description =
-						allUsHolidays[getHolidayDayString(current_day)];
+						allUsHolidays[
+							getHolidayDayString(
+								current_day,
+							)
+						];
 					title = description;
 				} else {
 					local_users.forEach((user_id) => {
-						const user = possibleUsersGroups.users[user_id];
+						const user =
+							possibleUsersGroups
+								.users[user_id];
 						if (
 							!user ||
 							!user.vacations ||
-							!user.vacations.includes(holiday_string)
+							!user.vacations.includes(
+								holiday_string,
+							)
 						) {
 							working++;
 							if (user) {
 								if (!title) {
-									title = "Working:\n";
+									title =
+										"Working:\n";
 								}
-								title += user.name + "\n";
+								title +=
+									user.name +
+									"\n";
 							}
 						} else {
 							if (user) {
 								if (!off) {
-									off = "Off:\n";
+									off =
+										"Off:\n";
 								}
-								off += user.name + "\n";
+								off +=
+									user.name +
+									"\n";
 							}
 						}
 					});
@@ -182,54 +206,104 @@ const Calendar: FC<{
 						<Table aria-label="simple table">
 							<TableHead>
 								<TableRow>
-									<EstimatorCell isOff={true}>
+									<EstimatorCell
+										isOff={
+											true
+										}
+									>
 										S
 									</EstimatorCell>
-									<EstimatorCell>M</EstimatorCell>
-									<EstimatorCell>T</EstimatorCell>
-									<EstimatorCell>W</EstimatorCell>
-									<EstimatorCell>T</EstimatorCell>
-									<EstimatorCell>F</EstimatorCell>
-									<EstimatorCell isOff={true}>
+									<EstimatorCell>
+										M
+									</EstimatorCell>
+									<EstimatorCell>
+										T
+									</EstimatorCell>
+									<EstimatorCell>
+										W
+									</EstimatorCell>
+									<EstimatorCell>
+										T
+									</EstimatorCell>
+									<EstimatorCell>
+										F
+									</EstimatorCell>
+									<EstimatorCell
+										isOff={
+											true
+										}
+									>
 										S
 									</EstimatorCell>
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{rows.map((row) => (
-									<TableRow key={getDateString(row[0].day)}>
-										{row.map((cell) => (
-											<EstimatorCell
-												key={getDateString(cell.day)}
-												title={cell.title}
-												isOff={!cell.working}
-												isDone={
-													!!cell.working &&
-													!cell.workleft
-												}
-												isPartial={
-													cell.working &&
-													cell.working != user_count
-														? true
-														: false
-												}
-											>
-												{getDateString(cell.day)}
-												<br />
-												{cell.description ? (
-													<>{cell.description}</>
-												) : (
-													<>
-														Working: {cell.working}
+								{rows.map(
+									(
+										row,
+									) => (
+										<TableRow
+											key={getDateString(
+												row[0]
+													.day,
+											)}
+										>
+											{row.map(
+												(
+													cell,
+												) => (
+													<EstimatorCell
+														key={getDateString(
+															cell.day,
+														)}
+														title={
+															cell.title
+														}
+														isOff={
+															!cell.working
+														}
+														isDone={
+															!!cell.working &&
+															!cell.workleft
+														}
+														isPartial={
+															cell.working &&
+															cell.working !=
+																user_count
+																? true
+																: false
+														}
+													>
+														{getDateString(
+															cell.day,
+														)}
 														<br />
-														Work Left:{" "}
-														{cell.workleft}
-													</>
-												)}
-											</EstimatorCell>
-										))}
-									</TableRow>
-								))}
+														{cell.description ? (
+															<>
+																{
+																	cell.description
+																}
+															</>
+														) : (
+															<>
+																Working:{" "}
+																{
+																	cell.working
+																}
+																<br />
+																Work
+																Left:{" "}
+																{
+																	cell.workleft
+																}
+															</>
+														)}
+													</EstimatorCell>
+												),
+											)}
+										</TableRow>
+									),
+								)}
 							</TableBody>
 						</Table>
 					</TableContainer>

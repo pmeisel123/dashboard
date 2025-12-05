@@ -55,7 +55,10 @@ export const SavePageModal = (props: BasicModalProps) => {
 			return;
 		}
 		savedViews[name] = url;
-		window.localStorage.setItem("saveViews", JSON.stringify(savedViews));
+		window.localStorage.setItem(
+			"saveViews",
+			JSON.stringify(savedViews),
+		);
 		window.dispatchEvent(new Event("storage"));
 		setOpen(false);
 	};
@@ -78,18 +81,25 @@ export const SavePageModal = (props: BasicModalProps) => {
 					>
 						Save Current Page
 					</Typography>
-					<InputLabel id="name">Name Of Page</InputLabel>
+					<InputLabel id="name">
+						Name Of Page
+					</InputLabel>
 					<TextField
 						id="name"
 						value={name}
 						onChange={(event) => {
-							setName(event.target.value);
+							setName(
+								event.target
+									.value,
+							);
 						}}
 					/>
 					<Button onClick={save} disabled={!name}>
 						Save
 					</Button>
-					<Button onClick={handleClose}>Close</Button>
+					<Button onClick={handleClose}>
+						Close
+					</Button>
 				</Box>
 			</Modal>
 		</div>
@@ -100,7 +110,9 @@ export const SavePageList: FC<{
 	width?: number;
 	parentHandleClick?: Function;
 }> = ({ width, parentHandleClick }) => {
-	const [savedViews, setSaveViews] = useState<{ [key: string]: string }>({});
+	const [savedViews, setSaveViews] = useState<{ [key: string]: string }>(
+		{},
+	);
 	const handleClick = () => {
 		if (parentHandleClick) {
 			parentHandleClick();
@@ -110,7 +122,8 @@ export const SavePageList: FC<{
 
 	useEffect(() => {
 		const checkSavedViews = () => {
-			const savedViewJson = window.localStorage.getItem("saveViews");
+			const savedViewJson =
+				window.localStorage.getItem("saveViews");
 			if (savedViewJson) {
 				setSaveViews(JSON.parse(savedViewJson));
 			} else {
@@ -135,7 +148,10 @@ export const SavePageList: FC<{
 			return;
 		}
 		delete savedViews[name];
-		window.localStorage.setItem("saveViews", JSON.stringify(savedViews));
+		window.localStorage.setItem(
+			"saveViews",
+			JSON.stringify(savedViews),
+		);
 		window.dispatchEvent(new Event("storage"));
 	};
 	if (!Object.keys(savedViews).length) {
@@ -153,28 +169,46 @@ export const SavePageList: FC<{
 			<List sx={{ width: width }}>
 				{Object.keys(savedViews)
 					.sort((a, b) =>
-						a.toLowerCase().localeCompare(b.toLowerCase()),
+						a
+							.toLowerCase()
+							.localeCompare(
+								b.toLowerCase(),
+							),
 					)
 					.map((name: string) => {
 						let url = savedViews[name];
 						return (
 							<ListItem
 								disablePadding
-								key={name + " " + url}
-								sx={{ width: width, maxWidth: 532 }}
+								key={
+									name +
+									" " +
+									url
+								}
+								sx={{
+									width: width,
+									maxWidth: 532,
+								}}
 							>
 								<ListItemButton
-									title={name}
-									component={Link}
+									title={
+										name
+									}
+									component={
+										Link
+									}
 									to={url}
-									onClick={() => handleClick()}
+									onClick={() =>
+										handleClick()
+									}
 									sx={{
 										width: new_width,
 										maxWidth: 500,
 										paddingRight: 0,
 									}}
 									selected={
-										location.pathname + location.search ==
+										location.pathname +
+											location.search ==
 										url
 									}
 								>
@@ -183,20 +217,35 @@ export const SavePageList: FC<{
 											sx={{
 												whiteSpace: "nowrap",
 												overflow: "hidden",
-												textOverflow: "ellipsis",
+												textOverflow:
+													"ellipsis",
 											}}
 										>
-											{name}
+											{
+												name
+											}
 										</Box>
 									</ListItemText>
 								</ListItemButton>
 								<ListItemButton
-									title={"Delete"}
-									component={MuiLink}
-									sx={{ width: 20, padding: "12px 4px" }}
-									onClick={() => deleteSave(name)}
+									title={
+										"Delete"
+									}
+									component={
+										MuiLink
+									}
+									sx={{
+										width: 20,
+										padding: "12px 4px",
+									}}
+									onClick={() =>
+										deleteSave(
+											name,
+										)
+									}
 									selected={
-										location.pathname + location.search ==
+										location.pathname +
+											location.search ==
 										url
 									}
 								>

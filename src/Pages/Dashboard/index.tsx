@@ -24,17 +24,39 @@ const ListDashboard: FC<{
 				<Fragment key={key}>
 					<Button
 						onClick={() => {
-							setDashboard(__DASHBOARDS__[key].key);
+							setDashboard(
+								__DASHBOARDS__[
+									key
+								].key,
+							);
 						}}
 					>
 						{__DASHBOARDS__[key].name}
 					</Button>
 					<Box>
-						{__DASHBOARDS__[key].pages.map((page) => (
-							<Box sx={{ paddingLeft: 5 }} key={key + page.name}>
-								<Link to={page.url}>{page.name}</Link>
-							</Box>
-						))}
+						{__DASHBOARDS__[key].pages.map(
+							(page) => (
+								<Box
+									sx={{
+										paddingLeft: 5,
+									}}
+									key={
+										key +
+										page.name
+									}
+								>
+									<Link
+										to={
+											page.url
+										}
+									>
+										{
+											page.name
+										}
+									</Link>
+								</Box>
+							),
+						)}
 					</Box>
 				</Fragment>
 			))}
@@ -55,7 +77,9 @@ function DashboardPage() {
 		parseInt(searchParams.get("pageNumber") || "0"),
 	);
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
+		const newSearchParams = new URLSearchParams(
+			searchParams.toString(),
+		);
 		if (dashboard) {
 			newSearchParams.set("dashboard", dashboard);
 		} else {
@@ -99,7 +123,11 @@ function DashboardPage() {
 		const iframe = document.getElementById(
 			"dashboard",
 		) as myHTMLIFrameElement | null;
-		if (iframe && iframe.contentWindow && iframe.contentWindow.changeUrl) {
+		if (
+			iframe &&
+			iframe.contentWindow &&
+			iframe.contentWindow.changeUrl
+		) {
 			iframe.contentWindow.changeUrl(url);
 		} else {
 			// TODO: fix this
@@ -108,7 +136,8 @@ function DashboardPage() {
 	};
 	useEffect(() => {
 		if (dashboard && __DASHBOARDS__[dashboard]) {
-			let url = __DASHBOARDS__[dashboard].pages[pageNumber].url;
+			let url =
+				__DASHBOARDS__[dashboard].pages[pageNumber].url;
 			if (url.match(/\?/)) {
 				url += "&";
 			} else {
@@ -136,16 +165,30 @@ function DashboardPage() {
 							marginBottom: "2px",
 						}}
 						component={Link}
-						to={__DASHBOARDS__[dashboard].pages[pageNumber].url}
+						to={
+							__DASHBOARDS__[
+								dashboard
+							].pages[pageNumber].url
+						}
 					>
 						Exit Dashboard
 					</Button>
-					Dashboard &gt; {__DASHBOARDS__[dashboard].name} &gt;{" "}
-					{__DASHBOARDS__[dashboard].pages[pageNumber].name}
+					Dashboard &gt;{" "}
+					{__DASHBOARDS__[dashboard].name} &gt;{" "}
+					{
+						__DASHBOARDS__[dashboard].pages[
+							pageNumber
+						].name
+					}
 					<>
 						{" "}
 						(Page {pageNumber + 1} of{" "}
-						{__DASHBOARDS__[dashboard].pages.length})
+						{
+							__DASHBOARDS__[
+								dashboard
+							].pages.length
+						}
+						)
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>

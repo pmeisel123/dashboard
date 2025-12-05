@@ -12,7 +12,10 @@ function DuckPage() {
 							backgroundColor: "#000",
 							margin: 10,
 						}}
-						src={"/src/assets/ducks/" + duck}
+						src={
+							"/src/assets/ducks/" +
+							duck
+						}
 					/>
 					<br />
 					{duck}

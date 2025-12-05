@@ -23,7 +23,10 @@ const TopNavBar: FC<TopNavBarProps> = ({
 		<>
 			<AppBar
 				position="fixed"
-				sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+				sx={{
+					zIndex: (theme) =>
+						theme.zIndex.drawer + 1,
+				}}
 			>
 				<Toolbar>
 					<IconButton
@@ -48,9 +51,14 @@ const TopNavBar: FC<TopNavBarProps> = ({
 						onClick={toggleHideTitle}
 						title="Hide/Show the Page Titles and Description on every page"
 					>
-						{hideTitle ? "Show" : "Hide"} Page Titles
+						{hideTitle ? "Show" : "Hide"}{" "}
+						Page Titles
 					</Button>
-					<Button color="inherit" component={Link} to="/">
+					<Button
+						color="inherit"
+						component={Link}
+						to="/"
+					>
 						Home
 					</Button>
 				</Toolbar>

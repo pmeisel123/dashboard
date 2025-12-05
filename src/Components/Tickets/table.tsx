@@ -354,25 +354,14 @@ const TicketTable: FC<{
 									key,
 									value,
 								]) => {
+									const url = value.repo.url + "/tree/" + value.name
 									return (
 										<Link
-											key={
-												key
-											}
-											href={
-												value
-													.repo
-													.url +
-												"/tree/" +
-												value.name
-											}
-											target={
-												"_blank"
-											}
+											key={key}
+											href={url}
+											target={"_blank"}
 										>
-											{
-												value.name
-											}
+											{value.name}
 											<br />
 										</Link>
 									);

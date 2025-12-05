@@ -43,7 +43,7 @@ GITREPOS.forEach((repo, index: number) => {
 			path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
-console.log(git_proxies);
+
 const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/
 export default defineConfig({

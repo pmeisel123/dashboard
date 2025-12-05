@@ -1,35 +1,35 @@
 {
 	"compilerOptions": {
+		"allowImportingTsExtensions": false,
 		"baseUrl": "./",
+		"composite": true,
+		"emitDeclarationOnly": true,
+		"erasableSyntaxOnly": true,
+		"esModuleInterop": true,
+
+		"lib": ["ES2023"],
+		"module": "ESNext",
+		"moduleDetection": "force",
+		/* Bundler mode */
+		"moduleResolution": "bundler",
+		"noEmit": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"outDir": "./dist/node",
 		"paths": {
 			"@src/*": ["./src/*"]
 		},
-		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-		"target": "ES2023",
-		"lib": ["ES2023"],
-		"module": "ESNext",
-		"types": ["node"],
-		"skipLibCheck": true,
-		"esModuleInterop": true,
-
-		/* Bundler mode */
-		"moduleResolution": "bundler",
-		"allowImportingTsExtensions": false,
-		"verbatimModuleSyntax": true,
-		"moduleDetection": "force",
-		"noEmit": true,
-		"emitDeclarationOnly": true,
-		"composite": true,
-		"outDir": "./dist/node",
 		"rootDirs": ["./", "./src"],
 
+		"skipLibCheck": true,
 		/* Linting */
 		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"erasableSyntaxOnly": true,
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true
+		"target": "ES2023",
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+		"types": ["node"],
+		"verbatimModuleSyntax": true
 	},
 	"include": ["vite.config.ts", "globals.ts", "src/Api/types.ts"]
 }

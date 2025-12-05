@@ -1,16 +1,16 @@
 {
 	"compilerOptions": {
-		"moduleResolution": "Bundler",
-		"module": "ESNext",
-		"declaration": true,
 		"baseUrl": ".",
+		"declaration": true,
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"paths": {
 			"@src/*": ["./src/*"]
 		}
 	},
-	"include": [],
 	"exclude": ["node_modules", "dist"],
 	"files": [],
+	"include": [],
 	"references": [
 		{ "path": "./tsconfig.app.json" },
 		{ "path": "./tsconfig.node.json" }

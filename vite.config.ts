@@ -16,9 +16,10 @@ import {
 	GITREPOS,
 	VACATION_KEY,
 } from "./globals";
+import type { ReportNamePaths } from "./src/Api/types";
 
 const git_proxies: { [key: string]: ProxyOptions } = {};
-const git_proxies_name_path: { [key: string]: string } = {};
+const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};
 GITREPOS.forEach((repo, index: number) => {
 	const repo_path = "/git_" + index;
 	const repo_name = repo.name;
@@ -27,7 +28,10 @@ GITREPOS.forEach((repo, index: number) => {
 		"https://api.github.com/repos/",
 	);
 
-	git_proxies_name_path[repo_name] = repo_path;
+	git_proxies_name_path[repo_name] = {
+		path: repo_path,
+		url: repo.url,
+	};
 
 	git_proxies[repo_path] = {
 		target: repo_target,
@@ -43,7 +47,6 @@ GITREPOS.forEach((repo, index: number) => {
 			path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
-console.log(git_proxies_name_path);
 
 const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/

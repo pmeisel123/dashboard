@@ -1,5 +1,5 @@
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchTickets, fetchUsersAndGroups, isUserDataRecent, getBranches } from "@src/Api";
+import { fetchTickets, fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
 import {
 	allGroups,
 	Calendar,
@@ -79,14 +79,6 @@ function EstimatorPage() {
 			freezeParams.current = false;
 		});
 	}, [searchParams]);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const data = await getBranches();
-			console.log(data);
-		};
-		fetchData();
-	}, []);
 
 	var getFunc = function () {
 		var jira_search = "";

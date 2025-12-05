@@ -15,7 +15,8 @@ import {
 	GridPagination,
 	useGridApiRef,
 } from "@mui/x-data-grid";
-import type { CustomFieldsProps, TicketProps } from "@src/Api";
+import type { CustomFieldsProps, TicketCache, TicketProps } from "@src/Api";
+import { getTicketBranches } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import { defaultTableSettings, getTicketColumns } from "@src/Components";
 import { formatDistanceToNow } from "date-fns";
@@ -111,9 +112,18 @@ const TicketTable: FC<{
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
 	const apiRef = useGridApiRef();
+	const [ticketsBranches, setTicketsBranches] = useState<TicketCache>({});
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
 		...defaultTableSettings,
 	});
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const data = await getTicketBranches();
+			setTicketsBranches(data);
+		};
+		fetchData();
+	}, []);
 
 	const theme = useTheme();
 	let columns: GridColDef<any>[] = [
@@ -324,6 +334,56 @@ const TicketTable: FC<{
 			});
 		}
 	});
+	if (Object.keys(ticketsBranches).length) {
+		columns.push({
+			field: "branches",
+			headerName: "Git Branches",
+			flex: 2,
+			renderCell: (
+				params: GridRenderCellParams<TicketProps>,
+			) => {
+				const ticket_branches =
+					ticketsBranches[params.row.key];
+				if (ticket_branches) {
+					return (
+						<>
+							{Object.entries(
+								ticket_branches,
+							).map(
+								([
+									key,
+									value,
+								]) => {
+									return (
+										<Link
+											key={
+												key
+											}
+											href={
+												value
+													.repo
+													.url +
+												"/tree/" +
+												value.name
+											}
+											target={
+												"_blank"
+											}
+										>
+											{
+												value.name
+											}
+											<br />
+										</Link>
+									);
+								},
+							)}
+						</>
+					);
+				}
+			},
+		});
+	}
 
 	const handleColumnModelChange = ({
 		column,

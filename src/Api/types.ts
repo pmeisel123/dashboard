@@ -65,9 +65,25 @@ export interface HolidayProps {
 
 // Git Props
 export interface GitBranch {
-	"name": string,
+	name: string;
 	commit: {
-		sha: string,
-		url: string,
-	},
+		sha: string;
+		url: string;
+	};
+	ticket?: string;
+	creator?: string;
+}
+
+export interface ReportNamePaths {
+	path: string;
+	url: string;
+}
+
+export interface TicketCache {
+	[key: string]: {
+		[key: string]: {
+			name: string;
+			repo: ReportNamePaths;
+		};
+	};
 }

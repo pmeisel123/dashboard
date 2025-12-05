@@ -162,7 +162,6 @@ function DashboardPage() {
 						sx={{
 							float: "right",
 							outline: "1px solid red",
-							marginBottom: "2px",
 						}}
 						component={Link}
 						to={
@@ -196,10 +195,10 @@ function DashboardPage() {
 					id="dashboard"
 					style={{
 						position: "fixed",
-						top: "40px",
+						top: "48px",
 						left: 0,
 						width: windowSize.width,
-						height: windowSize.height - 40,
+						height: windowSize.height - 48,
 						border: "none",
 						zIndex: 9999,
 					}}

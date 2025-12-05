@@ -20,12 +20,7 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 		}
 	};
 	return (
-		<Drawer
-			anchor="left"
-			open={open}
-			variant={isSmallOrLarger ? "persistent" : "temporary"}
-			sx={{ width: width }}
-		>
+		<Drawer anchor="left" open={open} variant={isSmallOrLarger ? "persistent" : "temporary"} sx={{ width: width }}>
 			<Toolbar />
 			<List sx={{ width: width }}>
 				{pages.map((page) => (

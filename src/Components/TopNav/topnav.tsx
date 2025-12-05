@@ -24,13 +24,7 @@ const TopNavBar: FC<TopNavBarProps> = ({ toggleLeftNav, toggleHideTitle, hideTit
 				}}
 			>
 				<Toolbar>
-					<IconButton
-						size="large"
-						edge="start"
-						color="inherit"
-						aria-label="menu"
-						onClick={toggleLeftNav}
-					>
+					<IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={toggleLeftNav}>
 						<MenuIcon />
 					</IconButton>
 					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>

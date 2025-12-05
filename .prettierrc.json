@@ -4,6 +4,6 @@
 	"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-sort-json"],
 	"printWidth": 120,
 	"singleAttributePerLine": false,
-	"tabWidth": 8,
+	"tabWidth": 4,
 	"useTabs": true
 }

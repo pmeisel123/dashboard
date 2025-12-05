@@ -65,9 +65,7 @@ const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps
 				}}
 			>
 				<Typography variant="body2">totalTimEstimate: {totalTimEstimate}</Typography>
-				<Typography variant="body2">
-					totalTimeOriginalEstimate: {totalTimeOriginalEstimate}
-				</Typography>
+				<Typography variant="body2">totalTimeOriginalEstimate: {totalTimeOriginalEstimate}</Typography>
 				<Typography variant="body2">totalTimeSpent: {totalTimeSpent}</Typography>
 			</Box>
 			<GridPagination />
@@ -118,11 +116,7 @@ const TicketTable: FC<{
 			field: "key",
 			headerName: "key",
 			renderCell: (params: GridRenderCellParams<TicketProps>) => (
-				<Link
-					href={(API_URL + "/browse/" + params.value) as string}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
+				<Link href={(API_URL + "/browse/" + params.value) as string} target="_blank" rel="noopener noreferrer">
 					{params.value}
 				</Link>
 			),
@@ -136,11 +130,7 @@ const TicketTable: FC<{
 					return (
 						<>
 							<Link
-								href={
-									(API_URL +
-										"/browse/" +
-										params.row.parentkey) as string
-								}
+								href={(API_URL + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -148,11 +138,7 @@ const TicketTable: FC<{
 							</Link>
 							: &#x200b;
 							<Link
-								href={
-									(API_URL +
-										"/browse/" +
-										params.row.parentkey) as string
-								}
+								href={(API_URL + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -244,15 +230,8 @@ const TicketTable: FC<{
 							);
 						} else {
 							return (
-								<Link
-									href={value}
-									target="_blank"
-									rel="noopener noreferrer"
-									title={custom_field_name}
-								>
-									{custom_field_link_text
-										? custom_field_link_text
-										: custom_field_name}
+								<Link href={value} target="_blank" rel="noopener noreferrer" title={custom_field_name}>
+									{custom_field_link_text ? custom_field_link_text : custom_field_name}
 								</Link>
 							);
 						}

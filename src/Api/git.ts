@@ -35,11 +35,7 @@ const getOwnerFromLastCommit = async (repo_name: string, branch_name: string) =>
 		for (var i = 0; i < 5 && i < ajax_result.length; i++) {
 			const first_commit = ajax_result[i].commit;
 			let creator = "";
-			if (
-				first_commit.author &&
-				first_commit.author.email &&
-				!first_commit.author.email.match(/noreply/)
-			) {
+			if (first_commit.author && first_commit.author.email && !first_commit.author.email.match(/noreply/)) {
 				creator = first_commit.author.email.replace(/@.*/, "");
 				return creator;
 			}

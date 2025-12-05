@@ -144,18 +144,9 @@ const HolidayPage = () => {
 							<DateRow date={holiday.date} key={holiday.name + holiday.date}>
 								<TableCell>
 									{holiday.name}
-									{with_ducks && (
-										<HolidayDuck
-											day={holiday.date}
-											name={holiday.name}
-										/>
-									)}
+									{with_ducks && <HolidayDuck day={holiday.date} name={holiday.name} />}
 								</TableCell>
-								<TableCell>
-									{getDateStringWithDayOfWeek(
-										getDate(holiday.date),
-									)}
-								</TableCell>
+								<TableCell>{getDateStringWithDayOfWeek(getDate(holiday.date))}</TableCell>
 								<TableCell>
 									{formatDistanceToNow(getDate(holiday.date), {
 										addSuffix: true,

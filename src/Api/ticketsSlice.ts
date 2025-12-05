@@ -22,16 +22,18 @@ export const ticketsSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(fetchTickets.pending, (state, action) => {
-			const searchKey = action.meta.arg;
-			if (!state[searchKey]) {
-				state[searchKey] = [];
-			}
-		}).addCase(fetchTickets.fulfilled, (state, action) => {
-			const data = action.payload;
-			const searchKey = action.meta.arg;
-			state[searchKey] = data;
-		});
+		builder
+			.addCase(fetchTickets.pending, (state, action) => {
+				const searchKey = action.meta.arg;
+				if (!state[searchKey]) {
+					state[searchKey] = [];
+				}
+			})
+			.addCase(fetchTickets.fulfilled, (state, action) => {
+				const data = action.payload;
+				const searchKey = action.meta.arg;
+				state[searchKey] = data;
+			});
 	},
 });
 

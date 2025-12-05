@@ -170,18 +170,14 @@ export const SavePageList: FC<{
 										maxWidth: 500,
 										paddingRight: 0,
 									}}
-									selected={
-										location.pathname + location.search ==
-										url
-									}
+									selected={location.pathname + location.search == url}
 								>
 									<ListItemText>
 										<Box
 											sx={{
 												whiteSpace: "nowrap",
 												overflow: "hidden",
-												textOverflow:
-													"ellipsis",
+												textOverflow: "ellipsis",
 											}}
 										>
 											{name}
@@ -196,10 +192,7 @@ export const SavePageList: FC<{
 										padding: "12px 4px",
 									}}
 									onClick={() => deleteSave(name)}
-									selected={
-										location.pathname + location.search ==
-										url
-									}
+									selected={location.pathname + location.search == url}
 								>
 									<ListItemIcon
 										sx={{

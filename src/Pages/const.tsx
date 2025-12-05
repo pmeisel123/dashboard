@@ -18,8 +18,8 @@ export const pages = [
 		element: <EstimatorPage />,
 		description: (
 			<>
-				Display Jira tickets with their estimates and allow selecting users to calculate the
-				approximate completion date.
+				Display Jira tickets with their estimates and allow selecting users to calculate the approximate
+				completion date.
 				<br />
 				Include upcoming vacation time and holidays in the estimates.
 				<br />
@@ -70,8 +70,8 @@ export const pages = [
 				<br />
 				Vacation times are pulled from src/assets/vacation.csv via src/API/vacations.tsx
 				<br />
-				Need to pull vacations from your HR site. Either via a cron job updating the csv file or
-				by updating to vacations api to automaticlly pull/format the vacation data
+				Need to pull vacations from your HR site. Either via a cron job updating the csv file or by updating to
+				vacations api to automaticlly pull/format the vacation data
 			</>
 		),
 	},

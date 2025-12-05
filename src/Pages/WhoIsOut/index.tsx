@@ -111,11 +111,7 @@ function WhoIsOutPage() {
 					} else {
 						Object.keys(users).forEach((user_id) => {
 							const user = possibleUsersGroups.users[user_id];
-							if (
-								user &&
-								user.vacations &&
-								user.vacations.includes(holiday_string)
-							) {
+							if (user && user.vacations && user.vacations.includes(holiday_string)) {
 								whoisout.push(user.name);
 							}
 						});
@@ -216,10 +212,7 @@ function WhoIsOutPage() {
 									<EstimatorCell
 										key={getDateString(cell.day)}
 										isOff={
-											!!cell.past ||
-											(!!cell.holiday &&
-												!cell.nonBankholiday) ||
-											!!cell.weekend
+											!!cell.past || (!!cell.holiday && !cell.nonBankholiday) || !!cell.weekend
 										}
 										isDone={false}
 										isPartial={cell.nonBankholiday}
@@ -227,10 +220,7 @@ function WhoIsOutPage() {
 										{getDateString(cell.day)}
 										<br />
 										{cell.holiday}
-										{!!cell.holiday &&
-											!!cell.whoisout.length && (
-												<br />
-											)}
+										{!!cell.holiday && !!cell.whoisout.length && <br />}
 										{cell.whoisout.map((item, index) => (
 											<React.Fragment key={index}>
 												<br />

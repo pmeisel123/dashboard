@@ -12,9 +12,7 @@ function MyTicketsPage() {
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
-	const [group, setGroup] = useState<string>(
-		searchParams.get("group") || window.localStorage.getItem("group") || "",
-	);
+	const [group, setGroup] = useState<string>(searchParams.get("group") || window.localStorage.getItem("group") || "");
 	const [user, setUser] = useState<string>(searchParams.get("user") || window.localStorage.getItem("user") || "");
 	const [loading, setLoading] = useState<boolean>(true);
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);

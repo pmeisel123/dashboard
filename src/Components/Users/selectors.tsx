@@ -81,8 +81,7 @@ export const UsersSelector: FC<{
 											{
 												field: "groups",
 												operator: "Contains",
-												value: event.target
-													.value,
+												value: event.target.value,
 											},
 										],
 									},
@@ -333,20 +332,10 @@ export const UserSelector: FC<{
 							sx={{ minWidth: 200 }}
 						>
 							{Object.keys(possibleUsersGroups.users)
-								.filter((user_id) =>
-									UserHasGroup(
-										possibleUsersGroups,
-										user_id,
-										group,
-									),
-								)
+								.filter((user_id) => UserHasGroup(possibleUsersGroups, user_id, group))
 								.map((user_id: string) => (
 									<MenuItem key={user_id} value={user_id}>
-										{
-											possibleUsersGroups.users[
-												user_id
-											].name
-										}
+										{possibleUsersGroups.users[user_id].name}
 									</MenuItem>
 								))}
 						</Select>

@@ -52,8 +52,7 @@ const Calendar: FC<{
 			local_users = new Set(
 				Object.keys(possibleUsersGroups.users).filter((key) => {
 					return (
-						possibleUsersGroups.users[key].groups &&
-						possibleUsersGroups.users[key].groups.includes(group)
+						possibleUsersGroups.users[key].groups && possibleUsersGroups.users[key].groups.includes(group)
 					);
 				}),
 			);
@@ -92,11 +91,7 @@ const Calendar: FC<{
 				} else {
 					local_users.forEach((user_id) => {
 						const user = possibleUsersGroups.users[user_id];
-						if (
-							!user ||
-							!user.vacations ||
-							!user.vacations.includes(holiday_string)
-						) {
+						if (!user || !user.vacations || !user.vacations.includes(holiday_string)) {
 							working++;
 							if (user) {
 								if (!title) {
@@ -170,45 +165,21 @@ const Calendar: FC<{
 									<TableRow key={getDateString(row[0].day)}>
 										{row.map((cell) => (
 											<EstimatorCell
-												key={getDateString(
-													cell.day,
-												)}
+												key={getDateString(cell.day)}
 												title={cell.title}
 												isOff={!cell.working}
-												isDone={
-													!!cell.working &&
-													!cell.workleft
-												}
-												isPartial={
-													cell.working &&
-													cell.working !=
-														user_count
-														? true
-														: false
-												}
+												isDone={!!cell.working && !cell.workleft}
+												isPartial={cell.working && cell.working != user_count ? true : false}
 											>
-												{getDateString(
-													cell.day,
-												)}
+												{getDateString(cell.day)}
 												<br />
 												{cell.description ? (
-													<>
-														{
-															cell.description
-														}
-													</>
+													<>{cell.description}</>
 												) : (
 													<>
-														Working:{" "}
-														{
-															cell.working
-														}
+														Working: {cell.working}
 														<br />
-														Work
-														Left:{" "}
-														{
-															cell.workleft
-														}
+														Work Left: {cell.workleft}
 													</>
 												)}
 											</EstimatorCell>

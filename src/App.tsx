@@ -139,11 +139,7 @@ function Main() {
 						toggleHideTitle={toggleHideTitle}
 						hideTitle={hideTitle}
 					></TopNav>
-					<LeftNav
-						open={leftNavOpen}
-						setLeftNavOpen={setLeftNavOpen}
-						width={sideWidth}
-					></LeftNav>
+					<LeftNav open={leftNavOpen} setLeftNavOpen={setLeftNavOpen} width={sideWidth}></LeftNav>
 				</>
 			)}
 			<Box

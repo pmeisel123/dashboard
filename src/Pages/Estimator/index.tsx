@@ -32,9 +32,7 @@ function EstimatorPage() {
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
-		defaultDefaultEstimate = parseInt(
-			searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "",
-		);
+		defaultDefaultEstimate = parseInt(searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "");
 		setDefaultEstimate(defaultDefaultEstimate);
 		setSearch(searchParams.get("search") || "");
 		setParent(searchParams.get("parent") || "");

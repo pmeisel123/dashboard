@@ -74,6 +74,15 @@ export interface GitBranch {
 	creator?: string;
 }
 
+export interface GitBranches {
+	[key: string]: GitBranch[]
+}
+
+export interface GitBranchesSlice {
+	gitBranches: GitBranches,
+	loaded: number | null; // ms since epoch
+}
+
 export interface ReportNamePaths {
 	path: string;
 	url: string;
@@ -86,4 +95,10 @@ export interface TicketCache {
 			repo: ReportNamePaths;
 		};
 	};
+}
+
+export interface BranchesAndTicket {
+	branches: GitBranches,
+	tickets: TicketCache,
+	loaded: number | null; // ms since epoch
 }

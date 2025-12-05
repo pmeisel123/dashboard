@@ -1,4 +1,4 @@
-import type { GitBranch, ReportNamePaths, TicketCache } from "./types";
+import type { GitBranch, ReportNamePaths, TicketCache, BranchesAndTicket } from "./types";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -66,14 +66,9 @@ const getBranchOwner = async (repo_name: string, branch_name: string): Promise<[
 	return branchCache[key];
 };
 
-const ticketCache: TicketCache = {};
-export const getBranches = async (): Promise<{
-	[key: string]: GitBranch[];
-}> => {
+export const getBranches = async (): Promise<BranchesAndTicket> => {
 	const branches: { [key: string]: GitBranch[] } = {};
-	Object.keys(ticketCache).forEach((key) => {
-		delete ticketCache[key];
-	});
+	const ticketBranches: TicketCache = {};
 	for (const [repo_name, repo] of Object.entries(__GIT_REPOS_PATHS__)) {
 		const path = repo.path;
 		const url = path + "/branches";
@@ -86,10 +81,10 @@ export const getBranches = async (): Promise<{
 				let [ticket, creator] = await getBranchOwner(repo_name, branch_name);
 				if (ticket) {
 					branch.ticket = ticket;
-					if (!ticketCache[ticket]) {
-						ticketCache[ticket] = {};
+					if (!ticketBranches[ticket]) {
+						ticketBranches[ticket] = {};
 					}
-					ticketCache[ticket][repo_name + "/" + branch_name] = {
+					ticketBranches[ticket][repo_name + "/" + branch_name] = {
 						name: branch_name,
 						repo: repo,
 					};
@@ -100,12 +95,9 @@ export const getBranches = async (): Promise<{
 			}
 		}
 	}
-	return branches;
-};
-
-export const getTicketBranches = async () => {
-	if (!Object.keys(ticketCache).length) {
-		await getBranches();
+	return {
+		tickets: ticketBranches,
+		branches: branches,
+		loaded: null,
 	}
-	return ticketCache;
 };

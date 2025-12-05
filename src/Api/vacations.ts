@@ -2,7 +2,7 @@ import { getHolidayDayString } from "./holiday";
 
 export const getVacationApi = async () => {
 	let results: { [key: string]: string[] } = {};
-	let response = await fetch("/src/assets/vacation.csv");
+	let response = await fetch("/vacation.csv");
 	if (!response.body) {
 		return results;
 	}

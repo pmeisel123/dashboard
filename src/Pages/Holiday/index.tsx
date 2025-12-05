@@ -37,7 +37,7 @@ const HolidayDuck: FC<{ day: string; name: string }> = ({ day, name }) => {
 				position: "absolute",
 				margin: "-5px 0 0 5px",
 			}}
-			src={"/src/assets/ducks/" + holiday_duck}
+			src={"/ducks/" + holiday_duck}
 		/>
 	);
 };

@@ -75,7 +75,7 @@ export const Duck = () => {
 					maxWidth: "64px",
 					opacity: 0.25,
 				}}
-				src={"/src/assets/ducks/" + duck}
+				src={"/ducks/" + duck}
 			/>
 		</Box>
 	);

@@ -10,14 +10,15 @@ import type {
 	GridSortModel,
 } from "@mui/x-data-grid";
 import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@mui/x-data-grid";
-import type { CustomFieldsProps, TicketCache, TicketProps } from "@src/Api";
-import { getTicketBranches } from "@src/Api";
+import type { AppDispatch, RootState, CustomFieldsProps, TicketProps } from "@src/Api";
+import { isGitDataRecent, fetchBranches } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import { defaultTableSettings, getTicketColumns } from "@src/Components";
 import { formatDistanceToNow } from "date-fns";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 declare const __API_URL__: string;
 const API_URL = __API_URL__;
@@ -97,18 +98,17 @@ const TicketTable: FC<{
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
 	const apiRef = useGridApiRef();
-	const [ticketsBranches, setTicketsBranches] = useState<TicketCache>({});
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
 		...defaultTableSettings,
 	});
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
+	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
-		const fetchData = async () => {
-			const data = await getTicketBranches();
-			setTicketsBranches(data);
-		};
-		fetchData();
-	}, []);
+		if (!isGitDataRecent(ticketsBranches)) {
+			dispatch(fetchBranches());
+		}
+	}, [dispatch, ticketsBranches]);
 
 	const theme = useTheme();
 	let columns: GridColDef<any>[] = [
@@ -241,13 +241,13 @@ const TicketTable: FC<{
 			});
 		}
 	});
-	if (Object.keys(ticketsBranches).length) {
+	if (ticketsBranches && Object.keys(ticketsBranches.branches).length) {
 		columns.push({
 			field: "branches",
 			headerName: "Git Branches",
 			flex: 2,
 			renderCell: (params: GridRenderCellParams<TicketProps>) => {
-				const ticket_branches = ticketsBranches[params.row.key];
+				const ticket_branches = ticketsBranches.tickets[params.row.key];
 				if (ticket_branches) {
 					return (
 						<>

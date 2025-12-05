@@ -25,10 +25,7 @@ const parseBranchName = (branch_name: string) => {
 	return [ticket, creator];
 };
 
-const getOwnerFromLastCommit = async (
-	repo_name: string,
-	branch_name: string,
-) => {
+const getOwnerFromLastCommit = async (repo_name: string, branch_name: string) => {
 	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
 	const path = repo.path;
 	const url = path + "/commits?sha=" + encodeURI(branch_name);
@@ -43,10 +40,7 @@ const getOwnerFromLastCommit = async (
 				first_commit.author.email &&
 				!first_commit.author.email.match(/noreply/)
 			) {
-				creator = first_commit.author.email.replace(
-					/@.*/,
-					"",
-				);
+				creator = first_commit.author.email.replace(/@.*/, "");
 				return creator;
 			}
 			if (
@@ -54,10 +48,7 @@ const getOwnerFromLastCommit = async (
 				first_commit.committer.email &&
 				!first_commit.committer.email.match(/noreply/)
 			) {
-				creator = first_commit.committer.email.replace(
-					/@.*/,
-					"",
-				);
+				creator = first_commit.committer.email.replace(/@.*/, "");
 				return creator;
 			}
 		}
@@ -66,10 +57,7 @@ const getOwnerFromLastCommit = async (
 };
 
 const branchCache: { [key: string]: [string, string] } = {};
-const getBranchOwner = async (
-	repo_name: string,
-	branch_name: string,
-): Promise<[string, string]> => {
+const getBranchOwner = async (repo_name: string, branch_name: string): Promise<[string, string]> => {
 	const key: string = repo_name + "____" + branch_name;
 	if (branchCache[key]) {
 		return branchCache[key];
@@ -99,18 +87,16 @@ export const getBranches = async (): Promise<{
 		for (const branch of branches[repo_name]) {
 			const branch_name: string = branch.name;
 			if (branch_name != "main" && branch_name != "master") {
-				let [ticket, creator] = await getBranchOwner(
-					repo_name,
-					branch_name,
-				);
+				let [ticket, creator] = await getBranchOwner(repo_name, branch_name);
 				if (ticket) {
 					branch.ticket = ticket;
 					if (!ticketCache[ticket]) {
 						ticketCache[ticket] = {};
 					}
-					ticketCache[ticket][
-						repo_name + "/" + branch_name
-					] = { name: branch_name, repo: repo };
+					ticketCache[ticket][repo_name + "/" + branch_name] = {
+						name: branch_name,
+						repo: repo,
+					};
 				}
 				if (creator) {
 					branch.creator = creator;

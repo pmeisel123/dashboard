@@ -1,12 +1,6 @@
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
 import { fetchTickets, fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
-import {
-	allGroups,
-	Calendar,
-	FormFields,
-	TicketTable,
-	UsersSelector,
-} from "@src/Components";
+import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useSearchParams } from "react-router-dom";
@@ -17,56 +11,34 @@ function EstimatorPage() {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams();
 	let defaultDefaultEstimate: number = parseInt(
-		searchParams.get("defaultEstimate") ||
-			defaultDefaultDefaultEstimate + "",
+		searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "",
 	);
-	const ticketsSelector = useSelector(
-		(state: RootState) => state.ticketsState,
-	);
-	const [search, setSearch] = useState<string>(
-		searchParams.get("search") || "",
-	);
+	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
+	const [search, setSearch] = useState<string>(searchParams.get("search") || "");
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector(
-		(state: RootState) => state.ticketsState[jiraSearch],
-	);
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [defaultEstimate, setDefaultEstimate] = useState<number>(
-		defaultDefaultEstimate,
-	);
-	const [parent, setParent] = useState<string>(
-		searchParams.get("parent") || "",
-	);
+	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
+	const [parent, setParent] = useState<string>(searchParams.get("parent") || "");
 	const [estimatePadding, setEstimatePadding] = useState<number>(
 		parseFloat(searchParams.get("estimatePadding") || "0"),
 	);
-	const possibleUsersGroups = useSelector(
-		(state: RootState) => state.usersAndGroupsState,
-	);
-	const [group, setGroup] = useState<string>(
-		searchParams.get("group") || allGroups,
-	);
+	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
+	const [group, setGroup] = useState<string>(searchParams.get("group") || allGroups);
 	let user_param = searchParams.get("users") || "";
-	const [users, setUsers] = useState<Set<string>>(
-		new Set(user_param.split(",")),
-	);
-	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(
-		new Set(),
-	);
+	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(",")));
+	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
 	const freezeParams = useRef(false);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
 		defaultDefaultEstimate = parseInt(
-			searchParams.get("defaultEstimate") ||
-				defaultDefaultDefaultEstimate + "",
+			searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "",
 		);
 		setDefaultEstimate(defaultDefaultEstimate);
 		setSearch(searchParams.get("search") || "");
 		setParent(searchParams.get("parent") || "");
-		setEstimatePadding(
-			parseFloat(searchParams.get("estimatePadding") || "0"),
-		);
+		setEstimatePadding(parseFloat(searchParams.get("estimatePadding") || "0"));
 		setGroup(searchParams.get("group") || allGroups);
 		user_param = searchParams.get("users") || "";
 		setUsers(new Set(user_param.split(",")));
@@ -94,10 +66,7 @@ function EstimatorPage() {
 			return;
 		}
 		setJiraSearch(jira_search);
-		setLoading(
-			!ticketsSelector[jira_search] ||
-				!ticketsSelector[jira_search].length,
-		);
+		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() => {
 			setLoading(false);
 		});
@@ -117,14 +86,9 @@ function EstimatorPage() {
 		if (freezeParams.current) {
 			return;
 		}
-		const newSearchParams = new URLSearchParams(
-			searchParams.toString(),
-		);
+		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (defaultEstimate != defaultDefaultDefaultEstimate) {
-			newSearchParams.set(
-				"defaultEstimate",
-				defaultEstimate + "",
-			);
+			newSearchParams.set("defaultEstimate", defaultEstimate + "");
 		} else {
 			newSearchParams.delete("defaultEstimate");
 		}
@@ -139,10 +103,7 @@ function EstimatorPage() {
 			newSearchParams.delete("parent");
 		}
 		if (estimatePadding != 0) {
-			newSearchParams.set(
-				"estimatePadding",
-				estimatePadding + "",
-			);
+			newSearchParams.set("estimatePadding", estimatePadding + "");
 		} else {
 			newSearchParams.delete("estimatePadding");
 		}
@@ -151,16 +112,9 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete("group");
 		}
-		if (
-			possibleUsersGroups &&
-			possibleUsersGroups.users &&
-			Object.keys(possibleUsersGroups.users).length
-		) {
+		if (possibleUsersGroups && possibleUsersGroups.users && Object.keys(possibleUsersGroups.users).length) {
 			if (users.size) {
-				newSearchParams.set(
-					"users",
-					[...users].join(","),
-				);
+				newSearchParams.set("users", [...users].join(","));
 			} else {
 				newSearchParams.delete("users");
 			}
@@ -172,22 +126,10 @@ function EstimatorPage() {
 	}, [search, defaultEstimate, parent, estimatePadding, group, users]);
 
 	let totalTimEstimate =
-		tickets.reduce(
-			(sum, row) =>
-				sum + (row.timeestimate || defaultEstimate),
-			0,
-		) + estimatePadding;
+		tickets.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding;
 	let totalTimeOriginalEstimate =
-		tickets.reduce(
-			(sum, row) =>
-				sum +
-				(row.timeoriginalestimate || defaultEstimate),
-			0,
-		) + estimatePadding;
-	let totalTimeSpent = tickets.reduce(
-		(sum, row) => sum + (row.timespent || 0),
-		0,
-	);
+		tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding;
+	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			{!isDashboard && (
@@ -197,30 +139,18 @@ function EstimatorPage() {
 						setSearch={setSearch}
 						parent={parent}
 						setParent={setParent}
-						defaultEstimate={
-							defaultEstimate
-						}
-						setDefaultEstimate={
-							setDefaultEstimate
-						}
-						estimatePadding={
-							estimatePadding
-						}
-						setEstimatePadding={
-							setEstimatePadding
-						}
+						defaultEstimate={defaultEstimate}
+						setDefaultEstimate={setDefaultEstimate}
+						estimatePadding={estimatePadding}
+						setEstimatePadding={setEstimatePadding}
 					/>
 					<UsersSelector
-						possibleUsersGroups={
-							possibleUsersGroups
-						}
+						possibleUsersGroups={possibleUsersGroups}
 						group={group}
 						setGroup={setGroup}
 						users={users}
 						setUsers={setUsers}
-						setVisibleUsers={
-							setVisibleUsers
-						}
+						setVisibleUsers={setVisibleUsers}
 					/>
 				</>
 			)}
@@ -230,9 +160,7 @@ function EstimatorPage() {
 					defaultEstimate={defaultEstimate}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
-					totalTimeOriginalEstimate={
-						totalTimeOriginalEstimate
-					}
+					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
 				/>
@@ -241,9 +169,7 @@ function EstimatorPage() {
 				<Calendar
 					users={users}
 					group={group}
-					possibleUsersGroups={
-						possibleUsersGroups
-					}
+					possibleUsersGroups={possibleUsersGroups}
 					totalTimEstimate={totalTimEstimate}
 					visibleUsers={visibleUsers}
 					isDashboard={isDashboard}

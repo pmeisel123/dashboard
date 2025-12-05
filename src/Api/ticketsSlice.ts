@@ -7,13 +7,10 @@ const initialState: { [key: string]: TicketProps[] } = {
 	"": [],
 };
 
-export const fetchTickets = createAsyncThunk(
-	"tickets/fetchTickets",
-	async (search: string) => {
-		const data: TicketProps[] = await getTicketsApi(search);
-		return data;
-	},
-);
+export const fetchTickets = createAsyncThunk("tickets/fetchTickets", async (search: string) => {
+	const data: TicketProps[] = await getTicketsApi(search);
+	return data;
+});
 
 export const ticketsSlice = createSlice({
 	name: "tickets",

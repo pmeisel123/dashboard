@@ -8,17 +8,8 @@ function HomePage() {
 		<Box>
 			{pages.map((page) => (
 				<ListItem disablePadding key={page.path}>
-					<ListItemButton
-						title={page.name}
-						component={Link}
-						to={page.path}
-					>
-						<ListItemText
-							primary={page.name}
-							secondary={
-								page.description
-							}
-						/>
+					<ListItemButton title={page.name} component={Link} to={page.path}>
+						<ListItemText primary={page.name} secondary={page.description} />
 					</ListItemButton>
 				</ListItem>
 			))}

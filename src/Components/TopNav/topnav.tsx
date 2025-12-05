@@ -14,18 +14,13 @@ interface TopNavBarProps {
 	hideTitle: boolean;
 }
 
-const TopNavBar: FC<TopNavBarProps> = ({
-	toggleLeftNav,
-	toggleHideTitle,
-	hideTitle,
-}) => {
+const TopNavBar: FC<TopNavBarProps> = ({ toggleLeftNav, toggleHideTitle, hideTitle }) => {
 	return (
 		<>
 			<AppBar
 				position="fixed"
 				sx={{
-					zIndex: (theme) =>
-						theme.zIndex.drawer + 1,
+					zIndex: (theme) => theme.zIndex.drawer + 1,
 				}}
 			>
 				<Toolbar>
@@ -38,11 +33,7 @@ const TopNavBar: FC<TopNavBarProps> = ({
 					>
 						<MenuIcon />
 					</IconButton>
-					<Typography
-						variant="h6"
-						component="div"
-						sx={{ flexGrow: 1 }}
-					>
+					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 						Dashboard
 					</Typography>
 					<SavePageModal />
@@ -51,14 +42,9 @@ const TopNavBar: FC<TopNavBarProps> = ({
 						onClick={toggleHideTitle}
 						title="Hide/Show the Page Titles and Description on every page"
 					>
-						{hideTitle ? "Show" : "Hide"}{" "}
-						Page Titles
+						{hideTitle ? "Show" : "Hide"} Page Titles
 					</Button>
-					<Button
-						color="inherit"
-						component={Link}
-						to="/"
-					>
+					<Button color="inherit" component={Link} to="/">
 						Home
 					</Button>
 				</Toolbar>

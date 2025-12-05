@@ -1,13 +1,4 @@
-import {
-	Drawer,
-	List,
-	ListItem,
-	ListItemButton,
-	ListItemText,
-	Toolbar,
-	useMediaQuery,
-	useTheme,
-} from "@mui/material";
+import { Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMediaQuery, useTheme } from "@mui/material";
 import { SavePageList } from "@src/Components";
 import { pages } from "@src/Pages/const";
 import type { FC } from "react";
@@ -38,10 +29,7 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 			<Toolbar />
 			<List sx={{ width: width }}>
 				{pages.map((page) => (
-					<ListItem
-						disablePadding
-						key={page.path}
-					>
+					<ListItem disablePadding key={page.path}>
 						<ListItemButton
 							title={page.name}
 							component={Link}
@@ -49,24 +37,14 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 							onClick={() => {
 								handleClick();
 							}}
-							selected={
-								location.pathname ==
-								page.path
-							}
+							selected={location.pathname == page.path}
 						>
-							<ListItemText
-								primary={
-									page.name
-								}
-							/>
+							<ListItemText primary={page.name} />
 						</ListItemButton>
 					</ListItem>
 				))}
 			</List>
-			<SavePageList
-				width={width}
-				parentHandleClick={handleClick}
-			/>
+			<SavePageList width={width} parentHandleClick={handleClick} />
 		</Drawer>
 	);
 };

@@ -24,39 +24,22 @@ const ListDashboard: FC<{
 				<Fragment key={key}>
 					<Button
 						onClick={() => {
-							setDashboard(
-								__DASHBOARDS__[
-									key
-								].key,
-							);
+							setDashboard(__DASHBOARDS__[key].key);
 						}}
 					>
 						{__DASHBOARDS__[key].name}
 					</Button>
 					<Box>
-						{__DASHBOARDS__[key].pages.map(
-							(page) => (
-								<Box
-									sx={{
-										paddingLeft: 5,
-									}}
-									key={
-										key +
-										page.name
-									}
-								>
-									<Link
-										to={
-											page.url
-										}
-									>
-										{
-											page.name
-										}
-									</Link>
-								</Box>
-							),
-						)}
+						{__DASHBOARDS__[key].pages.map((page) => (
+							<Box
+								sx={{
+									paddingLeft: 5,
+								}}
+								key={key + page.name}
+							>
+								<Link to={page.url}>{page.name}</Link>
+							</Box>
+						))}
 					</Box>
 				</Fragment>
 			))}
@@ -70,16 +53,10 @@ function DashboardPage() {
 		height: window.innerHeight,
 	});
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [dashboard, setDashboard] = useState<string>(
-		searchParams.get("dashboard") || "",
-	);
-	const [pageNumber, setPageNumber] = useState<number>(
-		parseInt(searchParams.get("pageNumber") || "0"),
-	);
+	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
+	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "0"));
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(
-			searchParams.toString(),
-		);
+		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (dashboard) {
 			newSearchParams.set("dashboard", dashboard);
 		} else {
@@ -120,14 +97,8 @@ function DashboardPage() {
 		};
 	}, [dashboard]);
 	const ChangeUrl = (url: string) => {
-		const iframe = document.getElementById(
-			"dashboard",
-		) as myHTMLIFrameElement | null;
-		if (
-			iframe &&
-			iframe.contentWindow &&
-			iframe.contentWindow.changeUrl
-		) {
+		const iframe = document.getElementById("dashboard") as myHTMLIFrameElement | null;
+		if (iframe && iframe.contentWindow && iframe.contentWindow.changeUrl) {
 			iframe.contentWindow.changeUrl(url);
 		} else {
 			// TODO: fix this
@@ -136,8 +107,7 @@ function DashboardPage() {
 	};
 	useEffect(() => {
 		if (dashboard && __DASHBOARDS__[dashboard]) {
-			let url =
-				__DASHBOARDS__[dashboard].pages[pageNumber].url;
+			let url = __DASHBOARDS__[dashboard].pages[pageNumber].url;
 			if (url.match(/\?/)) {
 				url += "&";
 			} else {
@@ -164,30 +134,15 @@ function DashboardPage() {
 							outline: "1px solid red",
 						}}
 						component={Link}
-						to={
-							__DASHBOARDS__[
-								dashboard
-							].pages[pageNumber].url
-						}
+						to={__DASHBOARDS__[dashboard].pages[pageNumber].url}
 					>
 						Exit Dashboard
 					</Button>
-					Dashboard &gt;{" "}
-					{__DASHBOARDS__[dashboard].name} &gt;{" "}
-					{
-						__DASHBOARDS__[dashboard].pages[
-							pageNumber
-						].name
-					}
+					Dashboard &gt; {__DASHBOARDS__[dashboard].name} &gt;{" "}
+					{__DASHBOARDS__[dashboard].pages[pageNumber].name}
 					<>
 						{" "}
-						(Page {pageNumber + 1} of{" "}
-						{
-							__DASHBOARDS__[
-								dashboard
-							].pages.length
-						}
-						)
+						(Page {pageNumber + 1} of {__DASHBOARDS__[dashboard].pages.length})
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>

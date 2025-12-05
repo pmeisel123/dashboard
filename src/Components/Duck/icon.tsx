@@ -11,12 +11,8 @@ export const Duck = () => {
 	let default_duck_title = "ducky.png";
 	const [searchParams] = useSearchParams();
 	const [duck, setDuck] = useState<string>(default_duck);
-	const [silly, setSilly] = useState<number>(
-		parseInt(searchParams.get("silly") || max_silly + ""),
-	);
-	const [orderSilly] = useState<boolean>(
-		searchParams.get("orderSilly") == "true",
-	);
+	const [silly, setSilly] = useState<number>(parseInt(searchParams.get("silly") || max_silly + ""));
+	const [orderSilly] = useState<boolean>(searchParams.get("orderSilly") == "true");
 	const [duckTitle, setDuckTitle] = useState<string>("");
 	let today = getHolidayDayString(new Date());
 	const randomSilly = () => {
@@ -31,12 +27,7 @@ export const Duck = () => {
 			return;
 		}
 		if (searchParams.get("silly") != null) {
-			setSilly(
-				parseInt(
-					searchParams.get("silly") ||
-						max_silly + "",
-				),
-			);
+			setSilly(parseInt(searchParams.get("silly") || max_silly + ""));
 		} else {
 			setSilly(Math.floor(Math.random() * max_silly));
 		}

@@ -1,11 +1,4 @@
-import {
-	Button,
-	Grid,
-	InputLabel,
-	MenuItem,
-	Select,
-	TextField,
-} from "@mui/material";
+import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
 import { fetchTickets, getJiraDayString } from "@src/Api";
 import { TicketTable } from "@src/Components";
@@ -28,13 +21,9 @@ function RecentTicketsPage() {
 	const [days, setDays] = useState<number>(getParamDays());
 	const [search, setSearch] = useState<string>(getParamSearch());
 	const [loading, setLoading] = useState<boolean>(true);
-	const ticketsSelector = useSelector(
-		(state: RootState) => state.ticketsState,
-	);
+	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector(
-		(state: RootState) => state.ticketsState[jiraSearch],
-	);
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const getFunc = function () {
@@ -47,10 +36,7 @@ function RecentTicketsPage() {
 		past_date.setDate(past_date.getDate() - days);
 		jira_search += getJiraDayString(past_date) + '"';
 		setJiraSearch(jira_search);
-		setLoading(
-			!ticketsSelector[jira_search] ||
-				!ticketsSelector[jira_search].length,
-		);
+		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() => {
 			setLoading(false);
 		});
@@ -67,9 +53,7 @@ function RecentTicketsPage() {
 	}, [searchParams]);
 	useEffect(() => {
 		if (loading) {
-			const newSearchParams = new URLSearchParams(
-				searchParams.toString(),
-			);
+			const newSearchParams = new URLSearchParams(searchParams.toString());
 			if (days != default_days) {
 				newSearchParams.set("days", days + "");
 			} else {
@@ -80,104 +64,54 @@ function RecentTicketsPage() {
 			} else {
 				newSearchParams.delete("search");
 			}
-			if (
-				searchParams.toString() !=
-				newSearchParams.toString()
-			) {
+			if (searchParams.toString() != newSearchParams.toString()) {
 				setSearchParams(newSearchParams);
 			}
 			getFunc();
 		}
 	}, [loading]);
-	let totalTimEstimate = tickets.reduce(
-		(sum, row) => sum + (row.timeestimate || 0),
-		0,
-	);
-	let totalTimeOriginalEstimate = tickets.reduce(
-		(sum, row) => sum + (row.timeoriginalestimate || 0),
-		0,
-	);
-	let totalTimeSpent = tickets.reduce(
-		(sum, row) => sum + (row.timespent || 0),
-		0,
-	);
+	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
+	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
+	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			{!isDashboard && (
 				<Grid container spacing={2}>
 					<Grid size={{ xs: 12, md: 3 }}>
-						<InputLabel id="search">
-							Search
-						</InputLabel>
+						<InputLabel id="search">Search</InputLabel>
 						<TextField
 							id="search"
 							value={search}
 							onChange={(event) => {
-								setSearch(
-									event
-										.target
-										.value,
-								);
+								setSearch(event.target.value);
 							}}
 						/>
 					</Grid>
 					<Grid size={{ xs: 12, md: 3 }}>
-						<InputLabel id="Days Agao">
-							Days Ago
-						</InputLabel>
+						<InputLabel id="Days Agao">Days Ago</InputLabel>
 						<Select
 							label="Days Ago"
 							value={days}
 							onChange={(event) => {
-								setDays(
-									event
-										.target
-										.value,
-								);
+								setDays(event.target.value);
 							}}
 							sx={{ minWidth: 100 }}
 						>
-							{[
-								...Array(
-									31,
-								).keys(),
-							].map(
-								(
-									days: number,
-								) => (
-									<MenuItem
-										key={
-											days
-										}
-										value={
-											days
-										}
-									>
-										{
-											days
-										}
-									</MenuItem>
-								),
-							)}
+							{[...Array(31).keys()].map((days: number) => (
+								<MenuItem key={days} value={days}>
+									{days}
+								</MenuItem>
+							))}
 						</Select>
 					</Grid>
 					<Grid size={2}>
-						<InputLabel id="parent">
-							&nbsp;
-						</InputLabel>
+						<InputLabel id="parent">&nbsp;</InputLabel>
 						<Button
 							variant="contained"
 							onClick={() => {
-								setLoading(
-									true,
-								);
+								setLoading(true);
 							}}
-							disabled={
-								getParamDays() ==
-									days &&
-								getParamSearch() ==
-									search
-							}
+							disabled={getParamDays() == days && getParamSearch() == search}
 						>
 							Update
 						</Button>
@@ -190,9 +124,7 @@ function RecentTicketsPage() {
 					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
-					totalTimeOriginalEstimate={
-						totalTimeOriginalEstimate
-					}
+					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
 					defaultSort={"created"}

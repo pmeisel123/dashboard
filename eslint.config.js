@@ -59,10 +59,7 @@ export default [
 		},
 		rules: {
 			// Disable base rule, use TS one
-			"react-refresh/only-export-components": [
-				"warn",
-				{ allowConstantExport: true },
-			],
+			"react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
 			"no-unused-vars": "off",
 			"@typescript-eslint/no-unused-vars": [
 				"warn",
@@ -99,10 +96,7 @@ export default [
 			"react-refresh": pluginReactRefresh,
 		},
 		rules: {
-			"react-refresh/only-export-components": [
-				"warn",
-				{ allowConstantExport: true },
-			],
+			"react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
 		},
 	},
 ];

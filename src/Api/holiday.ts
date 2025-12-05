@@ -58,9 +58,7 @@ export const getHolidays = (year: string): HolidayProps[] => {
 			let name = renameHoliday(holiday.name);
 			holidaysUs.push({
 				name: name,
-				date: getHolidayDayString(
-					new Date(holiday.date),
-				),
+				date: getHolidayDayString(new Date(holiday.date)),
 				type: "US",
 				bank: true,
 			});
@@ -81,9 +79,7 @@ export const getAllUsHolidays = (year?: string): HolidayProps[] => {
 			name: name,
 			date: getHolidayDayString(new Date(holiday.date)),
 			type: "US",
-			bank:
-				holiday.type === "public" ||
-				holiday.type === "bank",
+			bank: holiday.type === "public" || holiday.type === "bank",
 		});
 	});
 	return usHolidays;
@@ -110,10 +106,7 @@ export const getAllHolidays = (year?: string): HolidayProps[] => {
 	});
 	const jewishHolidays = JewishHolidaysList(year);
 	allHolidays[year] = [...usHolidays, ...jewishHolidays];
-	allHolidays[year].sort(
-		(a, b) =>
-			new Date(a.date).getTime() - new Date(b.date).getTime(),
-	);
+	allHolidays[year].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 	return allHolidays[year];
 };
 
@@ -168,9 +161,5 @@ export const getDateString = (dateObj: Date) => {
 	return month + " " + day;
 };
 export const getDateStringWithDayOfWeek = (dateObj: Date) => {
-	return (
-		dateObj.toLocaleDateString("en-US", { weekday: "long" }) +
-		" " +
-		getDateString(dateObj)
-	);
+	return dateObj.toLocaleDateString("en-US", { weekday: "long" }) + " " + getDateString(dateObj);
 };

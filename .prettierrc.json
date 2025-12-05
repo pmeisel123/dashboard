@@ -1,10 +1,9 @@
 {
 	"jsonRecursiveSort": true,
 	"jsonSortOrder": "{\".*\": \"lexical\"}",
-	"plugins": [
-		"prettier-plugin-organize-imports",
-		"prettier-plugin-sort-json"
-	],
+	"plugins": ["prettier-plugin-organize-imports", "prettier-plugin-sort-json"],
+	"printWidth": 120,
+	"singleAttributePerLine": false,
 	"tabWidth": 8,
 	"useTabs": true
 }

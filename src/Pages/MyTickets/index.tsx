@@ -10,40 +10,20 @@ declare const __DONE_STATUS__: string[];
 function MyTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector(
-		(state: RootState) => state.ticketsState[jiraSearch],
-	);
-	const possibleUsersGroups = useSelector(
-		(state: RootState) => state.usersAndGroupsState,
-	);
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(
-		searchParams.get("group") ||
-			window.localStorage.getItem("group") ||
-			"",
+		searchParams.get("group") || window.localStorage.getItem("group") || "",
 	);
-	const [user, setUser] = useState<string>(
-		searchParams.get("user") ||
-			window.localStorage.getItem("user") ||
-			"",
-	);
+	const [user, setUser] = useState<string>(searchParams.get("user") || window.localStorage.getItem("user") || "");
 	const [loading, setLoading] = useState<boolean>(true);
-	const ticketsSelector = useSelector(
-		(state: RootState) => state.ticketsState,
-	);
+	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const hasFetchedTickets = useRef("");
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
-		setGroup(
-			searchParams.get("group") ||
-				window.localStorage.getItem("group") ||
-				"",
-		);
-		setUser(
-			searchParams.get("user") ||
-				window.localStorage.getItem("user") ||
-				"",
-		);
+		setGroup(searchParams.get("group") || window.localStorage.getItem("group") || "");
+		setUser(searchParams.get("user") || window.localStorage.getItem("user") || "");
 	};
 
 	useEffect(() => {
@@ -54,17 +34,9 @@ function MyTicketsPage() {
 		if (!user) {
 			setJiraSearch("");
 		}
-		const jira_search =
-			"assignee = " +
-			user +
-			' AND status NOT IN ("' +
-			__DONE_STATUS__.join('","') +
-			'")';
+		const jira_search = "assignee = " + user + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
 		setJiraSearch(jira_search);
-		setLoading(
-			!ticketsSelector[jira_search] ||
-				!ticketsSelector[jira_search].length,
-		);
+		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() => {
 			setLoading(false);
 		});
@@ -82,13 +54,8 @@ function MyTicketsPage() {
 		}
 	}, [user]);
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(
-			searchParams.toString(),
-		);
-		if (
-			group == window.localStorage.getItem("group") &&
-			user == window.localStorage.getItem("user")
-		) {
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (group == window.localStorage.getItem("group") && user == window.localStorage.getItem("user")) {
 			return;
 		}
 		if (group != "") {
@@ -107,18 +74,9 @@ function MyTicketsPage() {
 			setSearchParams(newSearchParams);
 		}
 	}, [group, user]);
-	let totalTimEstimate = tickets.reduce(
-		(sum, row) => sum + (row.timeestimate || 0),
-		0,
-	);
-	let totalTimeOriginalEstimate = tickets.reduce(
-		(sum, row) => sum + (row.timeoriginalestimate || 0),
-		0,
-	);
-	let totalTimeSpent = tickets.reduce(
-		(sum, row) => sum + (row.timespent || 0),
-		0,
-	);
+	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
+	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
+	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
 	return (
 		<>
 			<UserSelector
@@ -134,9 +92,7 @@ function MyTicketsPage() {
 					defaultEstimate={null}
 					loading={loading}
 					totalTimEstimate={totalTimEstimate}
-					totalTimeOriginalEstimate={
-						totalTimeOriginalEstimate
-					}
+					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 				/>
 			)}

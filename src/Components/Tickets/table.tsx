@@ -9,12 +9,7 @@ import type {
 	GridSlotsComponentsProps,
 	GridSortModel,
 } from "@mui/x-data-grid";
-import {
-	DataGrid,
-	GridFooterContainer,
-	GridPagination,
-	useGridApiRef,
-} from "@mui/x-data-grid";
+import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@mui/x-data-grid";
 import type { CustomFieldsProps, TicketCache, TicketProps } from "@src/Api";
 import { getTicketBranches } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
@@ -57,11 +52,8 @@ const Ago = (value: Date): string => {
 	return formatDistanceToNow(value, { addSuffix: false });
 };
 
-const CustomFooterStatusComponent = (
-	props: NonNullable<GridSlotsComponentsProps["footer"]>,
-) => {
-	const { totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent } =
-		props;
+const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps["footer"]>) => {
+	const { totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent } = props;
 	return (
 		<GridFooterContainer>
 			<Box
@@ -72,16 +64,11 @@ const CustomFooterStatusComponent = (
 					gap: 2,
 				}}
 			>
+				<Typography variant="body2">totalTimEstimate: {totalTimEstimate}</Typography>
 				<Typography variant="body2">
-					totalTimEstimate: {totalTimEstimate}
+					totalTimeOriginalEstimate: {totalTimeOriginalEstimate}
 				</Typography>
-				<Typography variant="body2">
-					totalTimeOriginalEstimate:{" "}
-					{totalTimeOriginalEstimate}
-				</Typography>
-				<Typography variant="body2">
-					totalTimeSpent: {totalTimeSpent}
-				</Typography>
+				<Typography variant="body2">totalTimeSpent: {totalTimeSpent}</Typography>
 			</Box>
 			<GridPagination />
 		</GridFooterContainer>
@@ -130,15 +117,9 @@ const TicketTable: FC<{
 		{
 			field: "key",
 			headerName: "key",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => (
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
 				<Link
-					href={
-						(API_URL +
-							"/browse/" +
-							params.value) as string
-					}
+					href={(API_URL + "/browse/" + params.value) as string}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -150,9 +131,7 @@ const TicketTable: FC<{
 		{
 			field: "parentkey",
 			headerName: "parent",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => {
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
 				if (params.value) {
 					return (
 						<>
@@ -160,36 +139,24 @@ const TicketTable: FC<{
 								href={
 									(API_URL +
 										"/browse/" +
-										params
-											.row
-											.parentkey) as string
+										params.row.parentkey) as string
 								}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{
-									params
-										.row
-										.parentkey
-								}
+								{params.row.parentkey}
 							</Link>
 							: &#x200b;
 							<Link
 								href={
 									(API_URL +
 										"/browse/" +
-										params
-											.row
-											.parentkey) as string
+										params.row.parentkey) as string
 								}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{
-									params
-										.row
-										.parentname
-								}
+								{params.row.parentname}
 							</Link>
 						</>
 					);
@@ -212,64 +179,41 @@ const TicketTable: FC<{
 		{
 			field: "created",
 			headerName: "created",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => <>{Ago(params.value)}</>,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => <>{Ago(params.value)}</>,
 		},
 		{
 			field: "updated",
 			headerName: "updated",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => <>{Ago(params.value)}</>,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => <>{Ago(params.value)}</>,
 		},
 		{
 			field: "timeestimate",
 			headerName: "Estimate",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => (
-				<RenderEstimate
-					value={params.value}
-					defaultEstimate={defaultEstimate}
-				/>
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+				<RenderEstimate value={params.value} defaultEstimate={defaultEstimate} />
 			),
 		},
 		{
 			field: "timeoriginalestimate",
 			headerName: "Original Estimate",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => (
-				<RenderEstimate
-					value={params.value}
-					defaultEstimate={defaultEstimate}
-				></RenderEstimate>
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+				<RenderEstimate value={params.value} defaultEstimate={defaultEstimate}></RenderEstimate>
 			),
 		},
 		{ field: "timespent", headerName: "Spent" },
 	];
 	Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-		let custom_field_name =
-			__CUSTOM_FIELDS__[custom_field_key].Name;
-		let custom_field_type =
-			__CUSTOM_FIELDS__[custom_field_key].Type;
-		let custom_field_link_text =
-			__CUSTOM_FIELDS__[custom_field_key].LinkText;
-		let custom_field_link_icon =
-			__CUSTOM_FIELDS__[custom_field_key].LinkIcon;
+		let custom_field_name = __CUSTOM_FIELDS__[custom_field_key].Name;
+		let custom_field_type = __CUSTOM_FIELDS__[custom_field_key].Type;
+		let custom_field_link_text = __CUSTOM_FIELDS__[custom_field_key].LinkText;
+		let custom_field_link_icon = __CUSTOM_FIELDS__[custom_field_key].LinkIcon;
 
 		if (custom_field_type == "Text") {
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (
-					params: GridRenderCellParams<TicketProps>,
-				) => {
-					const value: string | null =
-						params.row.customFields[
-							custom_field_key
-						];
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
 						return <>{value}</>;
 					}
@@ -282,29 +226,17 @@ const TicketTable: FC<{
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (
-					params: GridRenderCellParams<TicketProps>,
-				) => {
-					const value: string | null =
-						params.row.customFields[
-							custom_field_key
-						];
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
 						if (custom_field_link_icon) {
-							const IconComponent =
-								icons[
-									custom_field_link_icon
-								];
+							const IconComponent = icons[custom_field_link_icon];
 							return (
 								<Link
-									href={
-										value
-									}
+									href={value}
 									target="_blank"
 									rel="noopener noreferrer"
-									title={
-										custom_field_name
-									}
+									title={custom_field_name}
 									color="inherit"
 								>
 									<IconComponent />
@@ -313,14 +245,10 @@ const TicketTable: FC<{
 						} else {
 							return (
 								<Link
-									href={
-										value
-									}
+									href={value}
 									target="_blank"
 									rel="noopener noreferrer"
-									title={
-										custom_field_name
-									}
+									title={custom_field_name}
 								>
 									{custom_field_link_text
 										? custom_field_link_text
@@ -339,34 +267,20 @@ const TicketTable: FC<{
 			field: "branches",
 			headerName: "Git Branches",
 			flex: 2,
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => {
-				const ticket_branches =
-					ticketsBranches[params.row.key];
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				const ticket_branches = ticketsBranches[params.row.key];
 				if (ticket_branches) {
 					return (
 						<>
-							{Object.entries(
-								ticket_branches,
-							).map(
-								([
-									key,
-									value,
-								]) => {
-									const url = value.repo.url + "/tree/" + value.name
-									return (
-										<Link
-											key={key}
-											href={url}
-											target={"_blank"}
-										>
-											{value.name}
-											<br />
-										</Link>
-									);
-								},
-							)}
+							{Object.entries(ticket_branches).map(([key, value]) => {
+								const url = value.repo.url + "/tree/" + value.name;
+								return (
+									<Link key={key} href={url} target={"_blank"}>
+										{value.name}
+										<br />
+									</Link>
+								);
+							})}
 						</>
 					);
 				}
@@ -374,24 +288,16 @@ const TicketTable: FC<{
 		});
 	}
 
-	const handleColumnModelChange = ({
-		column,
-		newModel,
-	}: updateGridModelProps) => {
+	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
 		const newColumnModel = {
 			...columnModel,
 			[column]: newModel,
 		};
-		localStorage.setItem(
-			localStorageName,
-			JSON.stringify(newColumnModel),
-		);
+		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
 		setColumnModel(newColumnModel);
 	};
 
-	const handleColumnVisibilityModelChange = (
-		newModel: GridColumnVisibilityModel,
-	) => {
+	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
 		handleColumnModelChange({
 			column: "GridColumnVisibilityModel",
 			newModel: newModel,
@@ -417,27 +323,18 @@ const TicketTable: FC<{
 
 		if (
 			defaultSort &&
-			(isDashboard ||
-				!columnModel ||
-				!columnModel.GridSortModel ||
-				!columnModel.GridSortModel.length)
+			(isDashboard || !columnModel || !columnModel.GridSortModel || !columnModel.GridSortModel.length)
 		) {
 			if (defaultSortDirection == "desc") {
-				columnModel.GridSortModel = [
-					{ field: defaultSort, sort: "desc" },
-				];
+				columnModel.GridSortModel = [{ field: defaultSort, sort: "desc" }];
 			} else {
-				columnModel.GridSortModel = [
-					{ field: defaultSort, sort: "asc" },
-				];
+				columnModel.GridSortModel = [{ field: defaultSort, sort: "asc" }];
 			}
 		}
 		setColumnModel(columnModel);
 	}, []);
 
-	const getRowClassName = (
-		params: GridRowParams<TicketProps>,
-	): string => {
+	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
 		return params.row.isdone ? "MuiDataGrid-row-done" : "";
 	};
 	const getVisibility = () => {
@@ -468,8 +365,7 @@ const TicketTable: FC<{
 			<DataGrid
 				sx={{
 					"& .MuiDataGrid-row-done": {
-						backgroundColor:
-							theme.palette.grey.A400,
+						backgroundColor: theme.palette.grey.A400,
 					},
 				}}
 				loading={loading}
@@ -501,9 +397,7 @@ const TicketTable: FC<{
 				columnVisibilityModel={getVisibility()}
 				sortModel={columnModel.GridSortModel}
 				filterModel={columnModel.GridFilterModel}
-				onColumnVisibilityModelChange={
-					handleColumnVisibilityModelChange
-				}
+				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
 				onSortModelChange={handleSortModelChange}
 				onFilterModelChange={handleFilterChange}
 				apiRef={apiRef}

@@ -70,7 +70,7 @@ const getBranchOwner = async (
 	repo_name: string,
 	branch_name: string,
 ): Promise<[string, string]> => {
-	const key: string = repo_name + "___" + branch_name;
+	const key: string = repo_name + "____" + branch_name;
 	if (branchCache[key]) {
 		return branchCache[key];
 	}

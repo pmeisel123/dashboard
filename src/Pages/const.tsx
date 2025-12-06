@@ -1,3 +1,4 @@
+import BranchesPage from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import EstimatorPage from "@src/Pages/Estimator";
 import HolidayPage from "@src/Pages/Holiday";
@@ -45,6 +46,12 @@ export const pages = [
 		name: "Recent Tickets",
 		element: <RecentTicketsPage />,
 		description: <>Find Tickets recently files</>,
+	},
+	{
+		path: "/branches",
+		name: "Branches",
+		element: <BranchesPage />,
+		description: <>List all the repos and their branches</>,
 	},
 	{
 		path: "/holidays",

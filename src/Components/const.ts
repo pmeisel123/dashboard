@@ -1,4 +1,5 @@
 import type { GridColDef, GridColumnVisibilityModel, GridFilterModel, GridSortModel } from "@mui/x-data-grid";
+import { formatDistanceToNow } from "date-fns";
 
 export interface tableSetingsProps {
 	GridColumnVisibilityModel: GridColumnVisibilityModel;
@@ -54,6 +55,13 @@ export const getTicketColumns = (localStorageName: string, columns: GridColDef<a
 		return columnModel;
 	}
 	return { ...defaultTableSettings };
+};
+
+export const Ago = (value: Date): string => {
+	if (!value) {
+		return "";
+	}
+	return formatDistanceToNow(value, { addSuffix: false });
 };
 
 export const allGroups = "All";

@@ -72,6 +72,7 @@ export interface GitBranch {
 	};
 	ticket?: string;
 	creator?: string;
+	lastCommitDate?: string;
 }
 
 export interface GitBranches {

@@ -13,8 +13,7 @@ import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@m
 import type { AppDispatch, CustomFieldsProps, RootState, TicketProps } from "@src/Api";
 import { fetchBranches, isGitDataRecent } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { defaultTableSettings, getTicketColumns } from "@src/Components";
-import { formatDistanceToNow } from "date-fns";
+import { Ago, defaultTableSettings, getTicketColumns } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,13 +43,6 @@ const RenderEstimate: FC<{
 		return <span style={{ color: "red" }}>-</span>;
 	}
 	return <span style={{ color: "red" }}>{defaultEstimate}</span>;
-};
-
-const Ago = (value: Date): string => {
-	if (!value) {
-		return "";
-	}
-	return formatDistanceToNow(value, { addSuffix: false });
 };
 
 const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps["footer"]>) => {

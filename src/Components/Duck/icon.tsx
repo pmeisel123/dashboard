@@ -58,6 +58,19 @@ export const Duck = () => {
 			setDuckTitle(default_duck_title);
 		}
 	}, [silly]);
+	useEffect(() => {
+		let faviconLink: HTMLLinkElement | null = document.querySelector('link[rel*="icon"]');
+
+		if (!faviconLink) {
+			faviconLink = document.createElement("link");
+			faviconLink.type = "image/x-icon"; // Or the appropriate image type
+			faviconLink.rel = "shortcut icon"; // Or 'icon'
+			document.getElementsByTagName("head")[0].appendChild(faviconLink);
+		}
+		if (faviconLink) {
+			faviconLink.href = "/ducks/" + duck;
+		}
+	}, [duck]);
 
 	return (
 		<Box

@@ -50,6 +50,7 @@ GITREPOS.forEach((repo, index: number) => {
 });
 
 const ducks = fs.readdirSync("./src/assets/ducks/");
+console.log(ducks);
 // https://vite.dev/config/
 export default defineConfig({
 	define: {

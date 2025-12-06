@@ -80,7 +80,6 @@ export const Duck = () => {
 				right: "10px",
 			}}
 			title={duckTitle}
-			key={silly}
 		>
 			<img
 				style={{

@@ -23,21 +23,26 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 		<Drawer anchor="left" open={open} variant={isSmallOrLarger ? "persistent" : "temporary"} sx={{ width: width }}>
 			<Toolbar />
 			<List sx={{ width: width }}>
-				{pages.map((page) => (
-					<ListItem disablePadding key={page.path}>
-						<ListItemButton
-							title={page.name}
-							component={Link}
-							to={page.path}
-							onClick={() => {
-								handleClick();
-							}}
-							selected={location.pathname == page.path}
-						>
-							<ListItemText primary={page.name} />
-						</ListItemButton>
-					</ListItem>
-				))}
+				{pages.map((page) => {
+					if ("requires" in page && !page.requires) {
+						return;
+					}
+					return (
+						<ListItem disablePadding key={page.path}>
+							<ListItemButton
+								title={page.name}
+								component={Link}
+								to={page.path}
+								onClick={() => {
+									handleClick();
+								}}
+								selected={location.pathname == page.path}
+							>
+								<ListItemText primary={page.name} />
+							</ListItemButton>
+						</ListItem>
+					);
+				})}
 			</List>
 			<SavePageList width={width} parentHandleClick={handleClick} />
 		</Drawer>

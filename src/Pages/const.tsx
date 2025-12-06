@@ -1,3 +1,4 @@
+import type { ReportNamePaths } from "@src/Api";
 import BranchesPage from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import EstimatorPage from "@src/Pages/Estimator";
@@ -6,6 +7,8 @@ import HomePage from "@src/Pages/Home";
 import MyTicketsPage from "@src/Pages/MyTickets";
 import RecentTicketsPage from "@src/Pages/RecentTickets";
 import WhoIsOutPage from "@src/Pages/WhoIsOut";
+
+declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 export const pages = [
 	{
 		path: "/",
@@ -51,7 +54,8 @@ export const pages = [
 		path: "/branches",
 		name: "Branches",
 		element: <BranchesPage />,
-		description: <>List all the repos and their branches</>,
+		description: <>List all the git repos and their branches</>,
+		requires: !!Object.keys(__GIT_REPOS_PATHS__).length,
 	},
 	{
 		path: "/holidays",

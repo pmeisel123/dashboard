@@ -1,4 +1,4 @@
-import type { AppDispatch, RootState, TicketProps, CustomFieldsProps } from "@src/Api";
+import type { AppDispatch, CustomFieldsProps, RootState, TicketProps } from "@src/Api";
 import { fetchTickets, fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
 import { useEffect, useRef, useState } from "react";

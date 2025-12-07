@@ -75,7 +75,7 @@ const TicketTable: FC<{
 	isDashboard?: boolean;
 	defaultSort?: string;
 	defaultSortDirection?: "asc" | "desc";
-	user?: string
+	user?: string;
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -191,7 +191,7 @@ const TicketTable: FC<{
 		let custom_field_link_text = __CUSTOM_FIELDS__[custom_field_key].LinkText;
 		let custom_field_link_icon = __CUSTOM_FIELDS__[custom_field_key].LinkIcon;
 
-		if (custom_field_type == "Text" ) {
+		if (custom_field_type == "Text") {
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
@@ -203,20 +203,20 @@ const TicketTable: FC<{
 					return <></>;
 				},
 			});
-		}				
+		}
 		if (custom_field_type == "User") {
-					columns.push({
-						field: "customFields." + custom_field_key,
-						headerName: custom_field_name,
-						renderCell: (params: GridRenderCellParams<TicketProps>) => {
-							const value: string[] | null = params.row.customFields[custom_field_key] as string[] | null;
-							if (value) {
-								return <>{value.join(', ')}</>;
-							}
-							return <></>;
-						},
-					});
-				}
+			columns.push({
+				field: "customFields." + custom_field_key,
+				headerName: custom_field_name,
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string[] | null = params.row.customFields[custom_field_key] as string[] | null;
+					if (value) {
+						return <>{value.join(", ")}</>;
+					}
+					return <></>;
+				},
+			});
+		}
 
 		if (custom_field_type == "Link") {
 			columns.push({

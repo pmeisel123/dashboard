@@ -57,7 +57,9 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
 				if (__CUSTOM_FIELDS__[custom_field_key].Type == "User") {
 					if (fields[custom_field_key]) {
-						custom_fields[custom_field_key] = fields[custom_field_key].map((user: any) => getNameFromPerson(user));
+						custom_fields[custom_field_key] = fields[custom_field_key].map((user: any) =>
+							getNameFromPerson(user),
+						);
 					}
 				} else {
 					let custom_field_value = fields[custom_field_key] || "";

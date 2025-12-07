@@ -41,7 +41,7 @@ export interface TicketProps {
 
 export interface CustomFieldsProps {
 	Name: string;
-	Type: "Text" | "Link";
+	Type: "Text" | "Link" | "User";
 	LinkText?: string;
 	LinkIcon?: keyof typeof MuiIcons;
 }

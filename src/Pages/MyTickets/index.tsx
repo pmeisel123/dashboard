@@ -1,4 +1,4 @@
-import type { AppDispatch, RootState, TicketProps } from "@src/Api";
+import type { AppDispatch, RootState, TicketProps, CustomFieldsProps } from "@src/Api";
 import { fetchTickets, fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
@@ -6,6 +6,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
 declare const __DONE_STATUS__: string[];
+
+declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
+const UserFields: string[] = [];
+Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
+	if (__CUSTOM_FIELDS__[custom_field_key].Type == "User") {
+		UserFields.push(custom_field_key);
+	}
+});
 
 function MyTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -32,7 +40,15 @@ function MyTicketsPage() {
 		if (!user) {
 			setJiraSearch("");
 		}
-		const jira_search = "assignee = " + user + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
+		let user_search = "assignee = " + user;
+		if (UserFields.length) {
+			user_search = "(assignee = " + user;
+			UserFields.forEach((field) => {
+				user_search += " || " + field + " = " + user;
+			});
+			user_search += ")";
+		}
+		const jira_search = user_search + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
 		setJiraSearch(jira_search);
 		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() => {
@@ -92,6 +108,7 @@ function MyTicketsPage() {
 					totalTimEstimate={totalTimEstimate}
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
+					user={user}
 				/>
 			)}
 		</>

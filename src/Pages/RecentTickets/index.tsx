@@ -97,11 +97,16 @@ function RecentTicketsPage() {
 							}}
 							sx={{ minWidth: 100 }}
 						>
-							{[...Array(31).keys()].map((days: number) => (
+							{[...Array(31).keys()].map((day: number) => (
+								<MenuItem key={day} value={day}>
+									{day}
+								</MenuItem>
+							))}
+							{days > 30 && (
 								<MenuItem key={days} value={days}>
 									{days}
 								</MenuItem>
-							))}
+							)}
 						</Select>
 					</Grid>
 					<Grid size={2}>

@@ -55,11 +55,17 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let custom_fields: { [key: string]: string | null } = {};
 		if (__CUSTOM_FIELDS__) {
 			Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-				let custom_field_value = fields[custom_field_key] || "";
-				if (typeof custom_field_value == "object" && custom_field_value != null) {
-					custom_field_value = fields[custom_field_key].name || "";
+				if (__CUSTOM_FIELDS__[custom_field_key].Type == "User") {
+					if (fields[custom_field_key]) {
+						custom_fields[custom_field_key] = fields[custom_field_key].map((user: any) => getNameFromPerson(user));
+					}
+				} else {
+					let custom_field_value = fields[custom_field_key] || "";
+					if (typeof custom_field_value == "object" && custom_field_value != null) {
+						custom_field_value = fields[custom_field_key].name || "";
+					}
+					custom_fields[custom_field_key] = custom_field_value;
 				}
-				custom_fields[custom_field_key] = custom_field_value;
 			});
 		}
 		return {

@@ -1,6 +1,5 @@
 import type { CustomFieldsProps, DashboardProps } from './src/Api/types';
 
-
 // https://id.atlassian.com/manage-profile/security/api-tokens
 export const API_KEY = ''; // Jira API Key
 export const API_URL = ''; // like https://pmeisel.atlassian.net/';

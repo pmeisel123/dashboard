@@ -2,7 +2,7 @@ import * as MuiIcons from "@mui/icons-material";
 
 // Users Props
 export interface UserProps {
-	id: number;
+	id: string;
 	icon: string | null;
 	name: string;
 	email: string | null;
@@ -24,6 +24,7 @@ export interface TicketProps {
 	id: number;
 	key: string;
 	assignee: string | null;
+	assignee_id: string | null;
 	creator: string | null;
 	status: string | null;
 	summary: string | null;
@@ -73,6 +74,7 @@ export interface GitBranch {
 	ticket?: string;
 	creator?: string;
 	lastCommitDate?: string;
+	lastCommitMessage?: string | null;
 }
 
 export interface GitBranches {

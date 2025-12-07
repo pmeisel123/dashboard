@@ -43,6 +43,21 @@ const getOwnerFromLastCommit = (commits: any) => {
 	return "";
 };
 
+const getTicketFromLastCommit = (commits: any) => {
+	if (commits.length) {
+		for (var i = 0; i < 5 && i < commits.length; i++) {
+			const commit = commits[i].commit;
+			if (commit.message) {
+				const matches = commit.message.match(/^([A-Z]+-[0-9]+)/);
+				if (matches) {
+					return matches[1];
+				}
+			}
+		}
+	}
+	return "";
+};
+
 const getCommits = async (repo_name: string, branch_name: string): Promise<any> => {
 	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
 	const path = repo.path;
@@ -86,9 +101,13 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 			const last_commit = getLastCommit(commits);
 			if (last_commit) {
 				branch.lastCommitDate = last_commit;
+				branch.lastCommitMessage = commits[0].commit.message;
 			}
 			if (branch_name != "main" && branch_name != "master") {
 				let [ticket, creator] = getBranchOwner(branch_name, commits);
+				if (!ticket) {
+					ticket = getTicketFromLastCommit(commits);
+				}
 				if (ticket) {
 					branch.ticket = ticket;
 					if (!ticketBranches[ticket]) {

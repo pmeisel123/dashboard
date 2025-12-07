@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 
 declare const __API_URL__: string;
-const API_URL = __API_URL__;
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 
 declare module "@mui/x-data-grid" {
@@ -108,7 +107,11 @@ const TicketTable: FC<{
 			field: "key",
 			headerName: "key",
 			renderCell: (params: GridRenderCellParams<TicketProps>) => (
-				<Link href={(API_URL + "/browse/" + params.value) as string} target="_blank" rel="noopener noreferrer">
+				<Link
+					href={(__API_URL__ + "/browse/" + params.value) as string}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					{params.value}
 				</Link>
 			),
@@ -122,7 +125,7 @@ const TicketTable: FC<{
 					return (
 						<>
 							<Link
-								href={(API_URL + "/browse/" + params.row.parentkey) as string}
+								href={(__API_URL__ + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -130,7 +133,7 @@ const TicketTable: FC<{
 							</Link>
 							: &#x200b;
 							<Link
-								href={(API_URL + "/browse/" + params.row.parentkey) as string}
+								href={(__API_URL__ + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>

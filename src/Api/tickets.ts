@@ -9,6 +9,12 @@ function getNameFromPerson(person: any): string | null {
 	}
 	return null;
 }
+function getIdFromPerson(person: any): string | null {
+	if (person && person.accountId) {
+		return person.accountId;
+	}
+	return null;
+}
 
 function convertEstimateToDays(estimate: number | null): number | null {
 	if (estimate !== null && typeof estimate !== "undefined") {
@@ -24,6 +30,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let id: number = issue.id;
 		let key: string = issue.key;
 		let assignee: string | null = getNameFromPerson(fields.assignee);
+		let assignee_id: string | null = getIdFromPerson(fields.assignee);
 		let creator: string | null = getNameFromPerson(fields.creator);
 		let status: string | null = null;
 		if (fields.status) {
@@ -59,6 +66,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			id: id,
 			key: key,
 			assignee: assignee,
+			assignee_id: assignee_id,
 			creator: creator,
 			status: status,
 			summary: summary,

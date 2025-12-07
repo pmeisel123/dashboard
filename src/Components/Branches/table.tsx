@@ -13,51 +13,41 @@ import type {
 	GitBranch,
 	ReportNamePaths,
 	TicketProps,
+	UserProps,
 	UsersGroupProps,
 } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { Ago, defaultTableSettings, getTicketColumns } from "@src/Components";
+import { Ago, allGroups, defaultTableSettings, getTicketColumns } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import type { rowProp } from "./const";
 
 declare const __API_URL__: string;
 const API_URL = __API_URL__;
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
-interface rowProp {
-	id: string;
-	repo: string;
-	branch_name: string;
-	branch_creator: string | null;
-	last_commit: Date | null;
-	ticket_key: string | null;
-	ticket_summary: string | null;
-	ticket_assignee: string | null;
-	ticket_status: string | null;
-}
-
-const creatorCache: { [key: string]: string } = {};
-const getBranchCreatorName = (creator: string, possibleUsersGroups: UsersGroupProps) => {
-	if (creatorCache[creator]) {
+const creatorCache: { [key: string]: UserProps } = {};
+const getBranchCreator = (creator: string, possibleUsersGroups: UsersGroupProps) => {
+	if (creator in creatorCache) {
 		return creatorCache[creator];
 	}
 	Object.keys(possibleUsersGroups.users).forEach((user_id) => {
-		const user = possibleUsersGroups.users[user_id];
+		const user: UserProps = possibleUsersGroups.users[user_id];
 		const email = user.email;
 		if (!email) {
 			return;
 		}
 		const username = email.replace(/@.*/, "");
 		if (username == creator) {
-			creatorCache[creator] = user.name;
+			creatorCache[creator] = user;
 		}
 	});
-	if (creatorCache[creator]) {
+	if (creator in creatorCache) {
 		return creatorCache[creator];
 	}
-	return creator;
+	return;
 };
 
 const BranchesTable: FC<{
@@ -68,11 +58,24 @@ const BranchesTable: FC<{
 	defaultSort?: string;
 	defaultSortDirection?: "asc" | "desc";
 	loaded: boolean;
-}> = ({ ticketsBranches, possibleUsersGroups, ticketKeys, isDashboard, defaultSort, defaultSortDirection, loaded }) => {
+	user: string;
+	group: string;
+}> = ({
+	ticketsBranches,
+	possibleUsersGroups,
+	ticketKeys,
+	isDashboard,
+	defaultSort,
+	defaultSortDirection,
+	loaded,
+	user,
+	group,
+}) => {
 	const location = useLocation();
 	const localStorageName = "GitTableColumns22." + location.pathname;
 	const apiRef = useGridApiRef();
 	const [rows, setRows] = useState<rowProp[]>([]);
+	const [rowsFilter, setRowsFiltered] = useState<rowProp[]>([]);
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
 		...defaultTableSettings,
 	});
@@ -102,6 +105,11 @@ const BranchesTable: FC<{
 			field: "last_commit",
 			headerName: "Last Commit",
 			renderCell: (params: GridRenderCellParams<rowProp>) => <>{Ago(params.value)}</>,
+			flex: 1,
+		},
+		{
+			field: "last_commit_message",
+			headerName: "Last Commit Message",
 			flex: 1,
 		},
 		{
@@ -164,31 +172,78 @@ const BranchesTable: FC<{
 	const getRow = (repo: string, branch: GitBranch) => {
 		const branch_name = branch.name;
 		let branch_creator = branch.creator || null;
+		let branch_creator_id: string | null = null;
 		if (branch_creator) {
-			branch_creator = getBranchCreatorName(branch_creator, possibleUsersGroups);
+			const branch_creator_user = getBranchCreator(branch_creator, possibleUsersGroups);
+			if (branch_creator_user) {
+				branch_creator = branch_creator_user.name;
+				branch_creator_id = branch_creator_user.id;
+			}
 		}
 		const last_commit = branch.lastCommitDate ? new Date(branch.lastCommitDate) : null;
+		const last_commit_message = branch.lastCommitMessage || "";
 		const ticket_key = branch.ticket || null;
 		let ticket_summary: string | null = null;
 		let ticket_assignee: string | null = null;
 		let ticket_status: string | null = null;
+		let ticket_assignee_id: string | null = null;
 		if (ticket_key && ticket_key in ticketKeys) {
 			const ticket = ticketKeys[ticket_key];
 			ticket_status = ticket.status;
 			ticket_summary = ticket.summary;
 			ticket_assignee = ticket.assignee;
+			ticket_assignee_id = ticket.assignee_id;
 		}
 		return {
 			id: repo + "___" + branch_name,
 			repo: repo,
 			branch_name: branch_name,
 			branch_creator: branch_creator,
+			branch_creator_id: branch_creator_id,
 			last_commit: last_commit,
+			last_commit_message: last_commit_message,
 			ticket_key: ticket_key,
 			ticket_summary: ticket_summary,
 			ticket_assignee: ticket_assignee,
+			ticket_assignee_id: ticket_assignee_id,
 			ticket_status: ticket_status,
 		};
+	};
+
+	const filterRow = (row: rowProp) => {
+		if (user) {
+			return row.branch_creator_id == user || row.ticket_assignee_id == user;
+		}
+		if (group && group != allGroups) {
+			const creator_id = row.branch_creator_id;
+			if (
+				creator_id &&
+				creator_id in possibleUsersGroups.users &&
+				possibleUsersGroups.users[creator_id].groups &&
+				possibleUsersGroups.users[creator_id].groups.includes(group)
+			) {
+				return true;
+			}
+			const assignee_id = row.ticket_assignee_id;
+			if (
+				assignee_id &&
+				assignee_id in possibleUsersGroups.users &&
+				possibleUsersGroups.users[assignee_id].groups &&
+				possibleUsersGroups.users[assignee_id].groups.includes(group)
+			) {
+				return true;
+			}
+			return false;
+		}
+		return true;
+	};
+
+	const filterRows = (rows: rowProp[]) => {
+		let local_rows = [...rows];
+		if (user || group) {
+			local_rows = rows.filter((row) => filterRow(row));
+		}
+		setRowsFiltered(local_rows);
 	};
 
 	useEffect(() => {
@@ -199,7 +254,12 @@ const BranchesTable: FC<{
 			});
 		});
 		setRows(rows);
+		filterRows(rows);
 	}, [ticketsBranches, possibleUsersGroups, ticketKeys, loaded]);
+
+	useEffect(() => {
+		filterRows(rows);
+	}, [user, group]);
 
 	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
 		const newColumnModel = {
@@ -235,7 +295,7 @@ const BranchesTable: FC<{
 		<Box sx={{ width: "100%" }}>
 			<DataGrid
 				getRowHeight={() => "auto"}
-				rows={rows}
+				rows={rowsFilter}
 				columns={columns}
 				loading={!loaded}
 				slotProps={{

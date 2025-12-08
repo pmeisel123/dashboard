@@ -1,5 +1,5 @@
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchTickets, fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
+import { fetchBranches, fetchTickets, fetchUsersAndGroups, isGitDataRecent, isUserDataRecent } from "@src/Api";
 import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +29,7 @@ function EstimatorPage() {
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(",")));
 	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
 	const freezeParams = useRef(false);
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
@@ -72,6 +73,9 @@ function EstimatorPage() {
 	useEffect(() => {
 		if (!isUserDataRecent(possibleUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
+		}
+		if (!isGitDataRecent(ticketsBranches)) {
+			dispatch(fetchBranches());
 		}
 		getFunc();
 	}, [dispatch]);
@@ -161,6 +165,8 @@ function EstimatorPage() {
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
+					possibleUsersGroups={possibleUsersGroups}
+					ticketsBranches={ticketsBranches}
 				/>
 			)}
 			{(search || parent) && !!tickets.length && (

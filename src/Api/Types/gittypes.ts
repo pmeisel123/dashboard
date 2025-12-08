@@ -23,6 +23,7 @@ export interface TicketCache {
 	[key: string]: {
 		[key: string]: {
 			name: string;
+			branch: GitBranch;
 			repo: ReportNamePaths;
 		};
 	};

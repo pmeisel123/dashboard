@@ -115,6 +115,7 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 					}
 					ticketBranches[ticket][repo_name + "/" + branch_name] = {
 						name: branch_name,
+						branch: branch,
 						repo: repo,
 					};
 				}

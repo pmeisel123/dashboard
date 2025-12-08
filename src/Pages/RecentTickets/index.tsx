@@ -1,6 +1,6 @@
 import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchTickets, getJiraDayString } from "@src/Api";
+import { fetchBranches, fetchTickets, getJiraDayString, isGitDataRecent } from "@src/Api";
 import { TicketTable } from "@src/Components";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,15 @@ function RecentTicketsPage() {
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+		if (!isGitDataRecent(ticketsBranches)) {
+			dispatch(fetchBranches());
+		}
+	}, [dispatch, ticketsBranches]);
 
 	const getFunc = function () {
 		var jira_search = "";
@@ -134,6 +142,8 @@ function RecentTicketsPage() {
 					isDashboard={isDashboard}
 					defaultSort={"created"}
 					defaultSortDirection={"desc"}
+					possibleUsersGroups={possibleUsersGroups}
+					ticketsBranches={ticketsBranches}
 				/>
 			}
 		</>

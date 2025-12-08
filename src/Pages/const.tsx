@@ -14,7 +14,7 @@ export const pages = [
 		path: "/",
 		name: "Home",
 		element: <HomePage />,
-		description: <>Landing Page</>,
+		description: <>Landing Page for the application.</>,
 	},
 	{
 		path: "/Estimator",
@@ -22,13 +22,8 @@ export const pages = [
 		element: <EstimatorPage />,
 		description: (
 			<>
-				Display Jira tickets with their estimates and allow selecting users to calculate the approximate
-				completion date.
-				<br />
-				Include upcoming vacation time and holidays in the estimates.
-				<br />
-				Useful for project planning.
-				<br />
+				Calculate approximate project completion dates based on Jira ticket estimates, user selection, upcoming
+				vacations, and holidays. Useful for project planning.
 			</>
 		),
 	},
@@ -37,24 +32,20 @@ export const pages = [
 		name: "My Tickets",
 		element: <MyTicketsPage />,
 		description: (
-			<>
-				Find a ticket by a user.
-				<br />
-				Selected user will be saved to localstorage
-			</>
+			<>View tickets assigned to a specific user. The selected user is saved to local storage for convenience.</>
 		),
 	},
 	{
 		path: "/RecentTickets",
 		name: "Recent Tickets",
 		element: <RecentTicketsPage />,
-		description: <>Find Tickets recently files</>,
+		description: <>Find tickets that were recently filed.</>,
 	},
 	{
 		path: "/branches",
 		name: "Branches",
 		element: <BranchesPage />,
-		description: <>List all the git repos and their branches</>,
+		description: <>List all the git repositories and their respective branches.</>,
 		requires: !!Object.keys(__GIT_REPOS_PATHS__).length,
 	},
 	{
@@ -63,9 +54,8 @@ export const pages = [
 		name: "Holidays",
 		description: (
 			<>
-				Show holidays by year. By default filtered for US bank holidays.
-				<br />
-				To Change Edit src/API/holiday.ts getHolidays
+				Display US bank holidays by year. To change the default filters, edit src/API/holiday.ts &gt;
+				getHolidays.
 			</>
 		),
 	},
@@ -75,11 +65,8 @@ export const pages = [
 		element: <WhoIsOutPage />,
 		description: (
 			<>
-				Show upcoming vacation
-				<br />
-				Users are pulled from Jira
-				<br />
-				Vacation times are pulled from src/assets/vacation.csv via src/API/vacations.tsx
+				Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from
+				src/assets/vacation.csv via src/API/vacations.tsx
 				<br />
 				Need to pull vacations from your HR site. Either via a cron job updating the csv file or by updating to
 				vacations api to automaticlly pull/format the vacation data

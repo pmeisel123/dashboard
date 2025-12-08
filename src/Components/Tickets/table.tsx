@@ -10,13 +10,12 @@ import type {
 	GridSortModel,
 } from "@mui/x-data-grid";
 import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@mui/x-data-grid";
-import type { AppDispatch, CustomFieldsProps, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, isGitDataRecent } from "@src/Api";
+import type { BranchesAndTicket, CustomFieldsProps, TicketProps, UsersGroupProps } from "@src/Api";
+import { GetBranchCreator } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import { Ago, defaultTableSettings, getTicketColumns } from "@src/Components";
 import type { FC } from "react";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 declare const __API_URL__: string;
@@ -76,6 +75,8 @@ const TicketTable: FC<{
 	defaultSort?: string;
 	defaultSortDirection?: "asc" | "desc";
 	user?: string;
+	possibleUsersGroups: UsersGroupProps;
+	ticketsBranches: BranchesAndTicket;
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -87,6 +88,8 @@ const TicketTable: FC<{
 	defaultSort,
 	defaultSortDirection,
 	user,
+	possibleUsersGroups,
+	ticketsBranches,
 }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
@@ -94,14 +97,6 @@ const TicketTable: FC<{
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
 		...defaultTableSettings,
 	});
-	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
-	const dispatch = useDispatch<AppDispatch>();
-
-	useEffect(() => {
-		if (!isGitDataRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
-		}
-	}, [dispatch, ticketsBranches]);
 
 	const theme = useTheme();
 	let columns: GridColDef<any>[] = [
@@ -266,14 +261,44 @@ const TicketTable: FC<{
 				if (ticket_branches) {
 					return (
 						<>
-							{Object.entries(ticket_branches).map(([key, value]) => {
-								const url = value.repo.url + "/tree/" + value.name;
+							{Object.entries(ticket_branches).map(([key, ticket_branch]) => {
+								const url = ticket_branch.repo.url + "/tree/" + ticket_branch.name;
 								return (
 									<Link key={key} href={url} target={"_blank"}>
-										{value.name}
+										{ticket_branch.name}
 										<br />
 									</Link>
 								);
+							})}
+						</>
+					);
+				}
+			},
+		});
+		columns.push({
+			field: "branches2",
+			headerName: "Git Branches Owners",
+			flex: 2,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				const ticket_branches = ticketsBranches.tickets[params.row.key];
+				if (ticket_branches) {
+					return (
+						<>
+							{Object.entries(ticket_branches).map(([key, ticket_branch]) => {
+								if (ticket_branch.branch.creator) {
+									const creator = GetBranchCreator(ticket_branch.branch.creator, possibleUsersGroups);
+									const name = creator ? creator.name : "";
+									return (
+										<Fragment key={key}>
+											{name}
+											<br />
+										</Fragment>
+									);
+								} else {
+									<Fragment key={key}>
+										<br />
+									</Fragment>;
+								}
 							})}
 						</>
 					);

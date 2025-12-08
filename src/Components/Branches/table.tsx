@@ -13,9 +13,9 @@ import type {
 	GitBranch,
 	ReportNamePaths,
 	TicketProps,
-	UserProps,
 	UsersGroupProps,
 } from "@src/Api";
+import { GetBranchCreator } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import { Ago, allGroups, defaultTableSettings, getTicketColumns } from "@src/Components";
 import type { FC } from "react";
@@ -27,28 +27,6 @@ declare const __API_URL__: string;
 const API_URL = __API_URL__;
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
-
-const creatorCache: { [key: string]: UserProps } = {};
-const getBranchCreator = (creator: string, possibleUsersGroups: UsersGroupProps) => {
-	if (creator in creatorCache) {
-		return creatorCache[creator];
-	}
-	Object.keys(possibleUsersGroups.users).forEach((user_id) => {
-		const user: UserProps = possibleUsersGroups.users[user_id];
-		const email = user.email;
-		if (!email) {
-			return;
-		}
-		const username = email.replace(/@.*/, "");
-		if (username == creator) {
-			creatorCache[creator] = user;
-		}
-	});
-	if (creator in creatorCache) {
-		return creatorCache[creator];
-	}
-	return;
-};
 
 const BranchesTable: FC<{
 	ticketsBranches: BranchesAndTicket;
@@ -174,7 +152,7 @@ const BranchesTable: FC<{
 		let branch_creator = branch.creator || null;
 		let branch_creator_id: string | null = null;
 		if (branch_creator) {
-			const branch_creator_user = getBranchCreator(branch_creator, possibleUsersGroups);
+			const branch_creator_user = GetBranchCreator(branch_creator, possibleUsersGroups);
 			if (branch_creator_user) {
 				branch_creator = branch_creator_user.name;
 				branch_creator_id = branch_creator_user.id;

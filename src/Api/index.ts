@@ -1,6 +1,7 @@
 export * from "./git";
 export * from "./gitSlice";
 export * from "./holiday";
+export * from "./misc";
 export * from "./store";
 export * from "./tickets";
 export * from "./ticketsSlice";

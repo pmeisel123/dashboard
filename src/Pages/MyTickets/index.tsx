@@ -1,12 +1,19 @@
-import type { AppDispatch, CustomFieldsProps, RootState, TicketProps } from "@src/Api";
-import { fetchTickets, fetchUsersAndGroups, isUserDataRecent } from "@src/Api";
+import type { AppDispatch, CustomFieldsProps, ReportNamePaths, RootState, TicketProps } from "@src/Api";
+import {
+	fetchBranches,
+	fetchTickets,
+	fetchUsersAndGroups,
+	GetBranchCreator,
+	isGitDataRecent,
+	isUserDataRecent,
+} from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
 declare const __DONE_STATUS__: string[];
-
+declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 const UserFields: string[] = [];
 Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
@@ -25,6 +32,7 @@ function MyTicketsPage() {
 	const [loading, setLoading] = useState<boolean>(true);
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const hasFetchedTickets = useRef("");
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
@@ -35,6 +43,15 @@ function MyTicketsPage() {
 	useEffect(() => {
 		loadParams();
 	}, [searchParams]);
+
+	useEffect(() => {
+		if (!isUserDataRecent(possibleUsersGroups)) {
+			dispatch(fetchUsersAndGroups());
+		}
+		if (!isGitDataRecent(ticketsBranches)) {
+			dispatch(fetchBranches());
+		}
+	}, [dispatch]);
 
 	var getFunc = function () {
 		if (!user) {
@@ -48,18 +65,29 @@ function MyTicketsPage() {
 			});
 			user_search += ")";
 		}
-		const jira_search = user_search + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
+		let ticket_search = "";
+		if (Object.keys(ticketsBranches.branches).length && Object.keys(possibleUsersGroups.users).length) {
+			Object.keys(ticketsBranches.branches).forEach((repo) => {
+				ticketsBranches.branches[repo].forEach((branch) => {
+					if (branch.creator && branch.ticket) {
+						const branch_user = GetBranchCreator(branch.creator, possibleUsersGroups);
+						if (branch_user && branch_user.id == user) {
+							ticket_search += ' || key = "' + branch.ticket + '"';
+						}
+					}
+				});
+			});
+		}
+		let jira_search = user_search + ' AND status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
+		if (ticket_search) {
+			jira_search = "(" + jira_search + ")" + ticket_search;
+		}
 		setJiraSearch(jira_search);
 		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
 		dispatch(fetchTickets(jira_search)).then(() => {
 			setLoading(false);
 		});
 	};
-	useEffect(() => {
-		if (!isUserDataRecent(possibleUsersGroups)) {
-			dispatch(fetchUsersAndGroups());
-		}
-	}, [dispatch]);
 
 	useEffect(() => {
 		if (user && hasFetchedTickets.current != user) {
@@ -67,6 +95,9 @@ function MyTicketsPage() {
 			hasFetchedTickets.current = user;
 		}
 	}, [user]);
+	useEffect(() => {
+		getFunc();
+	}, [possibleUsersGroups, ticketsBranches]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (group == window.localStorage.getItem("group") && user == window.localStorage.getItem("user")) {
@@ -109,6 +140,8 @@ function MyTicketsPage() {
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					user={user}
+					possibleUsersGroups={possibleUsersGroups}
+					ticketsBranches={ticketsBranches}
 				/>
 			)}
 		</>

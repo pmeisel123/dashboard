@@ -24,7 +24,7 @@ function RecentTicketsPage() {
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
-	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -142,7 +142,7 @@ function RecentTicketsPage() {
 					isDashboard={isDashboard}
 					defaultSort={"created"}
 					defaultSortDirection={"desc"}
-					possibleUsersGroups={possibleUsersGroups}
+					allJiraUsersGroups={allJiraUsersGroups}
 					ticketsBranches={ticketsBranches}
 				/>
 			}

@@ -23,7 +23,7 @@ function EstimatorPage() {
 	const [estimatePadding, setEstimatePadding] = useState<number>(
 		parseFloat(searchParams.get("estimatePadding") || "0"),
 	);
-	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get("group") || allGroups);
 	let user_param = searchParams.get("users") || "";
 	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(",")));
@@ -71,7 +71,7 @@ function EstimatorPage() {
 		});
 	};
 	useEffect(() => {
-		if (!isUserDataRecent(possibleUsersGroups)) {
+		if (!isUserDataRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 		if (!isGitDataRecent(ticketsBranches)) {
@@ -114,7 +114,7 @@ function EstimatorPage() {
 		} else {
 			newSearchParams.delete("group");
 		}
-		if (possibleUsersGroups && possibleUsersGroups.users && Object.keys(possibleUsersGroups.users).length) {
+		if (allJiraUsersGroups && allJiraUsersGroups.users && Object.keys(allJiraUsersGroups.users).length) {
 			if (users.size) {
 				newSearchParams.set("users", [...users].join(","));
 			} else {
@@ -147,7 +147,7 @@ function EstimatorPage() {
 						setEstimatePadding={setEstimatePadding}
 					/>
 					<UsersSelector
-						possibleUsersGroups={possibleUsersGroups}
+						allJiraUsersGroups={allJiraUsersGroups}
 						group={group}
 						setGroup={setGroup}
 						users={users}
@@ -165,7 +165,7 @@ function EstimatorPage() {
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					isDashboard={isDashboard}
-					possibleUsersGroups={possibleUsersGroups}
+					allJiraUsersGroups={allJiraUsersGroups}
 					ticketsBranches={ticketsBranches}
 				/>
 			)}
@@ -173,7 +173,7 @@ function EstimatorPage() {
 				<Calendar
 					users={users}
 					group={group}
-					possibleUsersGroups={possibleUsersGroups}
+					allJiraUsersGroups={allJiraUsersGroups}
 					totalTimEstimate={totalTimEstimate}
 					visibleUsers={visibleUsers}
 					isDashboard={isDashboard}

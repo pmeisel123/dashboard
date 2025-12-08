@@ -29,7 +29,7 @@ interface cellData {
 function WhoIsOutPage() {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	let param_groups = searchParams.get("groups");
 	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
 	const dispatch = useDispatch<AppDispatch>();
@@ -44,7 +44,7 @@ function WhoIsOutPage() {
 	}, [searchParams]);
 
 	useEffect(() => {
-		if (!isUserDataRecent(possibleUsersGroups)) {
+		if (!isUserDataRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);
@@ -78,18 +78,18 @@ function WhoIsOutPage() {
 	current_day.setDate(current_day.getDate() - current_day.getDay());
 	current_day.setHours(0, 0, 0, 0);
 
-	let users = possibleUsersGroups.users;
+	let users = allJiraUsersGroups.users;
 	const getRows = () => {
 		if (groups.length) {
 			users = {};
-			Object.keys(possibleUsersGroups.users).forEach((user_id) => {
-				const user = possibleUsersGroups.users[user_id];
+			Object.keys(allJiraUsersGroups.users).forEach((user_id) => {
+				const user = allJiraUsersGroups.users[user_id];
 				if (user.groups && user.groups.some((item) => groups.includes(item))) {
 					users[user_id] = user;
 				}
 			});
 		} else {
-			users = possibleUsersGroups.users;
+			users = allJiraUsersGroups.users;
 		}
 		let rows: cellData[][] = [];
 		for (var week = 0; week <= 10; week++) {
@@ -110,7 +110,7 @@ function WhoIsOutPage() {
 						holiday = allUsHolidays[holiday_string];
 					} else {
 						Object.keys(users).forEach((user_id) => {
-							const user = possibleUsersGroups.users[user_id];
+							const user = allJiraUsersGroups.users[user_id];
 							if (user && user.vacations && user.vacations.includes(holiday_string)) {
 								whoisout.push(user.name);
 							}
@@ -172,7 +172,7 @@ function WhoIsOutPage() {
 							minHeight: "3em",
 						}}
 					>
-						{possibleUsersGroups.groups.map((option, index) => (
+						{allJiraUsersGroups.groups.map((option, index) => (
 							<FormControlLabel
 								key={index}
 								control={

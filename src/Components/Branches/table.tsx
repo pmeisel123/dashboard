@@ -30,7 +30,7 @@ declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
 const BranchesTable: FC<{
 	ticketsBranches: BranchesAndTicket;
-	possibleUsersGroups: UsersGroupProps;
+	allJiraUsersGroups: UsersGroupProps;
 	ticketKeys: { [key: string]: TicketProps };
 	isDashboard?: boolean;
 	defaultSort?: string;
@@ -40,7 +40,7 @@ const BranchesTable: FC<{
 	group: string;
 }> = ({
 	ticketsBranches,
-	possibleUsersGroups,
+	allJiraUsersGroups,
 	ticketKeys,
 	isDashboard,
 	defaultSort,
@@ -152,7 +152,7 @@ const BranchesTable: FC<{
 		let branch_creator = branch.creator || null;
 		let branch_creator_id: string | null = null;
 		if (branch_creator) {
-			const branch_creator_user = GetBranchCreator(branch_creator, possibleUsersGroups);
+			const branch_creator_user = GetBranchCreator(branch_creator, allJiraUsersGroups);
 			if (branch_creator_user) {
 				branch_creator = branch_creator_user.name;
 				branch_creator_id = branch_creator_user.id;
@@ -196,18 +196,18 @@ const BranchesTable: FC<{
 			const creator_id = row.branch_creator_id;
 			if (
 				creator_id &&
-				creator_id in possibleUsersGroups.users &&
-				possibleUsersGroups.users[creator_id].groups &&
-				possibleUsersGroups.users[creator_id].groups.includes(group)
+				creator_id in allJiraUsersGroups.users &&
+				allJiraUsersGroups.users[creator_id].groups &&
+				allJiraUsersGroups.users[creator_id].groups.includes(group)
 			) {
 				return true;
 			}
 			const assignee_id = row.ticket_assignee_id;
 			if (
 				assignee_id &&
-				assignee_id in possibleUsersGroups.users &&
-				possibleUsersGroups.users[assignee_id].groups &&
-				possibleUsersGroups.users[assignee_id].groups.includes(group)
+				assignee_id in allJiraUsersGroups.users &&
+				allJiraUsersGroups.users[assignee_id].groups &&
+				allJiraUsersGroups.users[assignee_id].groups.includes(group)
 			) {
 				return true;
 			}
@@ -233,7 +233,7 @@ const BranchesTable: FC<{
 		});
 		setRows(rows);
 		filterRows(rows);
-	}, [ticketsBranches, possibleUsersGroups, ticketKeys, loaded]);
+	}, [ticketsBranches, allJiraUsersGroups, ticketKeys, loaded]);
 
 	useEffect(() => {
 		filterRows(rows);

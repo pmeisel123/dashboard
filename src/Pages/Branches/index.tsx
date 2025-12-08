@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom";
 function BranchesPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
-	const possibleUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
@@ -48,7 +48,7 @@ function BranchesPage() {
 		if (!isGitDataRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
-		if (!isUserDataRecent(possibleUsersGroups)) {
+		if (!isUserDataRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);
@@ -91,7 +91,7 @@ function BranchesPage() {
 	return (
 		<Box sx={{ width: "100%" }}>
 			<UserSelector
-				possibleUsersGroups={possibleUsersGroups}
+				allJiraUsersGroups={allJiraUsersGroups}
 				group={group}
 				setGroup={setGroup}
 				user={user}
@@ -100,7 +100,7 @@ function BranchesPage() {
 			<BranchesTable
 				loaded={loaded}
 				ticketsBranches={ticketsBranches}
-				possibleUsersGroups={possibleUsersGroups}
+				allJiraUsersGroups={allJiraUsersGroups}
 				ticketKeys={ticketKeys}
 				group={group}
 				user={user}

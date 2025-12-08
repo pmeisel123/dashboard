@@ -75,7 +75,7 @@ const TicketTable: FC<{
 	defaultSort?: string;
 	defaultSortDirection?: "asc" | "desc";
 	user?: string;
-	possibleUsersGroups: UsersGroupProps;
+	allJiraUsersGroups: UsersGroupProps;
 	ticketsBranches: BranchesAndTicket;
 }> = ({
 	tickets,
@@ -88,7 +88,7 @@ const TicketTable: FC<{
 	defaultSort,
 	defaultSortDirection,
 	user,
-	possibleUsersGroups,
+	allJiraUsersGroups,
 	ticketsBranches,
 }) => {
 	const location = useLocation();
@@ -286,7 +286,7 @@ const TicketTable: FC<{
 						<>
 							{Object.entries(ticket_branches).map(([key, ticket_branch]) => {
 								if (ticket_branch.branch.creator) {
-									const creator = GetBranchCreator(ticket_branch.branch.creator, possibleUsersGroups);
+									const creator = GetBranchCreator(ticket_branch.branch.creator, allJiraUsersGroups);
 									const name = creator ? creator.name : "";
 									return (
 										<Fragment key={key}>

@@ -38,7 +38,7 @@ const allUserFieldsDefaultArray = Object.keys(allUserFieldsDefault).filter((key)
 function MyTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const possibleUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get("group") || window.localStorage.getItem("group") || "");
 	const [user, setUser] = useState<string>(searchParams.get("user") || window.localStorage.getItem("user") || "");
 	const [loading, setLoading] = useState<boolean>(true);
@@ -69,7 +69,7 @@ function MyTicketsPage() {
 	}, [searchParams]);
 
 	useEffect(() => {
-		if (!isUserDataRecent(possibleUsersGroups)) {
+		if (!isUserDataRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 		if (!isGitDataRecent(ticketsBranches)) {
@@ -94,12 +94,12 @@ function MyTicketsPage() {
 		if (
 			userFields.includes("git") &&
 			Object.keys(ticketsBranches.branches).length &&
-			Object.keys(possibleUsersGroups.users).length
+			Object.keys(allJiraUsersGroups.users).length
 		) {
 			Object.keys(ticketsBranches.branches).forEach((repo) => {
 				ticketsBranches.branches[repo].forEach((branch) => {
 					if (branch.creator && branch.ticket) {
-						const branch_user = GetBranchCreator(branch.creator, possibleUsersGroups);
+						const branch_user = GetBranchCreator(branch.creator, allJiraUsersGroups);
 						if (branch_user && branch_user.id == user) {
 							ticket_search += ' OR key = "' + branch.ticket + '"';
 						}
@@ -133,7 +133,7 @@ function MyTicketsPage() {
 	}, [user]);
 	useEffect(() => {
 		getFunc();
-	}, [possibleUsersGroups, ticketsBranches, userFields]);
+	}, [allJiraUsersGroups, ticketsBranches, userFields]);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (
@@ -180,7 +180,7 @@ function MyTicketsPage() {
 			<Grid container spacing={2}>
 				<Grid>
 					<UserSelector
-						possibleUsersGroups={possibleUsersGroups}
+						allJiraUsersGroups={allJiraUsersGroups}
 						group={group}
 						setGroup={setGroup}
 						user={user}
@@ -215,7 +215,7 @@ function MyTicketsPage() {
 					totalTimeOriginalEstimate={totalTimeOriginalEstimate}
 					totalTimeSpent={totalTimeSpent}
 					user={user}
-					possibleUsersGroups={possibleUsersGroups}
+					allJiraUsersGroups={allJiraUsersGroups}
 					ticketsBranches={ticketsBranches}
 				/>
 			)}

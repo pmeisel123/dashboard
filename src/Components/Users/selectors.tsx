@@ -16,31 +16,31 @@ import type { Dispatch, FC, SetStateAction } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-export const UserHasGroup = (possibleUsersGroups: UsersGroupProps, user_id: string, group: string) => {
+export const UserHasGroup = (allJiraUsersGroups: UsersGroupProps, user_id: string, group: string) => {
 	if (
-		!possibleUsersGroups ||
+		!allJiraUsersGroups ||
 		!user_id ||
 		!group ||
-		!possibleUsersGroups.users[user_id] ||
-		!possibleUsersGroups.users[user_id].groups ||
-		!possibleUsersGroups.users[user_id].groups.length
+		!allJiraUsersGroups.users[user_id] ||
+		!allJiraUsersGroups.users[user_id].groups ||
+		!allJiraUsersGroups.users[user_id].groups.length
 	) {
 		return false;
 	}
 	if (group == allGroups) {
 		return true;
 	}
-	return possibleUsersGroups.users[user_id].groups.includes(group);
+	return allJiraUsersGroups.users[user_id].groups.includes(group);
 };
 
 export const UsersSelector: FC<{
-	possibleUsersGroups: UsersGroupProps;
+	allJiraUsersGroups: UsersGroupProps;
 	group: string;
 	setGroup: Dispatch<SetStateAction<string>>;
 	users: Set<string>;
 	setUsers: Dispatch<SetStateAction<Set<string>>>;
 	setVisibleUsers: Dispatch<SetStateAction<Set<string>>>;
-}> = ({ possibleUsersGroups, group, setGroup, users, setUsers, setVisibleUsers }) => {
+}> = ({ allJiraUsersGroups, group, setGroup, users, setUsers, setVisibleUsers }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
 	const apiRef = useGridApiRef();
@@ -94,7 +94,7 @@ export const UsersSelector: FC<{
 						<MenuItem key={allGroups} value={allGroups}>
 							{allGroups}
 						</MenuItem>
-						{possibleUsersGroups.groups.map((value: string) => (
+						{allJiraUsersGroups.groups.map((value: string) => (
 							<MenuItem key={value} value={value}>
 								{value}
 							</MenuItem>
@@ -195,7 +195,7 @@ export const UsersSelector: FC<{
 		setColumnModel(columnModel);
 	}, []);
 	const getNonFilteredRows = () => {
-		if (Object.values(possibleUsersGroups.users).length) {
+		if (Object.values(allJiraUsersGroups.users).length) {
 			const allFilteredEntries = gridFilteredSortedRowEntriesSelector(apiRef);
 			const allFilteredEntriesIds = new Set(allFilteredEntries.map((row) => row.id));
 			setVisibleUsers(allFilteredEntriesIds as Set<string>);
@@ -203,7 +203,7 @@ export const UsersSelector: FC<{
 	};
 	useEffect(() => {
 		getNonFilteredRows();
-	}, [possibleUsersGroups.users, columnModel.GridFilterModel]);
+	}, [allJiraUsersGroups.users, columnModel.GridFilterModel]);
 	return (
 		<>
 			<DataGrid
@@ -214,7 +214,7 @@ export const UsersSelector: FC<{
 					},
 				}}
 				getRowHeight={() => "auto"}
-				rows={Object.values(possibleUsersGroups.users)}
+				rows={Object.values(allJiraUsersGroups.users)}
 				columns={columns}
 				checkboxSelection={true}
 				disableRowSelectionExcludeModel
@@ -234,7 +234,7 @@ export const UsersSelector: FC<{
 					},
 				}}
 				onRowSelectionModelChange={(newRowSelectionModel) => {
-					if (Object.values(possibleUsersGroups.users).length) {
+					if (Object.values(allJiraUsersGroups.users).length) {
 						setUsers(newRowSelectionModel.ids as Set<string>);
 					}
 				}}
@@ -255,13 +255,13 @@ export const UsersSelector: FC<{
 };
 
 export const UserSelector: FC<{
-	possibleUsersGroups: UsersGroupProps;
+	allJiraUsersGroups: UsersGroupProps;
 	group: string;
 	setGroup: Dispatch<SetStateAction<string>>;
 	user: string;
 	setUser: Dispatch<SetStateAction<string>>;
-}> = ({ possibleUsersGroups, group, setGroup, user, setUser }) => {
-	if (!Object.values(possibleUsersGroups.users).length) {
+}> = ({ allJiraUsersGroups, group, setGroup, user, setUser }) => {
+	if (!Object.values(allJiraUsersGroups.users).length) {
 		return (
 			<Grid container spacing={2} sx={{ paddingBottom: 1 }}>
 				<Grid>
@@ -303,7 +303,7 @@ export const UserSelector: FC<{
 					value={group}
 					onChange={(event) => {
 						setGroup(event.target.value);
-						if (!UserHasGroup(possibleUsersGroups, user, event.target.value)) {
+						if (!UserHasGroup(allJiraUsersGroups, user, event.target.value)) {
 							setUser("");
 						}
 					}}
@@ -312,7 +312,7 @@ export const UserSelector: FC<{
 					<MenuItem key={allGroups} value={allGroups}>
 						All
 					</MenuItem>
-					{possibleUsersGroups.groups.map((value: string) => (
+					{allJiraUsersGroups.groups.map((value: string) => (
 						<MenuItem key={value} value={value}>
 							{value}
 						</MenuItem>
@@ -331,11 +331,11 @@ export const UserSelector: FC<{
 							}}
 							sx={{ minWidth: 200 }}
 						>
-							{Object.keys(possibleUsersGroups.users)
-								.filter((user_id) => UserHasGroup(possibleUsersGroups, user_id, group))
+							{Object.keys(allJiraUsersGroups.users)
+								.filter((user_id) => UserHasGroup(allJiraUsersGroups, user_id, group))
 								.map((user_id: string) => (
 									<MenuItem key={user_id} value={user_id}>
-										{possibleUsersGroups.users[user_id].name}
+										{allJiraUsersGroups.users[user_id].name}
 									</MenuItem>
 								))}
 						</Select>

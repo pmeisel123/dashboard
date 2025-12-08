@@ -13,14 +13,14 @@ interface cellData {
 }
 
 const Calendar: FC<{
-	possibleUsersGroups: UsersGroupProps;
+	allJiraUsersGroups: UsersGroupProps;
 	users: Set<string>;
 	group: string;
 	totalTimEstimate: number;
 	visibleUsers: Set<string>;
 	isDashboard?: boolean;
-}> = ({ possibleUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard }) => {
-	if (!Object.keys(possibleUsersGroups.users).length) {
+}> = ({ allJiraUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard }) => {
+	if (!Object.keys(allJiraUsersGroups.users).length) {
 		return <></>;
 	}
 	const today = new Date();
@@ -50,9 +50,9 @@ const Calendar: FC<{
 	if (!user_count) {
 		if (group && group != allGroups) {
 			local_users = new Set(
-				Object.keys(possibleUsersGroups.users).filter((key) => {
+				Object.keys(allJiraUsersGroups.users).filter((key) => {
 					return (
-						possibleUsersGroups.users[key].groups && possibleUsersGroups.users[key].groups.includes(group)
+						allJiraUsersGroups.users[key].groups && allJiraUsersGroups.users[key].groups.includes(group)
 					);
 				}),
 			);
@@ -90,7 +90,7 @@ const Calendar: FC<{
 					title = description;
 				} else {
 					local_users.forEach((user_id) => {
-						const user = possibleUsersGroups.users[user_id];
+						const user = allJiraUsersGroups.users[user_id];
 						if (!user || !user.vacations || !user.vacations.includes(holiday_string)) {
 							working++;
 							if (user) {

@@ -1,3 +1,5 @@
+import type { SelectChangeEvent } from "@mui/material";
+import { Checkbox, Grid, InputLabel, ListItemText, MenuItem, Select } from "@mui/material";
 import type { AppDispatch, CustomFieldsProps, ReportNamePaths, RootState, TicketProps } from "@src/Api";
 import {
 	fetchBranches,
@@ -11,21 +13,19 @@ import { TicketTable, UserSelector } from "@src/Components";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { Select, MenuItem, InputLabel, Grid, Checkbox , ListItemText} from "@mui/material";
-import type { SelectChangeEvent } from "@mui/material";
 
 declare const __DONE_STATUS__: string[];
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
-const allUserFieldsMap:  {[key: string]: string}  = {
-	'assignee': 'Assignee',
-	'creator': 'Creator',
-	'git': 'Git Branches Owner',
+const allUserFieldsMap: { [key: string]: string } = {
+	assignee: "Assignee",
+	creator: "Creator",
+	git: "Git Branches Owner",
 };
-const allUserFieldsDefault: {[key: string]: boolean} = {
-	'assignee': true,
-	'creator': false,
-	'git': true,
+const allUserFieldsDefault: { [key: string]: boolean } = {
+	assignee: true,
+	creator: false,
+	git: true,
 };
 Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
 	if (__CUSTOM_FIELDS__[custom_field_key].Type == "User") {
@@ -33,7 +33,7 @@ Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
 		allUserFieldsDefault[custom_field_key] = true;
 	}
 });
-const allUserFieldsDefaultArray = Object.keys(allUserFieldsDefault).filter(key => allUserFieldsDefault[key]);
+const allUserFieldsDefaultArray = Object.keys(allUserFieldsDefault).filter((key) => allUserFieldsDefault[key]);
 
 function MyTicketsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -45,7 +45,7 @@ function MyTicketsPage() {
 	let user_fields_params = searchParams.get("user_fields") || window.localStorage.getItem("user_fields");
 	let user_field_load = allUserFieldsDefaultArray;
 	if (user_fields_params) {
-		user_field_load = user_fields_params.split(',');
+		user_field_load = user_fields_params.split(",");
 	}
 	const [userFields, setUserFields] = useState<string[]>(user_field_load);
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
@@ -59,7 +59,7 @@ function MyTicketsPage() {
 		setUser(searchParams.get("user") || window.localStorage.getItem("user") || "");
 		let user_fields_params = searchParams.get("user_fields") || window.localStorage.getItem("user_fields");
 		if (user_fields_params) {
-			let user_field_load = user_fields_params.split(',');
+			let user_field_load = user_fields_params.split(",");
 			setUserFields(user_field_load);
 		}
 	};
@@ -81,17 +81,21 @@ function MyTicketsPage() {
 		if (!user) {
 			setJiraSearch("");
 		}
-		let search = '';
+		let search = "";
 		userFields.forEach((field) => {
 			if (field != "git") {
 				if (search) {
 					search += " OR ";
 				}
-				search += field + ' = ' + user
+				search += field + " = " + user;
 			}
 		});
 		let ticket_search = "";
-		if (userFields.includes('git') && Object.keys(ticketsBranches.branches).length && Object.keys(possibleUsersGroups.users).length) {
+		if (
+			userFields.includes("git") &&
+			Object.keys(ticketsBranches.branches).length &&
+			Object.keys(possibleUsersGroups.users).length
+		) {
 			Object.keys(ticketsBranches.branches).forEach((repo) => {
 				ticketsBranches.branches[repo].forEach((branch) => {
 					if (branch.creator && branch.ticket) {
@@ -109,7 +113,7 @@ function MyTicketsPage() {
 		}
 		let jira_search = 'status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
 		if (search) {
-			jira_search += ' AND (' + search + ')';
+			jira_search += " AND (" + search + ")";
 		}
 		if (ticket_search) {
 			jira_search = "(" + jira_search + ")" + ticket_search;
@@ -133,9 +137,9 @@ function MyTicketsPage() {
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (
-			group == window.localStorage.getItem("group")
-			&& user == window.localStorage.getItem("user")
-			&& userFields == allUserFieldsDefaultArray
+			group == window.localStorage.getItem("group") &&
+			user == window.localStorage.getItem("user") &&
+			userFields == allUserFieldsDefaultArray
 		) {
 			return;
 		}
@@ -153,13 +157,13 @@ function MyTicketsPage() {
 			newSearchParams.delete("user");
 		}
 		window.localStorage.setItem("user", user);
-	
+
 		if (userFields != allUserFieldsDefaultArray) {
-			newSearchParams.set("user_fields", userFields.join(','));
+			newSearchParams.set("user_fields", userFields.join(","));
 		} else {
 			newSearchParams.delete("user_fields");
 		}
-		window.localStorage.setItem("user_fields", userFields.join(','));
+		window.localStorage.setItem("user_fields", userFields.join(","));
 
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
@@ -168,9 +172,9 @@ function MyTicketsPage() {
 	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
 	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
 	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
-	const owerColumnOnChange = ( event: SelectChangeEvent<string[]> ) => {
-		setUserFields(event.target.value as string[])
-	}
+	const owerColumnOnChange = (event: SelectChangeEvent<string[]>) => {
+		setUserFields(event.target.value as string[]);
+	};
 	return (
 		<>
 			<Grid container spacing={2}>
@@ -189,7 +193,7 @@ function MyTicketsPage() {
 						label="Owners Columns"
 						value={userFields}
 						multiple
-						sx={{width: '150px'}}
+						sx={{ width: "150px" }}
 						onChange={owerColumnOnChange}
 						renderValue={(selected) => "Selected (" + selected.length + ")"}
 					>

@@ -16,7 +16,7 @@ import {
 	GITREPOS,
 	VACATION_KEY,
 } from "./globals";
-import type { ReportNamePaths } from "./src/Api/types";
+import type { ReportNamePaths } from "./src/Api/Types";
 
 const git_proxies: { [key: string]: ProxyOptions } = {};
 const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};

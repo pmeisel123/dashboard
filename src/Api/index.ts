@@ -4,6 +4,6 @@ export * from "./holiday";
 export * from "./store";
 export * from "./tickets";
 export * from "./ticketsSlice";
-export type * from "./types";
+export type * from "./Types";
 export * from "./users";
 export * from "./usersSlice";

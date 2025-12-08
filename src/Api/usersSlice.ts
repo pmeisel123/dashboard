@@ -1,6 +1,6 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { UsersGroupProps, UsersGroupPropsSlice } from "./types";
+import type { UsersGroupProps, UsersGroupPropsSlice } from "./Types";
 import { getUsersAndGroupsApi } from "./users";
 
 const initialState: UsersGroupPropsSlice = {

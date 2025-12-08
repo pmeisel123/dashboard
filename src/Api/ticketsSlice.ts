@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getTicketsApi } from "./tickets";
-import type { TicketProps } from "./types";
+import type { TicketProps } from "./Types";
 
 const initialState: { [key: string]: TicketProps[] } = {
 	"": [],

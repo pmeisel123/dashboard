@@ -1,7 +1,7 @@
 import type { CalOptions } from "@hebcal/core";
 import { HebrewCalendar, Location } from "@hebcal/core";
 import holidays from "date-holidays";
-import type { HolidayProps } from "./types";
+import type { HolidayProps } from "./Types";
 
 const JewishHolidaysList = (year: string) => {
 	const loc = Location.lookup("San Francisco");

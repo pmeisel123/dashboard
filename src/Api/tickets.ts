@@ -1,4 +1,4 @@
-import type { CustomFieldsProps, TicketProps } from "./types";
+import type { CustomFieldsProps, TicketProps } from "./Types";
 declare const __DONE_STATUS__: string[];
 
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };

@@ -188,8 +188,6 @@ const TicketTable: FC<{
 	Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
 		let custom_field_name = __CUSTOM_FIELDS__[custom_field_key].Name;
 		let custom_field_type = __CUSTOM_FIELDS__[custom_field_key].Type;
-		let custom_field_link_text = __CUSTOM_FIELDS__[custom_field_key].LinkText;
-		let custom_field_link_icon = __CUSTOM_FIELDS__[custom_field_key].LinkIcon;
 
 		if (custom_field_type == "Text") {
 			columns.push({
@@ -225,6 +223,13 @@ const TicketTable: FC<{
 				renderCell: (params: GridRenderCellParams<TicketProps>) => {
 					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
+						const current_field_props = __CUSTOM_FIELDS__[custom_field_key];
+
+						const custom_field_link_icon =
+							"LinkIcon" in current_field_props ? current_field_props.LinkIcon : undefined;
+						const link_text =
+							"LinkText" in current_field_props ? current_field_props.LinkText : custom_field_name;
+
 						if (custom_field_link_icon) {
 							const IconComponent = icons[custom_field_link_icon];
 							return (
@@ -241,7 +246,7 @@ const TicketTable: FC<{
 						} else {
 							return (
 								<Link href={value} target="_blank" rel="noopener noreferrer" title={custom_field_name}>
-									{custom_field_link_text ? custom_field_link_text : custom_field_name}
+									{link_text}
 								</Link>
 							);
 						}

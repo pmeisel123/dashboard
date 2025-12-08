@@ -1,4 +1,4 @@
-import type { BranchesAndTicket, GitBranch, ReportNamePaths, TicketCache } from "./types";
+import type { BranchesAndTicket, GitBranch, ReportNamePaths, TicketCache } from "./Types";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 

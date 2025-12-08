@@ -1,4 +1,4 @@
-import type { UserProps, UsersGroupProps } from "./types";
+import type { UserProps, UsersGroupProps } from "./Types";
 import { getVacationApi } from "./vacations";
 
 declare const __VACATION_KEY__: string;

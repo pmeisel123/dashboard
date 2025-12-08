@@ -51,9 +51,7 @@ const Calendar: FC<{
 		if (group && group != allGroups) {
 			local_users = new Set(
 				Object.keys(allJiraUsersGroups.users).filter((key) => {
-					return (
-						allJiraUsersGroups.users[key].groups && allJiraUsersGroups.users[key].groups.includes(group)
-					);
+					return allJiraUsersGroups.users[key].groups && allJiraUsersGroups.users[key].groups.includes(group);
 				}),
 			);
 		} else {

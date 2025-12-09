@@ -1,5 +1,6 @@
 import { Box, Button } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
+import { DashboardIframe } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -97,12 +98,32 @@ function DashboardPage() {
 		};
 	}, [dashboard]);
 	const ChangeUrl = (url: string) => {
-		const iframe = document.getElementById("dashboard") as myHTMLIFrameElement | null;
-		if (iframe && iframe.contentWindow && iframe.contentWindow.changeUrl) {
-			iframe.contentWindow.changeUrl(url);
+		const iframeintenral = document.getElementById("dashboardinternal") as myHTMLIFrameElement | null;
+		const dashboardexternal = document.getElementById("dashboardexternal") as myHTMLIFrameElement | null;
+		if (url.match(/^http/)) {
+			if (dashboardexternal) {
+				dashboardexternal.src = url;
+				dashboardexternal.style.display = "inline";
+				if (iframeintenral) {
+					iframeintenral.style.display = "none";
+				}
+			} else {
+				setTimeout(function () {
+					ChangeUrl(url);
+				});
+			}
 		} else {
-			// TODO: fix this
-			console.log("external url?", url);
+			if (iframeintenral && iframeintenral.contentWindow && iframeintenral.contentWindow.changeUrl) {
+				iframeintenral.contentWindow.changeUrl(url);
+				iframeintenral.style.display = "inline";
+				if (dashboardexternal) {
+					dashboardexternal.style.display = "none";
+				}
+			} else {
+				setTimeout(function () {
+					ChangeUrl(url);
+				});
+			}
 		}
 	};
 	useEffect(() => {
@@ -125,6 +146,7 @@ function DashboardPage() {
 			url += "?";
 		}
 		url += "isDashboard=true";
+		ChangeUrl(url);
 		return (
 			<>
 				<Box>
@@ -146,20 +168,25 @@ function DashboardPage() {
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>
-				<iframe
-					id="dashboard"
+				<DashboardIframe
+					id="dashboardinternal"
+					src="/blank?isDashboard=true"
 					style={{
-						position: "fixed",
-						top: "48px",
-						left: 0,
-						width: windowSize.width,
-						height: windowSize.height - 48,
-						border: "none",
-						zIndex: 9999,
+						display: "none",
 					}}
-					src={url}
 					frameBorder="0"
 					allow="fullscreen"
+					windowSize={windowSize}
+				/>
+				<DashboardIframe
+					id="dashboardexternal"
+					style={{
+						display: "none",
+					}}
+					src="/blank?isDashboard=true"
+					frameBorder="0"
+					allow="fullscreen"
+					windowSize={windowSize}
 				/>
 			</>
 		);

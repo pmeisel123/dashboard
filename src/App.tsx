@@ -1,6 +1,7 @@
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import type { DashboardProps } from "@src/Api";
 import { store } from "@src/Api";
-import { Duck, LeftNav, Progress, TopNav } from "@src/Components";
+import { DashboardProgress, Duck, LeftNav, TopNav } from "@src/Components";
 import { pages } from "@src/Pages/const";
 import DucksPage from "@src/Pages/Ducks";
 import type { JSX } from "react";
@@ -17,6 +18,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 
+declare const __DASHBOARDS__: { [key: string]: DashboardProps };
 declare const __DASHBOARD_DUCKS__: boolean;
 const router = createBrowserRouter([
 	{
@@ -29,6 +31,12 @@ const router = createBrowserRouter([
 				name: "Ducks",
 				element: <DucksPage />,
 				description: <>DUCKS!</>,
+			},
+			{
+				path: "/blank",
+				name: "Blank",
+				element: <></>,
+				description: <></>,
 			},
 		],
 	},
@@ -53,6 +61,10 @@ function Main() {
 		width: window.innerWidth,
 		height: window.innerHeight,
 	});
+
+	if (dashboard && !__DASHBOARDS__[dashboard]) {
+		setDashboard("");
+	}
 
 	const toggleLeftNav = () => {
 		setLeftNavOpen(!leftNavOpen);
@@ -164,7 +176,7 @@ function Main() {
 						</Typography>
 					</>
 				)}
-				{isDashboard && <Progress />}
+				{isDashboard && <DashboardProgress />}
 				<Outlet
 					context={{
 						isDashboard: isDashboard || !!dashboard,

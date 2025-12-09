@@ -1,1 +1,1 @@
-export { Progress } from "./progres";
+export { DashboardIframe, DashboardProgress } from "./const";

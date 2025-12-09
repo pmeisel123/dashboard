@@ -23,6 +23,7 @@ interface DashboardIframeProps {
 export const DashboardIframe = styled("iframe", {
 	shouldForwardProp: (prop) => prop !== "windowSize",
 })<DashboardIframeProps>(({ windowSize }) => ({
+	display: "none",
 	position: "fixed",
 	top: "48px",
 	left: 0,

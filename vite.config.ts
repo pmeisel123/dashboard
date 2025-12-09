@@ -40,11 +40,11 @@ GITREPOS.forEach((repo, index: number) => {
 			"X-GitHub-Api-Version": "2022-11-28",
 			"User-Agent": "validator",
 		},
-		configure: (proxy) => {
-			proxy.on("proxyRes", (_proxyRes, req) => {
-				console.log("Received Response from Target:", req.url);
-			});
-		},
+		//		configure: (proxy) => {
+		//			proxy.on("proxyRes", (_proxyRes, req) => {
+		//				console.log("Received Response from Target:", req.url);
+		//			});
+		//		},
 		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
@@ -75,11 +75,11 @@ export default defineConfig({
 					Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
 				},
 				rewrite: (path) => path.replace(/^\/jira/, ""),
-				configure: (proxy) => {
-					proxy.on("proxyRes", (_proxyRes, req) => {
-						console.log("Received Response from Target:", req.url);
-					});
-				},
+				//				configure: (proxy) => {
+				//					proxy.on("proxyRes", (_proxyRes, req) => {
+				//						console.log("Received Response from Target:", req.url);
+				//					});
+				//				},
 			},
 			...git_proxies,
 		},

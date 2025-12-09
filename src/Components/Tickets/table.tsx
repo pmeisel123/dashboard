@@ -186,35 +186,35 @@ const TicketTable: FC<{
 
 		if (custom_field_type == "Text") {
 			columns.push({
-				field: "customFields." + custom_field_key,
+				field: "customFields_" + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (params: GridRenderCellParams<TicketProps>) => {
-					const value: string | null = params.row.customFields[custom_field_key];
-					if (value) {
-						return <>{value}</>;
-					}
-					return <></>;
+				valueGetter: (_params, row) => {
+					return row.customFields[custom_field_key];
 				},
 			});
 		}
 		if (custom_field_type == "User") {
 			columns.push({
-				field: "customFields." + custom_field_key,
+				field: "customFields_" + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (params: GridRenderCellParams<TicketProps>) => {
-					const value: string[] | null = params.row.customFields[custom_field_key] as string[] | null;
-					if (value) {
-						return <>{value.join(", ")}</>;
+				valueGetter: (_params, row) => {
+					if (row) {
+						const value: string[] | null = row.customFields[custom_field_key] as string[] | null;
+						if (value) {
+							return value.join(", ");
+						}
 					}
-					return <></>;
 				},
 			});
 		}
 
 		if (custom_field_type == "Link") {
 			columns.push({
-				field: "customFields." + custom_field_key,
+				field: "customFields_" + custom_field_key,
 				headerName: custom_field_name,
+				valueGetter: (_params, row) => {
+					return row.customFields[custom_field_key];
+				},
 				renderCell: (params: GridRenderCellParams<TicketProps>) => {
 					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
@@ -256,6 +256,16 @@ const TicketTable: FC<{
 			field: "branches",
 			headerName: "Git Branches",
 			flex: 2,
+			valueGetter: (_params, row) => {
+				const ticket_branches = ticketsBranches.tickets[row.key];
+				if (ticket_branches) {
+					let names = "";
+					Object.entries(ticket_branches).map(([_key, ticket_branch]) => {
+						names += ticket_branch.name;
+					});
+					return names;
+				}
+			},
 			renderCell: (params: GridRenderCellParams<TicketProps>) => {
 				const ticket_branches = ticketsBranches.tickets[params.row.key];
 				if (ticket_branches) {
@@ -279,6 +289,19 @@ const TicketTable: FC<{
 			field: "branches2",
 			headerName: "Git Branches Owners",
 			flex: 2,
+			valueGetter: (_params, row) => {
+				const ticket_branches = ticketsBranches.tickets[row.key];
+				if (ticket_branches) {
+					let names = "";
+					Object.entries(ticket_branches).map(([_key, ticket_branch]) => {
+						if (ticket_branch.branch.creator) {
+							const creator = GetBranchCreator(ticket_branch.branch.creator, allJiraUsersGroups);
+							names += creator ? creator.name : "";
+						}
+					});
+					return names;
+				}
+			},
 			renderCell: (params: GridRenderCellParams<TicketProps>) => {
 				const ticket_branches = ticketsBranches.tickets[params.row.key];
 				if (ticket_branches) {

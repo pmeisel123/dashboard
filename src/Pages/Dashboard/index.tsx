@@ -126,7 +126,7 @@ function DashboardPage() {
 			}
 		}
 	};
-	useEffect(() => {
+	const ChangeUrlFromPageNumber = () => {
 		if (dashboard && __DASHBOARDS__[dashboard]) {
 			let url = __DASHBOARDS__[dashboard].pages[pageNumber].url;
 			if (url.match(/\?/)) {
@@ -137,16 +137,13 @@ function DashboardPage() {
 			url += "isDashboard=true";
 			ChangeUrl(url);
 		}
+	};
+	useEffect(() => {
+		ChangeUrlFromPageNumber();
 	}, [pageNumber]);
 	if (dashboard && __DASHBOARDS__[dashboard]) {
-		let url = __DASHBOARDS__[dashboard].pages[0].url;
-		if (url.match(/\?/)) {
-			url += "&";
-		} else {
-			url += "?";
-		}
-		url += "isDashboard=true";
-		ChangeUrl(url);
+		const url = "/blank?isDashboard=true";
+		ChangeUrlFromPageNumber();
 		return (
 			<>
 				<Box>
@@ -168,26 +165,8 @@ function DashboardPage() {
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>
-				<DashboardIframe
-					id="dashboardinternal"
-					src="/blank?isDashboard=true"
-					style={{
-						display: "none",
-					}}
-					frameBorder="0"
-					allow="fullscreen"
-					windowSize={windowSize}
-				/>
-				<DashboardIframe
-					id="dashboardexternal"
-					style={{
-						display: "none",
-					}}
-					src="/blank?isDashboard=true"
-					frameBorder="0"
-					allow="fullscreen"
-					windowSize={windowSize}
-				/>
+				<DashboardIframe id="dashboardinternal" src={url} allow="fullscreen" windowSize={windowSize} />
+				<DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" windowSize={windowSize} />
 			</>
 		);
 	}

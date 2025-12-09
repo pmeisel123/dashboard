@@ -9,22 +9,16 @@ import type {
 	GridSlotsComponentsProps,
 	GridSortModel,
 } from "@mui/x-data-grid";
-import {
-	DataGrid,
-	GridFooterContainer,
-	GridPagination,
-	useGridApiRef,
-} from "@mui/x-data-grid";
-import type { CustomFieldsProps, TicketProps } from "@src/Api";
+import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@mui/x-data-grid";
+import type { BranchesAndTicket, CustomFieldsProps, TicketProps, UsersGroupProps } from "@src/Api";
+import { GetBranchCreator } from "@src/Api";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { defaultTableSettings, getTicketColumns } from "@src/Components";
-import { formatDistanceToNow } from "date-fns";
+import { Ago, defaultTableSettings, getTicketColumns } from "@src/Components";
 import type { FC } from "react";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 declare const __API_URL__: string;
-const API_URL = __API_URL__;
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 
 declare module "@mui/x-data-grid" {
@@ -49,18 +43,8 @@ const RenderEstimate: FC<{
 	return <span style={{ color: "red" }}>{defaultEstimate}</span>;
 };
 
-const Ago = (value: Date): string => {
-	if (!value) {
-		return "";
-	}
-	return formatDistanceToNow(value, { addSuffix: false });
-};
-
-const CustomFooterStatusComponent = (
-	props: NonNullable<GridSlotsComponentsProps["footer"]>,
-) => {
-	const { totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent } =
-		props;
+const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps["footer"]>) => {
+	const { totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent } = props;
 	return (
 		<GridFooterContainer>
 			<Box
@@ -71,16 +55,9 @@ const CustomFooterStatusComponent = (
 					gap: 2,
 				}}
 			>
-				<Typography variant="body2">
-					totalTimEstimate: {totalTimEstimate}
-				</Typography>
-				<Typography variant="body2">
-					totalTimeOriginalEstimate:{" "}
-					{totalTimeOriginalEstimate}
-				</Typography>
-				<Typography variant="body2">
-					totalTimeSpent: {totalTimeSpent}
-				</Typography>
+				<Typography variant="body2">totalTimEstimate: {totalTimEstimate}</Typography>
+				<Typography variant="body2">totalTimeOriginalEstimate: {totalTimeOriginalEstimate}</Typography>
+				<Typography variant="body2">totalTimeSpent: {totalTimeSpent}</Typography>
 			</Box>
 			<GridPagination />
 		</GridFooterContainer>
@@ -97,6 +74,9 @@ const TicketTable: FC<{
 	isDashboard?: boolean;
 	defaultSort?: string;
 	defaultSortDirection?: "asc" | "desc";
+	user?: string;
+	allJiraUsersGroups: UsersGroupProps;
+	ticketsBranches: BranchesAndTicket;
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -107,6 +87,9 @@ const TicketTable: FC<{
 	isDashboard,
 	defaultSort,
 	defaultSortDirection,
+	user,
+	allJiraUsersGroups,
+	ticketsBranches,
 }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
@@ -120,15 +103,9 @@ const TicketTable: FC<{
 		{
 			field: "key",
 			headerName: "key",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => (
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
 				<Link
-					href={
-						(API_URL +
-							"/browse/" +
-							params.value) as string
-					}
+					href={(__API_URL__ + "/browse/" + params.value) as string}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -140,46 +117,24 @@ const TicketTable: FC<{
 		{
 			field: "parentkey",
 			headerName: "parent",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => {
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
 				if (params.value) {
 					return (
 						<>
 							<Link
-								href={
-									(API_URL +
-										"/browse/" +
-										params
-											.row
-											.parentkey) as string
-								}
+								href={(__API_URL__ + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{
-									params
-										.row
-										.parentkey
-								}
+								{params.row.parentkey}
 							</Link>
 							: &#x200b;
 							<Link
-								href={
-									(API_URL +
-										"/browse/" +
-										params
-											.row
-											.parentkey) as string
-								}
+								href={(__API_URL__ + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{
-									params
-										.row
-										.parentname
-								}
+								{params.row.parentname}
 							</Link>
 						</>
 					);
@@ -202,66 +157,54 @@ const TicketTable: FC<{
 		{
 			field: "created",
 			headerName: "created",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => <>{Ago(params.value)}</>,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => <>{Ago(params.value)}</>,
 		},
 		{
 			field: "updated",
 			headerName: "updated",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => <>{Ago(params.value)}</>,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => <>{Ago(params.value)}</>,
 		},
 		{
 			field: "timeestimate",
 			headerName: "Estimate",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => (
-				<RenderEstimate
-					value={params.value}
-					defaultEstimate={defaultEstimate}
-				/>
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+				<RenderEstimate value={params.value} defaultEstimate={defaultEstimate} />
 			),
 		},
 		{
 			field: "timeoriginalestimate",
 			headerName: "Original Estimate",
-			renderCell: (
-				params: GridRenderCellParams<TicketProps>,
-			) => (
-				<RenderEstimate
-					value={params.value}
-					defaultEstimate={defaultEstimate}
-				></RenderEstimate>
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+				<RenderEstimate value={params.value} defaultEstimate={defaultEstimate}></RenderEstimate>
 			),
 		},
 		{ field: "timespent", headerName: "Spent" },
 	];
 	Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-		let custom_field_name =
-			__CUSTOM_FIELDS__[custom_field_key].Name;
-		let custom_field_type =
-			__CUSTOM_FIELDS__[custom_field_key].Type;
-		let custom_field_link_text =
-			__CUSTOM_FIELDS__[custom_field_key].LinkText;
-		let custom_field_link_icon =
-			__CUSTOM_FIELDS__[custom_field_key].LinkIcon;
+		let custom_field_name = __CUSTOM_FIELDS__[custom_field_key].Name;
+		let custom_field_type = __CUSTOM_FIELDS__[custom_field_key].Type;
 
 		if (custom_field_type == "Text") {
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (
-					params: GridRenderCellParams<TicketProps>,
-				) => {
-					const value: string | null =
-						params.row.customFields[
-							custom_field_key
-						];
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
 						return <>{value}</>;
+					}
+					return <></>;
+				},
+			});
+		}
+		if (custom_field_type == "User") {
+			columns.push({
+				field: "customFields." + custom_field_key,
+				headerName: custom_field_name,
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string[] | null = params.row.customFields[custom_field_key] as string[] | null;
+					if (value) {
+						return <>{value.join(", ")}</>;
 					}
 					return <></>;
 				},
@@ -272,29 +215,24 @@ const TicketTable: FC<{
 			columns.push({
 				field: "customFields." + custom_field_key,
 				headerName: custom_field_name,
-				renderCell: (
-					params: GridRenderCellParams<TicketProps>,
-				) => {
-					const value: string | null =
-						params.row.customFields[
-							custom_field_key
-						];
+				renderCell: (params: GridRenderCellParams<TicketProps>) => {
+					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
+						const current_field_props = __CUSTOM_FIELDS__[custom_field_key];
+
+						const custom_field_link_icon =
+							"LinkIcon" in current_field_props ? current_field_props.LinkIcon : undefined;
+						const link_text =
+							"LinkText" in current_field_props ? current_field_props.LinkText : custom_field_name;
+
 						if (custom_field_link_icon) {
-							const IconComponent =
-								icons[
-									custom_field_link_icon
-								];
+							const IconComponent = icons[custom_field_link_icon];
 							return (
 								<Link
-									href={
-										value
-									}
+									href={value}
 									target="_blank"
 									rel="noopener noreferrer"
-									title={
-										custom_field_name
-									}
+									title={custom_field_name}
 									color="inherit"
 								>
 									<IconComponent />
@@ -302,19 +240,8 @@ const TicketTable: FC<{
 							);
 						} else {
 							return (
-								<Link
-									href={
-										value
-									}
-									target="_blank"
-									rel="noopener noreferrer"
-									title={
-										custom_field_name
-									}
-								>
-									{custom_field_link_text
-										? custom_field_link_text
-										: custom_field_name}
+								<Link href={value} target="_blank" rel="noopener noreferrer" title={custom_field_name}>
+									{link_text}
 								</Link>
 							);
 						}
@@ -324,25 +251,72 @@ const TicketTable: FC<{
 			});
 		}
 	});
+	if (ticketsBranches && Object.keys(ticketsBranches.branches).length) {
+		columns.push({
+			field: "branches",
+			headerName: "Git Branches",
+			flex: 2,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				const ticket_branches = ticketsBranches.tickets[params.row.key];
+				if (ticket_branches) {
+					return (
+						<>
+							{Object.entries(ticket_branches).map(([key, ticket_branch]) => {
+								const url = ticket_branch.repo.url + "/tree/" + ticket_branch.name;
+								return (
+									<Link key={key} href={url} target={"_blank"}>
+										{ticket_branch.name}
+										<br />
+									</Link>
+								);
+							})}
+						</>
+					);
+				}
+			},
+		});
+		columns.push({
+			field: "branches2",
+			headerName: "Git Branches Owners",
+			flex: 2,
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				const ticket_branches = ticketsBranches.tickets[params.row.key];
+				if (ticket_branches) {
+					return (
+						<>
+							{Object.entries(ticket_branches).map(([key, ticket_branch]) => {
+								if (ticket_branch.branch.creator) {
+									const creator = GetBranchCreator(ticket_branch.branch.creator, allJiraUsersGroups);
+									const name = creator ? creator.name : "";
+									return (
+										<Fragment key={key}>
+											{name}
+											<br />
+										</Fragment>
+									);
+								} else {
+									<Fragment key={key}>
+										<br />
+									</Fragment>;
+								}
+							})}
+						</>
+					);
+				}
+			},
+		});
+	}
 
-	const handleColumnModelChange = ({
-		column,
-		newModel,
-	}: updateGridModelProps) => {
+	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
 		const newColumnModel = {
 			...columnModel,
 			[column]: newModel,
 		};
-		localStorage.setItem(
-			localStorageName,
-			JSON.stringify(newColumnModel),
-		);
+		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
 		setColumnModel(newColumnModel);
 	};
 
-	const handleColumnVisibilityModelChange = (
-		newModel: GridColumnVisibilityModel,
-	) => {
+	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
 		handleColumnModelChange({
 			column: "GridColumnVisibilityModel",
 			newModel: newModel,
@@ -368,27 +342,24 @@ const TicketTable: FC<{
 
 		if (
 			defaultSort &&
-			(isDashboard ||
-				!columnModel ||
-				!columnModel.GridSortModel ||
-				!columnModel.GridSortModel.length)
+			(isDashboard || !columnModel || !columnModel.GridSortModel || !columnModel.GridSortModel.length)
 		) {
 			if (defaultSortDirection == "desc") {
-				columnModel.GridSortModel = [
-					{ field: defaultSort, sort: "desc" },
-				];
+				columnModel.GridSortModel = [{ field: defaultSort, sort: "desc" }];
 			} else {
-				columnModel.GridSortModel = [
-					{ field: defaultSort, sort: "asc" },
-				];
+				columnModel.GridSortModel = [{ field: defaultSort, sort: "asc" }];
 			}
 		}
 		setColumnModel(columnModel);
 	}, []);
 
-	const getRowClassName = (
-		params: GridRowParams<TicketProps>,
-	): string => {
+	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
+		if (params.row.isdone) {
+			return "MuiDataGrid-row-done";
+		}
+		if (user && params.row.assignee_id != user) {
+			return "MuiDataGrid-row-notowner";
+		}
 		return params.row.isdone ? "MuiDataGrid-row-done" : "";
 	};
 	const getVisibility = () => {
@@ -418,9 +389,11 @@ const TicketTable: FC<{
 		<Box sx={{ width: "100%" }}>
 			<DataGrid
 				sx={{
+					"& .MuiDataGrid-row-notowner": {
+						backgroundColor: theme.palette.grey.A200,
+					},
 					"& .MuiDataGrid-row-done": {
-						backgroundColor:
-							theme.palette.grey.A400,
+						backgroundColor: theme.palette.grey.A400,
 					},
 				}}
 				loading={loading}
@@ -452,9 +425,7 @@ const TicketTable: FC<{
 				columnVisibilityModel={getVisibility()}
 				sortModel={columnModel.GridSortModel}
 				filterModel={columnModel.GridFilterModel}
-				onColumnVisibilityModelChange={
-					handleColumnVisibilityModelChange
-				}
+				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
 				onSortModelChange={handleSortModelChange}
 				onFilterModelChange={handleFilterChange}
 				apiRef={apiRef}

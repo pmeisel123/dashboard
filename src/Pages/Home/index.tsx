@@ -6,22 +6,18 @@ import { Link } from "react-router-dom";
 function HomePage() {
 	return (
 		<Box>
-			{pages.map((page) => (
-				<ListItem disablePadding key={page.path}>
-					<ListItemButton
-						title={page.name}
-						component={Link}
-						to={page.path}
-					>
-						<ListItemText
-							primary={page.name}
-							secondary={
-								page.description
-							}
-						/>
-					</ListItemButton>
-				</ListItem>
-			))}
+			{pages.map((page) => {
+				if ("requires" in page && !page.requires) {
+					return;
+				}
+				return (
+					<ListItem disablePadding key={page.path}>
+						<ListItemButton title={page.name} component={Link} to={page.path}>
+							<ListItemText primary={page.name} secondary={page.description} />
+						</ListItemButton>
+					</ListItem>
+				);
+			})}
 			<SavePageList />
 		</Box>
 	);

@@ -1,5 +1,6 @@
 import { Box, Button } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
+import { DashboardIframe } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -24,39 +25,22 @@ const ListDashboard: FC<{
 				<Fragment key={key}>
 					<Button
 						onClick={() => {
-							setDashboard(
-								__DASHBOARDS__[
-									key
-								].key,
-							);
+							setDashboard(__DASHBOARDS__[key].key);
 						}}
 					>
 						{__DASHBOARDS__[key].name}
 					</Button>
 					<Box>
-						{__DASHBOARDS__[key].pages.map(
-							(page) => (
-								<Box
-									sx={{
-										paddingLeft: 5,
-									}}
-									key={
-										key +
-										page.name
-									}
-								>
-									<Link
-										to={
-											page.url
-										}
-									>
-										{
-											page.name
-										}
-									</Link>
-								</Box>
-							),
-						)}
+						{__DASHBOARDS__[key].pages.map((page) => (
+							<Box
+								sx={{
+									paddingLeft: 5,
+								}}
+								key={key + page.name}
+							>
+								<Link to={page.url}>{page.name}</Link>
+							</Box>
+						))}
 					</Box>
 				</Fragment>
 			))}
@@ -70,16 +54,10 @@ function DashboardPage() {
 		height: window.innerHeight,
 	});
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [dashboard, setDashboard] = useState<string>(
-		searchParams.get("dashboard") || "",
-	);
-	const [pageNumber, setPageNumber] = useState<number>(
-		parseInt(searchParams.get("pageNumber") || "0"),
-	);
+	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
+	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "0"));
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(
-			searchParams.toString(),
-		);
+		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (dashboard) {
 			newSearchParams.set("dashboard", dashboard);
 		} else {
@@ -120,24 +98,37 @@ function DashboardPage() {
 		};
 	}, [dashboard]);
 	const ChangeUrl = (url: string) => {
-		const iframe = document.getElementById(
-			"dashboard",
-		) as myHTMLIFrameElement | null;
-		if (
-			iframe &&
-			iframe.contentWindow &&
-			iframe.contentWindow.changeUrl
-		) {
-			iframe.contentWindow.changeUrl(url);
+		const iframeintenral = document.getElementById("dashboardinternal") as myHTMLIFrameElement | null;
+		const dashboardexternal = document.getElementById("dashboardexternal") as myHTMLIFrameElement | null;
+		if (url.match(/^http/)) {
+			if (dashboardexternal) {
+				dashboardexternal.src = url;
+				dashboardexternal.style.display = "inline";
+				if (iframeintenral) {
+					iframeintenral.style.display = "none";
+				}
+			} else {
+				setTimeout(function () {
+					ChangeUrl(url);
+				});
+			}
 		} else {
-			// TODO: fix this
-			console.log("external url?", url);
+			if (iframeintenral && iframeintenral.contentWindow && iframeintenral.contentWindow.changeUrl) {
+				iframeintenral.contentWindow.changeUrl(url);
+				iframeintenral.style.display = "inline";
+				if (dashboardexternal) {
+					dashboardexternal.style.display = "none";
+				}
+			} else {
+				setTimeout(function () {
+					ChangeUrl(url);
+				});
+			}
 		}
 	};
 	useEffect(() => {
 		if (dashboard && __DASHBOARDS__[dashboard]) {
-			let url =
-				__DASHBOARDS__[dashboard].pages[pageNumber].url;
+			let url = __DASHBOARDS__[dashboard].pages[pageNumber].url;
 			if (url.match(/\?/)) {
 				url += "&";
 			} else {
@@ -155,6 +146,7 @@ function DashboardPage() {
 			url += "?";
 		}
 		url += "isDashboard=true";
+		ChangeUrl(url);
 		return (
 			<>
 				<Box>
@@ -164,47 +156,37 @@ function DashboardPage() {
 							outline: "1px solid red",
 						}}
 						component={Link}
-						to={
-							__DASHBOARDS__[
-								dashboard
-							].pages[pageNumber].url
-						}
+						to={__DASHBOARDS__[dashboard].pages[pageNumber].url}
 					>
 						Exit Dashboard
 					</Button>
-					Dashboard &gt;{" "}
-					{__DASHBOARDS__[dashboard].name} &gt;{" "}
-					{
-						__DASHBOARDS__[dashboard].pages[
-							pageNumber
-						].name
-					}
+					Dashboard &gt; {__DASHBOARDS__[dashboard].name} &gt;{" "}
+					{__DASHBOARDS__[dashboard].pages[pageNumber].name}
 					<>
 						{" "}
-						(Page {pageNumber + 1} of{" "}
-						{
-							__DASHBOARDS__[
-								dashboard
-							].pages.length
-						}
-						)
+						(Page {pageNumber + 1} of {__DASHBOARDS__[dashboard].pages.length})
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>
-				<iframe
-					id="dashboard"
+				<DashboardIframe
+					id="dashboardinternal"
+					src="/blank?isDashboard=true"
 					style={{
-						position: "fixed",
-						top: "48px",
-						left: 0,
-						width: windowSize.width,
-						height: windowSize.height - 48,
-						border: "none",
-						zIndex: 9999,
+						display: "none",
 					}}
-					src={url}
 					frameBorder="0"
 					allow="fullscreen"
+					windowSize={windowSize}
+				/>
+				<DashboardIframe
+					id="dashboardexternal"
+					style={{
+						display: "none",
+					}}
+					src="/blank?isDashboard=true"
+					frameBorder="0"
+					allow="fullscreen"
+					windowSize={windowSize}
 				/>
 			</>
 		);

@@ -11,12 +11,8 @@ export const Duck = () => {
 	let default_duck_title = "ducky.png";
 	const [searchParams] = useSearchParams();
 	const [duck, setDuck] = useState<string>(default_duck);
-	const [silly, setSilly] = useState<number>(
-		parseInt(searchParams.get("silly") || max_silly + ""),
-	);
-	const [orderSilly] = useState<boolean>(
-		searchParams.get("orderSilly") == "true",
-	);
+	const [silly, setSilly] = useState<number>(parseInt(searchParams.get("silly") || max_silly + ""));
+	const [orderSilly] = useState<boolean>(searchParams.get("orderSilly") == "true");
 	const [duckTitle, setDuckTitle] = useState<string>("");
 	let today = getHolidayDayString(new Date());
 	const randomSilly = () => {
@@ -30,14 +26,8 @@ export const Duck = () => {
 			});
 			return;
 		}
-		console.log("here");
 		if (searchParams.get("silly") != null) {
-			setSilly(
-				parseInt(
-					searchParams.get("silly") ||
-						max_silly + "",
-				),
-			);
+			setSilly(parseInt(searchParams.get("silly") || max_silly + ""));
 		} else {
 			setSilly(Math.floor(Math.random() * max_silly));
 		}
@@ -68,6 +58,19 @@ export const Duck = () => {
 			setDuckTitle(default_duck_title);
 		}
 	}, [silly]);
+	useEffect(() => {
+		let faviconLink: HTMLLinkElement | null = document.querySelector('link[rel*="icon"]');
+
+		if (!faviconLink) {
+			faviconLink = document.createElement("link");
+			faviconLink.type = "image/x-icon"; // Or the appropriate image type
+			faviconLink.rel = "shortcut icon"; // Or 'icon'
+			document.getElementsByTagName("head")[0].appendChild(faviconLink);
+		}
+		if (faviconLink) {
+			faviconLink.href = "/ducks/" + duck;
+		}
+	}, [duck]);
 
 	return (
 		<Box
@@ -77,7 +80,6 @@ export const Duck = () => {
 				right: "10px",
 			}}
 			title={duckTitle}
-			key={silly}
 		>
 			<img
 				style={{
@@ -85,7 +87,7 @@ export const Duck = () => {
 					maxWidth: "64px",
 					opacity: 0.25,
 				}}
-				src={"/src/assets/ducks/" + duck}
+				src={"/ducks/" + duck}
 			/>
 		</Box>
 	);

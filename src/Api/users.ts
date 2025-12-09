@@ -1,4 +1,4 @@
-import type { UserProps, UsersGroupProps } from "./types";
+import type { UserProps, UsersGroupProps } from "./Types";
 import { getVacationApi } from "./vacations";
 
 declare const __VACATION_KEY__: string;
@@ -43,9 +43,7 @@ const getUserDataFromAjaxResponse = (user: any) => {
 export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 	const max_results = 1000;
 	const main_url =
-		"/jira/rest/api/2/user/search?query=.&maxResults=" +
-		max_results +
-		"&expand=groups,applicationRoles";
+		"/jira/rest/api/2/user/search?query=.&maxResults=" + max_results + "&expand=groups,applicationRoles";
 	// let result: TicketProps[] = [];
 	const paramaters = {
 		method: "GET",
@@ -71,45 +69,21 @@ export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 			for (const user of ajax_result) {
 				// ajax_result.forEach((user: any) => {
 				if (user.accountType != "app") {
-					let formatted: UserProps | null =
-						getUserDataFromAjaxResponse(
-							user,
-						);
+					let formatted: UserProps | null = getUserDataFromAjaxResponse(user);
 					if (formatted != null) {
-						await getUserGroupApi(
-							user.accountId,
-						).then((data) => {
-							groups = [
-								...new Set(
-									groups.concat(
-										data,
-									),
-								),
-							];
+						await getUserGroupApi(user.accountId).then((data) => {
+							groups = [...new Set(groups.concat(data))];
 							formatted.groups = data;
 						});
 
-						let vacation_key:
-							| string
-							| null = formatted.name;
-						if (
-							__VACATION_KEY__ ==
-							"email"
-						) {
-							vacation_key =
-								formatted.email;
+						let vacation_key: string | null = formatted.name;
+						if (__VACATION_KEY__ == "email") {
+							vacation_key = formatted.email;
 						}
-						if (
-							vacation_key &&
-							vacations[vacation_key]
-						) {
-							formatted.vacations =
-								vacations[
-									vacation_key
-								];
+						if (vacation_key && vacations[vacation_key]) {
+							formatted.vacations = vacations[vacation_key];
 						}
-						results[formatted.id] =
-							formatted;
+						results[formatted.id] = formatted;
 					}
 				}
 			}

@@ -11,12 +11,7 @@ import {
 	TableRow,
 } from "@mui/material";
 import type { HolidayProps } from "@src/Api";
-import {
-	getAllHolidays,
-	getAllUsHolidays,
-	getDateStringWithDayOfWeek,
-	getHolidays,
-} from "@src/Api";
+import { getAllHolidays, getAllUsHolidays, getDateStringWithDayOfWeek, getHolidays } from "@src/Api";
 import { cleanHolidayName, getHolidayDuck } from "@src/Components/Duck/const";
 import { formatDistanceToNow } from "date-fns";
 import type { FC } from "react";
@@ -42,7 +37,7 @@ const HolidayDuck: FC<{ day: string; name: string }> = ({ day, name }) => {
 				position: "absolute",
 				margin: "-5px 0 0 5px",
 			}}
-			src={"/src/assets/ducks/" + holiday_duck}
+			src={"/ducks/" + holiday_duck}
 		/>
 	);
 };
@@ -51,15 +46,9 @@ const HolidayPage = () => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const this_year = new Date().getFullYear() + "";
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [year, setYear] = useState<string>(
-		searchParams.get("year") || this_year,
-	);
-	const [extended, setExtended] = useState<boolean>(
-		searchParams.get("extended") == "true",
-	);
-	const [withJewish, setWithJewish] = useState<boolean>(
-		searchParams.get("withJewish") == "true",
-	);
+	const [year, setYear] = useState<string>(searchParams.get("year") || this_year);
+	const [extended, setExtended] = useState<boolean>(searchParams.get("extended") == "true");
+	const [withJewish, setWithJewish] = useState<boolean>(searchParams.get("withJewish") == "true");
 	const with_ducks = searchParams.get("withDucks") != null;
 	const year_as_int = parseInt(this_year);
 
@@ -92,9 +81,7 @@ const HolidayPage = () => {
 	};
 
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(
-			searchParams.toString(),
-		);
+		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (year != this_year) {
 			newSearchParams.set("year", year);
 		} else {
@@ -131,18 +118,12 @@ const HolidayPage = () => {
 						label="Year"
 						value={year}
 						onChange={(event) => {
-							setYear(
-								event.target
-									.value,
-							);
+							setYear(event.target.value);
 						}}
 						sx={{ minWidth: 100 }}
 					>
 						{years_choices.map((year) => (
-							<MenuItem
-								key={year}
-								value={year}
-							>
+							<MenuItem key={year} value={year}>
 								{year}
 							</MenuItem>
 						))}
@@ -153,59 +134,23 @@ const HolidayPage = () => {
 				<Table aria-label="simple table">
 					<TableHead>
 						<TableRow>
-							<TableCell>
-								Name
-							</TableCell>
-							<TableCell>
-								Date
-							</TableCell>
-							<TableCell>
-								When
-							</TableCell>
+							<TableCell>Name</TableCell>
+							<TableCell>Date</TableCell>
+							<TableCell>When</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						{holidays.map((holiday) => (
-							<DateRow
-								date={
-									holiday.date
-								}
-								key={
-									holiday.name +
-									holiday.date
-								}
-							>
+							<DateRow date={holiday.date} key={holiday.name + holiday.date}>
 								<TableCell>
-									{
-										holiday.name
-									}
-									{with_ducks && (
-										<HolidayDuck
-											day={
-												holiday.date
-											}
-											name={
-												holiday.name
-											}
-										/>
-									)}
+									{holiday.name}
+									{with_ducks && <HolidayDuck day={holiday.date} name={holiday.name} />}
 								</TableCell>
+								<TableCell>{getDateStringWithDayOfWeek(getDate(holiday.date))}</TableCell>
 								<TableCell>
-									{getDateStringWithDayOfWeek(
-										getDate(
-											holiday.date,
-										),
-									)}
-								</TableCell>
-								<TableCell>
-									{formatDistanceToNow(
-										getDate(
-											holiday.date,
-										),
-										{
-											addSuffix: true,
-										},
-									)}
+									{formatDistanceToNow(getDate(holiday.date), {
+										addSuffix: true,
+									})}
 								</TableCell>
 							</DateRow>
 						))}

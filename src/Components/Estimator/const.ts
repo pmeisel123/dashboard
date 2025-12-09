@@ -7,8 +7,7 @@ interface EstimatorCellProps {
 }
 
 export const EstimatorCell = styled(TableCell, {
-	shouldForwardProp: (prop) =>
-		prop !== "isOff" && prop !== "isDone" && prop !== "isPartial",
+	shouldForwardProp: (prop) => prop !== "isOff" && prop !== "isDone" && prop !== "isPartial",
 })<EstimatorCellProps>(({ isOff, isDone, isPartial, theme }) => ({
 	border: "1px solid",
 	verticalAlign: "top",

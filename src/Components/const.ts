@@ -1,9 +1,5 @@
-import type {
-	GridColDef,
-	GridColumnVisibilityModel,
-	GridFilterModel,
-	GridSortModel,
-} from "@mui/x-data-grid";
+import type { GridColDef, GridColumnVisibilityModel, GridFilterModel, GridSortModel } from "@mui/x-data-grid";
+import { formatDistanceToNow } from "date-fns";
 
 export interface tableSetingsProps {
 	GridColumnVisibilityModel: GridColumnVisibilityModel;
@@ -37,21 +33,15 @@ export const defaultTableSettings: tableSetingsProps = {
 	GridFilterModel: { items: [] },
 };
 
-export const getTicketColumns = (
-	localStorageName: string,
-	columns: GridColDef<any>[],
-): tableSetingsProps => {
+export const getTicketColumns = (localStorageName: string, columns: GridColDef<any>[]): tableSetingsProps => {
 	const ticketTableColumns = localStorage.getItem(localStorageName);
 	if (ticketTableColumns) {
 		// Make sure there is at least one visible column
-		let columnModel: tableSetingsProps = JSON.parse(
-			ticketTableColumns,
-		) as tableSetingsProps;
+		let columnModel: tableSetingsProps = JSON.parse(ticketTableColumns) as tableSetingsProps;
 		let visible = columnModel.GridColumnVisibilityModel;
 		if (
 			visible &&
-			Object.keys(visible).length >=
-				Object.keys(columns).length &&
+			Object.keys(visible).length >= Object.keys(columns).length &&
 			Object.values(visible).every((value) => !value)
 		) {
 			let column_name = "__";
@@ -65,6 +55,13 @@ export const getTicketColumns = (
 		return columnModel;
 	}
 	return { ...defaultTableSettings };
+};
+
+export const Ago = (value: Date): string => {
+	if (!value) {
+		return "";
+	}
+	return formatDistanceToNow(value, { addSuffix: false });
 };
 
 export const allGroups = "All";

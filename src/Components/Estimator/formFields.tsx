@@ -1,11 +1,4 @@
-import {
-	Button,
-	Grid,
-	InputLabel,
-	MenuItem,
-	Select,
-	TextField,
-} from "@mui/material";
+import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
@@ -36,72 +29,45 @@ const FormFields: FC<{
 	}, [search, parent]);
 	var values = [...Array(11).keys()];
 	var estimateSteps = [...Array(16).keys()];
-	estimateSteps = estimateSteps.concat(
-		Array.from({ length: 9 }, (_, index) => 5 * index + 20),
-	);
+	estimateSteps = estimateSteps.concat(Array.from({ length: 9 }, (_, index) => 5 * index + 20));
 	return (
 		<>
 			<Grid container spacing={2}>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="search">
-						Search
-					</InputLabel>
+					<InputLabel id="search">Search</InputLabel>
 					<TextField
 						id="search"
 						value={localSearch}
 						onChange={(event) => {
-							setLocalSearch(
-								event.target
-									.value,
-							);
+							setLocalSearch(event.target.value);
 						}}
 					/>
 				</Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="parent">
-						Parent Ticket ID
-					</InputLabel>
+					<InputLabel id="parent">Parent Ticket ID</InputLabel>
 					<TextField
 						id="parent"
 						value={localParent}
 						onChange={(event) => {
-							setLocalParent(
-								event.target
-									.value,
-							);
+							setLocalParent(event.target.value);
 						}}
 					/>
 				</Grid>
 				<Grid size={2}>
-					<InputLabel id="parent">
-						&nbsp;
-					</InputLabel>
+					<InputLabel id="parent">&nbsp;</InputLabel>
 					<Button
 						variant="contained"
 						onClick={() => {
 							setParent(localParent);
 							if (!localSearch) {
 								setSearch("");
-							} else if (
-								localSearch.match(
-									/[^a-z]/i,
-								)
-							) {
-								setSearch(
-									localSearch,
-								);
+							} else if (localSearch.match(/[^a-z]/i)) {
+								setSearch(localSearch);
 							} else {
-								setSearch(
-									'textfields ~ "' +
-										localSearch +
-										'*"',
-								);
+								setSearch('textfields ~ "' + localSearch + '*"');
 							}
 						}}
-						disabled={
-							search == localSearch &&
-							parent == localParent
-						}
+						disabled={search == localSearch && parent == localParent}
 					>
 						Update
 					</Button>
@@ -109,62 +75,38 @@ const FormFields: FC<{
 			</Grid>
 			<Grid container spacing={2}>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="default_estimate">
-						Default Estimate
-					</InputLabel>
+					<InputLabel id="default_estimate">Default Estimate</InputLabel>
 					<Select
 						labelId="default_estimate"
 						value={defaultEstimate + ""}
 						onChange={(event) => {
-							setDefaultEstimate(
-								parseInt(
-									event
-										.target
-										.value,
-								),
-							);
+							setDefaultEstimate(parseInt(event.target.value));
 						}}
 						inputProps={{
-							"aria-label":
-								"Number dropdown",
+							"aria-label": "Number dropdown",
 						}}
 					>
 						{values.map((value) => (
-							<MenuItem
-								key={value}
-								value={value}
-							>
+							<MenuItem key={value} value={value}>
 								{value}
 							</MenuItem>
 						))}
 					</Select>
 				</Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel id="estimatePadding">
-						Estimate Padding
-					</InputLabel>
+					<InputLabel id="estimatePadding">Estimate Padding</InputLabel>
 					<Select
 						labelId="estimatePadding"
 						value={estimatePadding + ""}
 						onChange={(event) => {
-							setEstimatePadding(
-								parseFloat(
-									event
-										.target
-										.value,
-								),
-							);
+							setEstimatePadding(parseFloat(event.target.value));
 						}}
 						inputProps={{
-							"aria-label":
-								"Number dropdown",
+							"aria-label": "Number dropdown",
 						}}
 					>
 						{estimateSteps.map((value) => (
-							<MenuItem
-								key={value}
-								value={value}
-							>
+							<MenuItem key={value} value={value}>
 								{value}
 							</MenuItem>
 						))}

@@ -21,17 +21,19 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 ## Install
 
 1. Clone the repository:
-   ```bash
+```bash
    git clone https://github.com/pmeisel123/dashboard
    cd dashboard
 ```
+
 2. Install dependencies
-   ```bash
+```bash
    npm install
 ```
+
 3. Configure settings:
    Update `globals.ts` (see instructions in the file).
 4. Run the application:
-   ```bash
+```bash
    npm run dev
 ```

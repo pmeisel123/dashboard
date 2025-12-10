@@ -43,6 +43,9 @@ type CustomFieldsPropsLink = BaseCustomFieldProps &
 	};
 
 export type CustomFieldsProps = CustomFieldsPropsText | CustomFieldsPropsUser | CustomFieldsPropsLink;
+export interface CustomFieldsObjectProps {
+	[key: string]: CustomFieldsProps;
+}
 
 export interface DashboardPageProps {
 	name: string;
@@ -53,6 +56,10 @@ export interface DashboardProps {
 	key: string;
 	name: string;
 	pages: DashboardPageProps[];
+}
+
+export interface DashboardsProps {
+	[key: string]: DashboardProps;
 }
 
 export interface HolidayProps {

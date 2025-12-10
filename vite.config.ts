@@ -12,8 +12,10 @@ import {
 	DASHBOARD_DUCKS,
 	DASHBOARD_SPEED_SECONDS,
 	DONE_STATUS,
-	GITKEY,
 	GITREPOS,
+	GITTOKEN,
+	HOST,
+	PORT,
 	VACATION_KEY,
 } from "./globals";
 import type { ReportNamePaths } from "./src/Api/Types";
@@ -36,7 +38,7 @@ GITREPOS.forEach((repo, index: number) => {
 		secure: false,
 		headers: {
 			Accept: "application/vnd.github+json",
-			Authorization: "Bearer " + GITKEY,
+			Authorization: "Bearer " + GITTOKEN,
 			"X-GitHub-Api-Version": "2022-11-28",
 			"User-Agent": "validator",
 		},
@@ -65,8 +67,8 @@ export default defineConfig({
 	},
 	server: {
 		host: "0.0.0.0",
-		port: 3000,
-		allowedHosts: ["www.cybersquad.net"],
+		port: PORT,
+		allowedHosts: [HOST],
 		proxy: {
 			"/jira": {
 				target: API_URL,

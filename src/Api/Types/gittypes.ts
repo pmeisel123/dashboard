@@ -34,3 +34,8 @@ export interface BranchesAndTicket {
 	tickets: TicketCache;
 	loaded: number | null; // ms since epoch
 }
+
+export interface ReposProps {
+	name: string;
+	url: string;
+}

@@ -115,6 +115,12 @@ const TicketTable: FC<{
 			minWidth: 80,
 		},
 		{
+			field: "summary",
+			headerName: "summary",
+			flex: 2,
+			minWidth: 125,
+		},
+		{
 			field: "parentkey",
 			headerName: "parent",
 			renderCell: (params: GridRenderCellParams<TicketProps>) => {
@@ -148,12 +154,6 @@ const TicketTable: FC<{
 		{ field: "assignee", headerName: "assignee", flex: 1 },
 		{ field: "creator", headerName: "creator", flex: 1 },
 		{ field: "status", headerName: "status" },
-		{
-			field: "summary",
-			headerName: "summary",
-			flex: 1,
-			minWidth: 125,
-		},
 		{
 			field: "created",
 			headerName: "created",
@@ -193,7 +193,9 @@ const TicketTable: FC<{
 				},
 			});
 		}
+
 		if (custom_field_type == "User") {
+			// Technically "User" can be multiple people, but generally only 1 person
 			columns.push({
 				field: "customFields_" + custom_field_key,
 				headerName: custom_field_name,
@@ -251,6 +253,7 @@ const TicketTable: FC<{
 			});
 		}
 	});
+
 	if (ticketsBranches && Object.keys(ticketsBranches.branches).length) {
 		columns.push({
 			field: "branches",
@@ -285,6 +288,7 @@ const TicketTable: FC<{
 				}
 			},
 		});
+
 		columns.push({
 			field: "branches2",
 			headerName: "Git Branches Owners",

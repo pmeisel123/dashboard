@@ -30,6 +30,17 @@ const FormFields: FC<{
 	var values = [...Array(11).keys()];
 	var estimateSteps = [...Array(16).keys()];
 	estimateSteps = estimateSteps.concat(Array.from({ length: 9 }, (_, index) => 5 * index + 20));
+	const updateSearch = () => {
+		console.log("here");
+		setParent(localParent);
+		if (!localSearch) {
+			setSearch("");
+		} else if (localSearch.match(/[^a-z]/i)) {
+			setSearch(localSearch);
+		} else {
+			setSearch('textfields ~ "' + localSearch + '*"');
+		}
+	};
 	return (
 		<>
 			<Grid container spacing={2}>
@@ -41,6 +52,7 @@ const FormFields: FC<{
 						onChange={(event) => {
 							setLocalSearch(event.target.value);
 						}}
+						onBlur={updateSearch}
 					/>
 				</Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
@@ -51,22 +63,14 @@ const FormFields: FC<{
 						onChange={(event) => {
 							setLocalParent(event.target.value);
 						}}
+						onBlur={updateSearch}
 					/>
 				</Grid>
 				<Grid size={2}>
 					<InputLabel id="parent">&nbsp;</InputLabel>
 					<Button
 						variant="contained"
-						onClick={() => {
-							setParent(localParent);
-							if (!localSearch) {
-								setSearch("");
-							} else if (localSearch.match(/[^a-z]/i)) {
-								setSearch(localSearch);
-							} else {
-								setSearch('textfields ~ "' + localSearch + '*"');
-							}
-						}}
+						onClick={updateSearch}
 						disabled={search == localSearch && parent == localParent}
 					>
 						Update

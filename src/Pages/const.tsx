@@ -77,6 +77,9 @@ export const pages = [
 		path: "/dashboard",
 		name: "Dashboard",
 		element: <Dashboard />,
-		description: <>List dashboards configured in globals.ts</>,
+		description: <>
+			Dashboards are configured within the globals.ts file. When a dashboard is loaded, the page will automatically switch between different pages.<br />
+			This is useful for displaying information on internal office screens.
+		</>,
 	},
 ];

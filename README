@@ -1,1 +1,33 @@
-Test2
+This is a company Dashboard.
+It merges data from Jira, Git, and vacations.
+
+Pages:
+	path: /,
+	description: <>Landing Page for the application.</>,
+
+	path: /Estimator,
+	description: Calculate approximate project completion dates based on Jira ticket estimates, user selection, upcoming vacations, and holidays. Useful for project planning.
+
+	path: /MyTickets,
+	description: View tickets assigned to a specific user. The selected user is saved to local storage for convenience.
+
+	path: /RecentTickets,
+	description: Find tickets that were recently filed.
+
+	path: /branches,
+	description: List all the git repositories and their respective branches.
+
+	path: /holidays,
+	description: Display US bank holidays by year. To change the default filters, edit src/API/holiday.ts &gt; getHolidays.
+
+	path: /whoisout,
+	description:
+		Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from
+		src/assets/vacation.csv via src/API/vacations.tsx
+		Need to pull vacations from your HR site. Either via a cron job updating the csv file or by updating to
+		vacations api to automaticlly pull/format the vacation data
+
+	path: /dashboard,
+	description:
+		Dashboards are configured within the globals.ts file. When a dashboard is loaded, the page will automatically switch between different pages.<br />
+		This is useful for displaying information on internal office screens.

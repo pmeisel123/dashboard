@@ -13,7 +13,7 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 | /RecentTickets |	Find tickets that were recently filed. |
 | /branches |	List all the git repositories and their respective branches. |
 | /holidays |	Display US bank holidays by year. To change the default filters, edit `src/API/holiday.ts` > `getHolidays`. |
-| /whoisout |	Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from s`rc/assets/vacation.csv` via `src/API/vacations.tsx`. Need to pull vacations from your HR site. |
+| /whoisout |	Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from `src/assets/vacation.csv` via `src/API/vacations.tsx`. Need to pull vacations from your HR site. |
 | /dashboard |	Dashboards are configured within the `globals.ts` file. When a dashboard is loaded, the page will automatically switch between different pages. This is useful for displaying information on internal office screens.|
 
 

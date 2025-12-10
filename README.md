@@ -17,7 +17,6 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 | /dashboard |	Dashboards are configured within the `globals.ts` file. When a dashboard is loaded, the page will automatically switch between different pages. This is useful for displaying information on internal office screens.|
 
 
-
 ## Install
 
 1. Clone the repository:
@@ -33,6 +32,7 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 
 3. Configure settings:
    Update `globals.ts` (see instructions in the file).
+
 4. Run the application:
 ```bash
    npm run dev

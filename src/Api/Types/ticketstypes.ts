@@ -43,6 +43,7 @@ type CustomFieldsPropsLink = BaseCustomFieldProps &
 	};
 
 export type CustomFieldsProps = CustomFieldsPropsText | CustomFieldsPropsUser | CustomFieldsPropsLink;
+
 export interface CustomFieldsObjectProps {
 	[key: string]: CustomFieldsProps;
 }

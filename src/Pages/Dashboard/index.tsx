@@ -69,7 +69,7 @@ export const DASHBOARDS: DashboardsProps = {
 				url: "/holidays"
 			},
 		]
-	}
+	},
 };`}
 				</pre>
 			</>

@@ -1,7 +1,7 @@
 import type { CustomFieldsObjectProps, DashboardsProps, ReposProps } from './src/Api/Types';
 
 // Domain you are running this dashboard on
-export const HOST = "www.cybersquad.net";
+export const HOST = "www.host.net";
 export const PORT = 3000;
 
 // Jira Settings

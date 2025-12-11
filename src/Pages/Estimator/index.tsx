@@ -1,15 +1,18 @@
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
 import { fetchBranches, fetchTickets, fetchUsersAndGroups, isGitDataRecent, isUserDataRecent } from "@src/Api";
 import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
+import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const defaultDefaultDefaultEstimate = 2;
 
-function EstimatorPage() {
+const EstimatorPage: FC<{
+	searchParamsOveride?: URLSearchParams;
+}> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	let defaultDefaultEstimate: number = parseInt(
 		searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "",
 	);
@@ -181,5 +184,5 @@ function EstimatorPage() {
 			)}
 		</>
 	);
-}
+};
 export default EstimatorPage;

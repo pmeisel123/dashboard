@@ -2,15 +2,18 @@ import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/mate
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
 import { fetchBranches, fetchTickets, getJiraDayString, isGitDataRecent } from "@src/Api";
 import { TicketTable } from "@src/Components";
+import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const default_days = 5;
 
-function RecentTicketsPage() {
+const RecentTicketsPage: FC<{
+	searchParamsOveride?: URLSearchParams;
+}> = ({ searchParamsOveride }) => {
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
-	const [searchParams, setSearchParams] = useSearchParams();
 	const getParamDays = () => {
 		return parseInt(searchParams.get("days") || default_days + "");
 	};
@@ -148,6 +151,6 @@ function RecentTicketsPage() {
 			}
 		</>
 	);
-}
+};
 
 export default RecentTicketsPage;

@@ -10,6 +10,7 @@ import {
 	isUserDataRecent,
 } from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
+import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
@@ -35,8 +36,10 @@ Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
 });
 const allUserFieldsDefaultArray = Object.keys(allUserFieldsDefault).filter((key) => allUserFieldsDefault[key]);
 
-function MyTicketsPage() {
-	const [searchParams, setSearchParams] = useSearchParams();
+const MyTicketsPage: FC<{
+	searchParamsOveride?: URLSearchParams;
+}> = ({ searchParamsOveride }) => {
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get("group") || window.localStorage.getItem("group") || "");
@@ -221,6 +224,6 @@ function MyTicketsPage() {
 			)}
 		</>
 	);
-}
+};
 
 export default MyTicketsPage;

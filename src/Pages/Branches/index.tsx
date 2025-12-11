@@ -2,12 +2,15 @@ import { Box } from "@mui/material";
 import type { AppDispatch, BranchesAndTicket, RootState, TicketProps, UsersGroupPropsSlice } from "@src/Api";
 import { fetchBranches, fetchTickets, fetchUsersAndGroups, isGitDataRecent, isUserDataRecent } from "@src/Api";
 import { BranchesTable, UserSelector } from "@src/Components";
+import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
-function BranchesPage() {
-	const [searchParams, setSearchParams] = useSearchParams();
+const BranchesPage: FC<{
+	searchParamsOveride?: URLSearchParams;
+}> = ({ searchParamsOveride }) => {
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
 	const allJiraUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
 	const dispatch = useDispatch<AppDispatch>();
@@ -28,19 +31,21 @@ function BranchesPage() {
 	}, [searchParams]);
 
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
-		if (group != "") {
-			newSearchParams.set("group", group);
-		} else {
-			newSearchParams.delete("group");
-		}
-		if (user != "") {
-			newSearchParams.set("user", user);
-		} else {
-			newSearchParams.delete("user");
-		}
-		if (searchParams.toString() != newSearchParams.toString()) {
-			setSearchParams(newSearchParams);
+		if (!searchParamsOveride) {
+			const newSearchParams = new URLSearchParams(searchParams.toString());
+			if (group != "") {
+				newSearchParams.set("group", group);
+			} else {
+				newSearchParams.delete("group");
+			}
+			if (user != "") {
+				newSearchParams.set("user", user);
+			} else {
+				newSearchParams.delete("user");
+			}
+			if (searchParams.toString() != newSearchParams.toString()) {
+				setSearchParams(newSearchParams);
+			}
 		}
 	}, [group, user]);
 
@@ -107,6 +112,6 @@ function BranchesPage() {
 			/>
 		</Box>
 	);
-}
+};
 
 export default BranchesPage;

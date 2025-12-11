@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-
 import {
 	Checkbox,
 	FormControlLabel,
@@ -14,6 +12,8 @@ import {
 import type { AppDispatch, RootState } from "@src/Api";
 import { fetchUsersAndGroups, getAllUsHolidays, getDateString, getHolidayDayString, isUserDataRecent } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
+import type { ChangeEvent, FC } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
@@ -25,10 +25,11 @@ interface cellData {
 	whoisout: string[];
 	past: boolean;
 }
-
-function WhoIsOutPage() {
+const WhoIsOutPage: FC<{
+	searchParamsOveride?: URLSearchParams;
+}> = ({ searchParamsOveride }) => {
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
-	const [searchParams, setSearchParams] = useSearchParams();
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	let param_groups = searchParams.get("groups");
 	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
@@ -150,7 +151,7 @@ function WhoIsOutPage() {
 	}, [groups]);
 	rows = getRows();
 
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
 		if (event.target.checked) {
 			// Add the value if checked
@@ -222,10 +223,10 @@ function WhoIsOutPage() {
 										{cell.holiday}
 										{!!cell.holiday && !!cell.whoisout.length && <br />}
 										{cell.whoisout.map((item, index) => (
-											<React.Fragment key={index}>
+											<Fragment key={index}>
 												<br />
 												{item}
-											</React.Fragment>
+											</Fragment>
 										))}
 									</EstimatorCell>
 								))}
@@ -236,6 +237,6 @@ function WhoIsOutPage() {
 			</TableContainer>
 		</>
 	);
-}
+};
 
 export default WhoIsOutPage;

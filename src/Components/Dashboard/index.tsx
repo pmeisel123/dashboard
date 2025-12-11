@@ -1,1 +1,1 @@
-export { DashboardIframe, DashboardProgress } from "./const";
+export { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress } from "./const";

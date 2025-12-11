@@ -8,14 +8,7 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { matchRoutes } from "react-router";
-import {
-	createBrowserRouter,
-	Outlet,
-	RouterProvider,
-	useLocation,
-	useNavigate,
-	useSearchParams,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider, useLocation, useSearchParams } from "react-router-dom";
 import "./App.css";
 
 declare const __DASHBOARDS__: { [key: string]: DashboardProps };
@@ -45,7 +38,6 @@ const router = createBrowserRouter([
 const defaultLeftWidth = 150;
 
 function Main() {
-	const navigate = useNavigate();
 	const theme = useTheme();
 	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up("sm"));
 	const [leftNavOpen, setLeftNavOpen] = useState<boolean>(isSmallOrLarger);
@@ -137,10 +129,6 @@ function Main() {
 		}
 		document.title = title;
 	}, [location]);
-	const changeUrl = (url: string) => {
-		navigate(url);
-	};
-	(window as any).changeUrl = changeUrl;
 
 	return (
 		<>

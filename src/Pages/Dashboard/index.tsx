@@ -1,17 +1,10 @@
 import { Box, Button } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
-import { DashboardIframe } from "@src/Components";
+import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress } from "@src/Components";
+import { pages } from "@src/Pages/const";
 import type { Dispatch, FC, SetStateAction } from "react";
-import { Fragment, useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-
-interface myHTMLIFrameElement extends HTMLIFrameElement {
-	contentWindow: myContentWindow;
-}
-
-interface myContentWindow extends Window {
-	changeUrl?: Function;
-}
+import { cloneElement, Fragment, useEffect, useState } from "react";
+import { Link, matchRoutes, useSearchParams } from "react-router-dom";
 
 declare const __DASHBOARDS__: { [key: string]: DashboardProps };
 declare const __DASHBOARD_SPEED_SECONDS__: number;
@@ -104,6 +97,27 @@ export const DASHBOARDS: DashboardsProps = {
 	);
 };
 
+const LoadPage: FC<{
+	url: string;
+}> = ({ url }) => {
+	if (url.match(/blank/)) {
+		return null;
+	}
+	const urlObj = new URL(url, "http://random.com");
+	const matches = matchRoutes(pages, {
+		pathname: urlObj.pathname,
+	});
+	const lastMatch = matches ? matches[matches.length - 1] : null;
+	if (!lastMatch || !lastMatch.route.element) {
+		console.log("Bad url" + url);
+		return null;
+	}
+	const params = new URLSearchParams(urlObj.searchParams);
+	return cloneElement(lastMatch.route.element, {
+		searchParamsOveride: params,
+	});
+};
+
 function DashboardPage() {
 	const [windowSize, setWindowSize] = useState({
 		width: window.innerWidth,
@@ -112,6 +126,7 @@ function DashboardPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
 	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "0"));
+	const [url, setUrl] = useState<string>("/blank?isDashboard=true");
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (dashboard) {
@@ -153,35 +168,7 @@ function DashboardPage() {
 			clearInterval(changePageNumber);
 		};
 	}, [dashboard]);
-	const ChangeUrl = (url: string) => {
-		const iframeintenral = document.getElementById("dashboardinternal") as myHTMLIFrameElement | null;
-		const dashboardexternal = document.getElementById("dashboardexternal") as myHTMLIFrameElement | null;
-		if (url.match(/^http/)) {
-			if (dashboardexternal) {
-				dashboardexternal.src = url;
-				dashboardexternal.style.display = "inline";
-				if (iframeintenral) {
-					iframeintenral.style.display = "none";
-				}
-			} else {
-				setTimeout(function () {
-					ChangeUrl(url);
-				});
-			}
-		} else {
-			if (iframeintenral && iframeintenral.contentWindow && iframeintenral.contentWindow.changeUrl) {
-				iframeintenral.contentWindow.changeUrl(url);
-				iframeintenral.style.display = "inline";
-				if (dashboardexternal) {
-					dashboardexternal.style.display = "none";
-				}
-			} else {
-				setTimeout(function () {
-					ChangeUrl(url);
-				});
-			}
-		}
-	};
+
 	const ChangeUrlFromPageNumber = () => {
 		if (dashboard && __DASHBOARDS__[dashboard]) {
 			let url = __DASHBOARDS__[dashboard].pages[pageNumber].url;
@@ -191,15 +178,14 @@ function DashboardPage() {
 				url += "?";
 			}
 			url += "isDashboard=true";
-			ChangeUrl(url);
+			setUrl(url);
 		}
 	};
+
 	useEffect(() => {
 		ChangeUrlFromPageNumber();
 	}, [pageNumber]);
 	if (dashboard && __DASHBOARDS__[dashboard]) {
-		const url = "/blank?isDashboard=true";
-		ChangeUrlFromPageNumber();
 		return (
 			<>
 				<Box>
@@ -221,8 +207,15 @@ function DashboardPage() {
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>
-				<DashboardIframe id="dashboardinternal" src={url} allow="fullscreen" windowSize={windowSize} />
-				<DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" windowSize={windowSize} />
+				<DashboardProgress />
+				{url.match(/^http/) && (
+					<DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" windowSize={windowSize} />
+				)}
+				{!url.match(/^http/) && (
+					<DashboardLoadPageWrapper id="loadPage" windowSize={windowSize}>
+						<LoadPage url={url}></LoadPage>
+					</DashboardLoadPageWrapper>
+				)}
 			</>
 		);
 	}

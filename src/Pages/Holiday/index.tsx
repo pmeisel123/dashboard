@@ -42,10 +42,12 @@ const HolidayDuck: FC<{ day: string; name: string }> = ({ day, name }) => {
 	);
 };
 
-const HolidayPage = () => {
+const HolidayPage: FC<{
+	searchParamsOveride?: URLSearchParams;
+}> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const this_year = new Date().getFullYear() + "";
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [year, setYear] = useState<string>(searchParams.get("year") || this_year);
 	const [extended, setExtended] = useState<boolean>(searchParams.get("extended") == "true");
 	const [withJewish, setWithJewish] = useState<boolean>(searchParams.get("withJewish") == "true");

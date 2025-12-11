@@ -121,10 +121,15 @@ function DashboardPage() {
 				</Box>
 				<DashboardProgress />
 				{url.match(/^http/) && (
-					<DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" windowSize={windowSize} />
+					<DashboardIframe
+						id="dashboardexternal"
+						src={url}
+						allow="fullscreen"
+						height={windowSize.height - 62}
+					/>
 				)}
 				{!url.match(/^http/) && (
-					<DashboardLoadPageWrapper id="loadPage" windowSize={windowSize}>
+					<DashboardLoadPageWrapper id="loadPage">
 						<LoadPage url={url}></LoadPage>
 					</DashboardLoadPageWrapper>
 				)}

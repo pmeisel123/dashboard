@@ -3,7 +3,6 @@ import type { DashboardProps } from "@src/Api";
 import { store } from "@src/Api";
 import { DashboardProgress, Duck, LeftNav, TopNav } from "@src/Components";
 import { pages } from "@src/Pages/const";
-import DucksPage from "@src/Pages/Ducks";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";
@@ -17,21 +16,7 @@ const router = createBrowserRouter([
 	{
 		path: "/",
 		element: <Main />,
-		children: [
-			...pages,
-			{
-				path: "/ducks",
-				name: "Ducks",
-				element: <DucksPage />,
-				description: <>DUCKS!</>,
-			},
-			{
-				path: "/blank",
-				name: "Blank",
-				element: <></>,
-				description: <></>,
-			},
-		],
+		children: pages,
 	},
 ]);
 

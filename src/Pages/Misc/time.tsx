@@ -1,27 +1,10 @@
-import { Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { StyledTextfit } from "./const";
 
 export const TimePage = () => {
-	const parentRef = useRef<HTMLDivElement | null>(null);
-	const [fontSize, setFontSize] = useState<number>(16); // Default size
 	const [timeString, setTimeString] = useState<string>("");
 
 	useEffect(() => {
-		const handleResize = () => {
-			let parentWidth = 0;
-			if (parentRef.current) {
-				parentWidth = parentRef.current.clientWidth;
-			} else {
-				parentWidth = window.innerWidth;
-			}
-			const newSize = Math.min(parentWidth * 0.07); // 8% width
-			setFontSize(newSize);
-		};
-
-		handleResize();
-
-		window.addEventListener("resize", handleResize);
-
 		const intervalId = setInterval(() => {
 			const now = new Date();
 			setTimeString(
@@ -35,13 +18,8 @@ export const TimePage = () => {
 		});
 		return () => {
 			clearInterval(intervalId);
-			window.removeEventListener("resize", handleResize);
 		};
 	}, []);
 
-	return (
-		<Typography variant="body1" sx={{ fontSize: `${fontSize}px`, textAlign: "center" }}>
-			{timeString}
-		</Typography>
-	);
+	return <StyledTextfit>{timeString}</StyledTextfit>;
 };

@@ -9,8 +9,8 @@ export const TextPage: FC<{
 	const [searchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [text, setText] = useState<string>(searchParams.get("text") || "");
 	useEffect(() => {
-		setText(searchParams.get("text") || "");
-	}, [searchParams]);
+		setText((searchParamsOveride ? searchParamsOveride.get("text") : searchParams.get("text")) || "");
+	}, [searchParams, searchParamsOveride]);
 
 	return <StyledTextfit>{text}</StyledTextfit>;
 };

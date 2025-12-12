@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyledTextfit } from "./const";
+import {Typography} from '@mui/material';
 
 export const DatePage = () => {
 	const [timeString, setTimeString] = useState<string>("");
@@ -28,5 +29,5 @@ export const DatePage = () => {
 		};
 	}, []);
 
-	return <StyledTextfit>{timeString}</StyledTextfit>;
+	return <Typography noWrap><StyledTextfit>{timeString}</StyledTextfit></Typography>;;
 };

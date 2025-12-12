@@ -2,6 +2,7 @@ import type { HolidayProps } from "@src/Api";
 import { getAllUsHolidays, getDate, getDateStringWithDayOfWeek } from "@src/Api";
 import { formatDistanceToNow } from "date-fns";
 import { StyledTextfit } from "./const";
+import {Typography} from '@mui/material';
 
 export const NextHolidayPage = () => {
 	const year = new Date().getFullYear() + "";
@@ -26,13 +27,13 @@ export const NextHolidayPage = () => {
 
 	if (nextholiday) {
 		return (
-			<StyledTextfit>
+			<Typography noWrap><StyledTextfit>
 				{nextholiday.name} <br /> {getDateStringWithDayOfWeek(new Date(nextholiday.date))}
 				<br />
 				{formatDistanceToNow(getDate(nextholiday.date), {
 					addSuffix: true,
 				})}
-			</StyledTextfit>
+			</StyledTextfit></Typography>
 		);
 	}
 	return null;

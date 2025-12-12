@@ -156,7 +156,7 @@ function Main() {
 					}}
 				/>
 			</Box>
-			{!dashboard && (__DASHBOARD_DUCKS__ || !isDashboard) && <Duck />}
+			{(!dashboard || __DASHBOARD_DUCKS__) && <Duck />}
 		</>
 	);
 }

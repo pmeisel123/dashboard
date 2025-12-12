@@ -117,4 +117,18 @@ export const pages = [
 		description: <>Date</>,
 		requires: false,
 	},
+	{
+		path: "/nextholiday",
+		name: "Next Holiday",
+		element: <Misc.NextHolidayPage />,
+		description: <>Next holiday coming up</>,
+		requires: false,
+	},
+	{
+		path: "/text",
+		name: "Text",
+		element: <Misc.TextPage />,
+		description: <>Show some teext on the page</>,
+		requires: false,
+	},
 ];

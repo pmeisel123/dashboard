@@ -4,6 +4,7 @@ interface DateCellProps {
 	date: string;
 }
 const today = new Date();
+today.setHours(0, 0, 0, 0);
 export const DateRow = styled(TableRow, {
 	shouldForwardProp: (prop) => prop !== "date",
 })<DateCellProps>(({ date, theme }) => ({

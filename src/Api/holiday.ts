@@ -110,6 +110,19 @@ export const getAllHolidays = (year?: string): HolidayProps[] => {
 	return allHolidays[year];
 };
 
+export const getDate = (date_string: string) => {
+	const today = new Date();
+	let date = new Date(date_string);
+	const hours = today.getHours();
+	const minutes = today.getMinutes();
+	const seconds = today.getSeconds();
+	date.setHours(hours);
+	date.setMinutes(minutes);
+	date.setSeconds(seconds);
+
+	return date;
+};
+
 export const getHolidayDayString = (dateObj: Date) => {
 	let month: string | number = dateObj.getUTCMonth() + 1; // months from 1-12
 	let day: string | number = dateObj.getUTCDate();

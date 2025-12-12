@@ -36,13 +36,13 @@ const useParentSize = () => {
 export const StyledTextfit = ({ children }: { children: ReactNode }) => {
 	const { ref, size } = useParentSize();
 	return (
-		<div ref={ref} style={{ height: size.height, width: size.width, textAlign: "center", margin: 'auto' }}>
+		<div ref={ref} style={{ height: size.height, width: size.width, textAlign: "center", margin: "auto" }}>
 			<Textfit
 				key={size.height + "x" + size.width}
 				mode="multi"
 				min={1}
 				max={1000}
-				style={{ height: size.height - 5, width: size.width - 55, margin: 'auto' }}
+				style={{ height: size.height - 5, width: size.width - 55, margin: "auto" }}
 			>
 				{children}
 			</Textfit>

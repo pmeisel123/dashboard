@@ -1,6 +1,6 @@
+import { Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StyledTextfit } from "./const";
-import {Typography} from '@mui/material';
 
 export const TimePage = () => {
 	const [timeString, setTimeString] = useState<string>("");
@@ -22,5 +22,9 @@ export const TimePage = () => {
 		};
 	}, []);
 
-	return <Typography noWrap><StyledTextfit>{timeString}</StyledTextfit></Typography>;
+	return (
+		<Typography noWrap>
+			<StyledTextfit>{timeString}</StyledTextfit>
+		</Typography>
+	);
 };

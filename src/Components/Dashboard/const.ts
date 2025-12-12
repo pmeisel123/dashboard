@@ -1,7 +1,7 @@
 import { LinearProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { pages } from "@src/Pages/pages";
 import { matchRoutes } from "react-router-dom";
-import { pages } from "@src/Pages/const";
 
 declare const __DASHBOARD_SPEED_SECONDS__: number;
 
@@ -48,4 +48,4 @@ export const isExternalLink = (url: string) => {
 		return true;
 	}
 	return false;
-}
+};

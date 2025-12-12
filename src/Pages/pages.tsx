@@ -108,13 +108,13 @@ export const pages = [
 		name: "Time",
 		element: <Misc.TimePage />,
 		description: <>Time</>,
-		//		requires: false,
+		requires: false,
 	},
 	{
 		path: "/date",
 		name: "Date",
 		element: <Misc.DatePage />,
 		description: <>Date</>,
-		//		requires: false,
+		requires: false,
 	},
 ];

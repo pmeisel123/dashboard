@@ -1,6 +1,6 @@
 import { Box, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import { SavePageList } from "@src/Components";
-import { pages } from "@src/Pages/const";
+import { pages } from "@src/Pages/pages";
 import { Link } from "react-router-dom";
 
 function HomePage() {

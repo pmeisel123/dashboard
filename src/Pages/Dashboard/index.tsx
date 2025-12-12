@@ -1,7 +1,7 @@
 import { Box, Button } from "@mui/material";
 import type { DashboardPageProps, DashboardProps } from "@src/Api";
 import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress, ListDashboard } from "@src/Components";
-import { pages } from "@src/Pages/const";
+import { pages } from "@src/Pages/pages";
 import type { FC } from "react";
 import { cloneElement, useEffect, useState } from "react";
 import { Link, matchRoutes, useSearchParams } from "react-router-dom";

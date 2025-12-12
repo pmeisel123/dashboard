@@ -1,6 +1,6 @@
 import { Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMediaQuery, useTheme } from "@mui/material";
 import { SavePageList } from "@src/Components";
-import { pages } from "@src/Pages/const";
+import { pages } from "@src/Pages/pages";
 import type { FC } from "react";
 import { Link, useLocation } from "react-router-dom";
 

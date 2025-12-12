@@ -2,7 +2,7 @@ import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
 import { store } from "@src/Api";
 import { DashboardProgress, Duck, LeftNav, TopNav } from "@src/Components";
-import { pages } from "@src/Pages/const";
+import { pages } from "@src/Pages/pages";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { Provider } from "react-redux";

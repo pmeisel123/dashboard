@@ -46,8 +46,8 @@ export const DatePage = () => {
 	}, []);
 
 	return (
-		<Typography variant="body1" sx={{ fontSize: `${fontSize}px` }}>
-			<center>{timeString}</center>
+		<Typography variant="body1" sx={{ fontSize: `${fontSize}px`, textAlign: "center" }}>
+			{timeString}
 		</Typography>
 	);
 };

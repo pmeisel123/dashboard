@@ -11,21 +11,27 @@ declare const __DASHBOARD_SPEED_SECONDS__: number;
 
 const LoadPage: FC<{
 	url: string;
-}> = ({ url }) => {
+	height: number;
+}> = ({ url, height }) => {
 	const urlObj = new URL(url, "http://random.com");
 	const matches = matchRoutes(pages, {
 		pathname: urlObj.pathname,
 	});
 	const lastMatch = matches ? matches[matches.length - 1] : null;
 	if (!lastMatch || !lastMatch.route.element) {
-		console.log("Bad url" + url);
-		return null;
+		return <LoadUrlIframe url={url} height={height} />;
 	}
 	const params = new URLSearchParams(urlObj.searchParams);
-	console.log(url);
 	return cloneElement(lastMatch.route.element, {
 		searchParamsOveride: params,
 	});
+};
+
+const LoadUrlIframe: FC<{
+	url: string;
+	height: number;
+}> = ({ url, height }) => {
+	return <DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" height={height} />;
 };
 
 const LoadUrl: FC<{
@@ -35,12 +41,10 @@ const LoadUrl: FC<{
 	return (
 		<>
 			<DashboardProgress />
-			{url.match(/^http/) && (
-				<DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" height={height} />
-			)}
+			{url.match(/^http/) && <LoadUrlIframe url={url} height={height} />}
 			{!url.match(/^http/) && (
 				<DashboardLoadPageWrapper id="loadPage">
-					<LoadPage url={url}></LoadPage>
+					<LoadPage url={url} height={height}></LoadPage>
 				</DashboardLoadPageWrapper>
 			)}
 		</>

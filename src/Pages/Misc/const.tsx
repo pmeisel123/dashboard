@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
-import { Textfit } from "react-textfit";
+import type { ReactNode} from "react";
+import { Textfit } from 'react-textfit';
 
 export const StyledTextfit = ({ children }: { children: ReactNode }) => {
 	return (
-		<Textfit min={10} max={200} style={{ height: "100%", width: "100%", textAlign: "center" }}>
-			{children}
-		</Textfit>
+		<div style={{ height: '100%', width: '100%' }}>
+			<Textfit min={1} max={200}>
+				{children}
+			</Textfit>
+		</div>
 	);
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyledTextfit } from "./const";
+import {StyledTextfit} from './const';
 
 export const TimePage = () => {
 	const [timeString, setTimeString] = useState<string>("");
@@ -21,5 +21,9 @@ export const TimePage = () => {
 		};
 	}, []);
 
-	return <StyledTextfit>{timeString}</StyledTextfit>;
+	return (
+		<StyledTextfit>
+			{timeString}
+		</StyledTextfit>
+	);
 };

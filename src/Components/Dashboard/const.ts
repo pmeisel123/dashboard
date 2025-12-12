@@ -1,5 +1,8 @@
 import { LinearProgress } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { matchRoutes } from "react-router-dom";
+import { pages } from "@src/Pages/const";
+
 declare const __DASHBOARD_SPEED_SECONDS__: number;
 
 export const DashboardProgress = styled(LinearProgress)(() => ({
@@ -31,3 +34,18 @@ export const DashboardLoadPageWrapper = styled("div")(() => ({
 	marginTop: "4px",
 	width: "100%",
 }));
+
+export const isExternalLink = (url: string) => {
+	if (url.match(/^http/)) {
+		return true;
+	}
+	const urlObj = new URL(url, "http://random.com");
+	const matches = matchRoutes(pages, {
+		pathname: urlObj.pathname,
+	});
+	const lastMatch = matches ? matches[matches.length - 1] : null;
+	if (!lastMatch || !lastMatch.route.element) {
+		return true;
+	}
+	return false;
+}

@@ -1,11 +1,26 @@
 import { Box, Button } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
-import type { Dispatch, FC, SetStateAction } from "react";
+import type { Dispatch, FC, SetStateAction, ReactNode } from "react";
 import { Fragment } from "react";
 import { Link } from "react-router-dom";
+import { isExternalLink } from './const';
 
 declare const __DASHBOARDS__: { [key: string]: DashboardProps };
 
+const ExternalLink: FC<{to: string, children: ReactNode}> = ({ to, children, ...props }) => {
+	if (isExternalLink(to)) {
+		return (
+			<a href={to} target="_blank" rel="noopener noreferrer" {...props}>
+				{children}
+			</a>
+		);
+	}
+	return (
+		<Link to={to} {...props}>
+			{children}
+		</Link>
+	);
+}
 const ListDashboard: FC<{
 	setDashboard: Dispatch<SetStateAction<string>>;
 }> = ({ setDashboard }) => {
@@ -77,14 +92,29 @@ export const DASHBOARDS: DashboardsProps = {
 						{__DASHBOARDS__[key].name}
 					</Button>
 					<Box>
-						{__DASHBOARDS__[key].pages.map((page) => (
+						{__DASHBOARDS__[key].pages.map((page, index) => (
 							<Box
 								sx={{
 									paddingLeft: 5,
 								}}
-								key={key + page.name}
+								key={index + page.name}
 							>
-								{"url" in page && <Link to={page.url}>{page.name}</Link>}
+								{"url" in page && <ExternalLink to={page.url}>{page.name}</ExternalLink>}
+								{page && "split" in page && (
+									<>
+									{page.name}:
+									{page.pages.map((subpage, subindex) => (
+										<Box
+											sx={{
+												paddingLeft: 5,
+											}}
+											key={index + ' ' + subindex + subpage.name}
+										>
+										<ExternalLink to={subpage.url}>{subpage.name}</ExternalLink>
+										</Box>
+									))}
+									</>
+								)}
 							</Box>
 						))}
 					</Box>

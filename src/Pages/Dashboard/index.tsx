@@ -39,15 +39,14 @@ const LoadUrl: FC<{
 	height: number;
 }> = ({ url, height }) => {
 	return (
-		<>
-			<DashboardProgress />
+		<div style={{ height: height, overflow: "hidden" }}>
 			{url.match(/^http/) && <LoadUrlIframe url={url} height={height} />}
 			{!url.match(/^http/) && (
-				<DashboardLoadPageWrapper id="loadPage">
+				<DashboardLoadPageWrapper id="loadPage" height={height}>
 					<LoadPage url={url} height={height}></LoadPage>
 				</DashboardLoadPageWrapper>
 			)}
-		</>
+		</div>
 	);
 };
 
@@ -163,6 +162,7 @@ function DashboardPage() {
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>
+				<DashboardProgress />
 				{page && "url" in page && <LoadUrl url={getPageUrl(page)} height={windowSize.height} />}
 				{page && "split" in page && page.split == "sideways" && (
 					<>
@@ -213,7 +213,7 @@ function DashboardPage() {
 									outline: "1px solid black",
 								}}
 							>
-								<LoadUrl url={getPageUrl(subpage)} height={windowSize.height} />
+								<LoadUrl url={getPageUrl(subpage)} height={windowSize.height / 2} />
 							</Box>
 						))}
 					</>

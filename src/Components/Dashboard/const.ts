@@ -30,8 +30,11 @@ export const DashboardIframe = styled("iframe", {
 	width: "100%",
 }));
 
-export const DashboardLoadPageWrapper = styled("div")(() => ({
+export const DashboardLoadPageWrapper = styled("div", {
+	shouldForwardProp: (prop) => prop !== "height",
+})<DashboardIframeProps>(({ height }) => ({
 	marginTop: "4px",
+	height: height,
 	width: "100%",
 }));
 

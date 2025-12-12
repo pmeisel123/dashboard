@@ -1,13 +1,14 @@
 import type { ReportNamePaths } from "@src/Api";
 import BranchesPage from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
+import DucksPage from "@src/Pages/Ducks";
 import EstimatorPage from "@src/Pages/Estimator";
 import HolidayPage from "@src/Pages/Holiday";
 import HomePage from "@src/Pages/Home";
+import * as Misc from "@src/Pages/Misc";
 import MyTicketsPage from "@src/Pages/MyTickets";
 import RecentTicketsPage from "@src/Pages/RecentTickets";
 import WhoIsOutPage from "@src/Pages/WhoIsOut";
-import DucksPage from "@src/Pages/Ducks";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -101,5 +102,19 @@ export const pages = [
 		element: <></>,
 		description: <></>,
 		requires: false,
+	},
+	{
+		path: "/time",
+		name: "Time",
+		element: <Misc.TimePage />,
+		description: <>Time</>,
+		//		requires: false,
+	},
+	{
+		path: "/date",
+		name: "Date",
+		element: <Misc.DatePage />,
+		description: <>Date</>,
+		//		requires: false,
 	},
 ];

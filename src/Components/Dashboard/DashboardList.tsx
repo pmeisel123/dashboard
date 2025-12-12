@@ -84,7 +84,7 @@ export const DASHBOARDS: DashboardsProps = {
 								}}
 								key={key + page.name}
 							>
-								<Link to={page.url}>{page.name}</Link>
+								{"url" in page && <Link to={page.url}>{page.name}</Link>}
 							</Box>
 						))}
 					</Box>

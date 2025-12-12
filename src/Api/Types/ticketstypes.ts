@@ -47,25 +47,3 @@ export type CustomFieldsProps = CustomFieldsPropsText | CustomFieldsPropsUser | 
 export interface CustomFieldsObjectProps {
 	[key: string]: CustomFieldsProps;
 }
-
-export interface DashboardPageProps {
-	name: string;
-	url: string;
-}
-
-export interface DashboardProps {
-	key: string;
-	name: string;
-	pages: DashboardPageProps[];
-}
-
-export interface DashboardsProps {
-	[key: string]: DashboardProps;
-}
-
-export interface HolidayProps {
-	name: string;
-	date: string;
-	type: string;
-	bank?: boolean;
-}

@@ -1,8 +1,10 @@
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
 import * as fs from "fs";
 import path from "path";
 import type { ProxyOptions } from "vite";
 import { defineConfig } from "vite";
+
 import {
 	API_KEY,
 	API_URL,
@@ -86,7 +88,9 @@ export default defineConfig({
 			"/linkedin": {
 				target: "https://www.linkedin.com/",
 				changeOrigin: true,
-				rewrite: () => {return "/in/pmeisel/"},
+				rewrite: () => {
+					return "/in/pmeisel/";
+				},
 			},
 			...git_proxies,
 		},
@@ -100,7 +104,7 @@ export default defineConfig({
 			"@src": path.resolve(__dirname, "./src"),
 		},
 	},
-	plugins: [react()],
+	plugins: [react(), basicSsl()],
 	optimizeDeps: {
 		include: ["@mui/x-data-grid"],
 	},

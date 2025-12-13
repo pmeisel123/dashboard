@@ -11,8 +11,6 @@
 		"prettier": "npx prettier --write ."
 	},
 	"dependencies": {
-		"@atlaskit/adf-schema": "^51.5.1",
-		"@atlaskit/renderer": "^124.20.0",
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.1",
 		"@hebcal/cities": "^6.1.0",

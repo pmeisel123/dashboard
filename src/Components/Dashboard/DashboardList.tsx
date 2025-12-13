@@ -85,6 +85,12 @@ export const DASHBOARDS: DashboardsProps = {
 			{Object.keys(__DASHBOARDS__).map((key) => (
 				<Fragment key={key}>
 					<Button
+						sx={{
+							textDecoration: "underline",
+							"&:hover": {
+								textDecoration: "underline",
+							},
+						}}
 						onClick={() => {
 							setDashboard(__DASHBOARDS__[key].key);
 						}}

@@ -86,9 +86,7 @@ export default defineConfig({
 			"/linkedin": {
 				target: "https://www.linkedin.com/",
 				changeOrigin: true,
-				rewrite: () => {
-					return "/in/pmeisel/";
-				},
+				rewrite: () => {return "/in/pmeisel/"},
 			},
 			...git_proxies,
 		},

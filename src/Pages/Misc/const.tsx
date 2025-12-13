@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import type { ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { Textfit } from "react-textfit";
@@ -36,9 +37,8 @@ const useParentSize = () => {
 export const StyledTextfit = ({ children }: { children: ReactNode }) => {
 	const { ref, size } = useParentSize();
 	return (
-		<div ref={ref} style={{ height: size.height, width: size.width, textAlign: "center", margin: "auto" }}>
+		<Box ref={ref} style={{ height: size.height, width: size.width, textAlign: "center", margin: "auto" }}>
 			<Textfit
-				key={size.height + "x" + size.width}
 				mode="multi"
 				min={1}
 				max={1000}
@@ -46,6 +46,6 @@ export const StyledTextfit = ({ children }: { children: ReactNode }) => {
 			>
 				{children}
 			</Textfit>
-		</div>
+		</Box>
 	);
 };

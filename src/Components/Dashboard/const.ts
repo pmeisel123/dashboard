@@ -1,5 +1,4 @@
-import { LinearProgress } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Box, LinearProgress, styled } from "@mui/material";
 import { pages } from "@src/Pages/pages";
 import { matchRoutes } from "react-router-dom";
 
@@ -30,7 +29,7 @@ export const DashboardIframe = styled("iframe", {
 	width: "100%",
 }));
 
-export const DashboardLoadPageWrapper = styled("div", {
+export const DashboardLoadPageWrapper = styled(Box, {
 	shouldForwardProp: (prop) => prop !== "height",
 })<DashboardIframeProps>(({ height }) => ({
 	marginTop: "4px",

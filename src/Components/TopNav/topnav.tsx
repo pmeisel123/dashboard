@@ -1,9 +1,5 @@
 import MenuIcon from "@mui/icons-material/Menu";
-import AppBar from "@mui/material/AppBar";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import { AppBar, Box, Button, IconButton, Toolbar, Typography } from "@mui/material";
 import { SavePageModal } from "@src/Components";
 import type { FC } from "react";
 import { Link } from "react-router-dom"; // From react-router-dom
@@ -27,7 +23,7 @@ const TopNavBar: FC<TopNavBarProps> = ({ toggleLeftNav, toggleHideTitle, hideTit
 					<IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={toggleLeftNav}>
 						<MenuIcon />
 					</IconButton>
-					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+					<Typography variant="h6" component={Box} sx={{ flexGrow: 1 }}>
 						Dashboard
 					</Typography>
 					<SavePageModal />

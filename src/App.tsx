@@ -135,7 +135,7 @@ function Main() {
 			>
 				{!isDashboard && !dashboard && !hideTitle && (
 					<>
-						<Typography variant="h6" component="div">
+						<Typography variant="h6" component={Box}>
 							{currentName}
 						</Typography>
 						<Typography

@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import type { HolidayProps } from "@src/Api";
 import { getAllUsHolidays, getDate, getDateStringWithDayOfWeek } from "@src/Api";
 import { formatDistanceToNow } from "date-fns";
@@ -27,7 +27,7 @@ export const NextHolidayPage = () => {
 
 	if (nextholiday) {
 		return (
-			<Typography noWrap>
+			<Typography noWrap sx={{ height: "100%" }} component={Box}>
 				<StyledTextfit>
 					{nextholiday.name} <br /> {getDateStringWithDayOfWeek(new Date(nextholiday.date))}
 					<br />

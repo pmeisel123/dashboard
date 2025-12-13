@@ -39,14 +39,14 @@ const LoadUrl: FC<{
 	height: number;
 }> = ({ url, height }) => {
 	return (
-		<div style={{ height: height, overflow: "hidden" }}>
+		<Box sx={{ height: height, overflow: "hidden" }}>
 			{url.match(/^http/) && <LoadUrlIframe url={url} height={height} />}
 			{!url.match(/^http/) && (
 				<DashboardLoadPageWrapper id="loadPage" height={height}>
 					<LoadPage url={url} height={height}></LoadPage>
 				</DashboardLoadPageWrapper>
 			)}
-		</div>
+		</Box>
 	);
 };
 
@@ -164,59 +164,33 @@ function DashboardPage() {
 				</Box>
 				<DashboardProgress />
 				{page && "url" in page && <LoadUrl url={getPageUrl(page)} height={windowSize.height} />}
-				{page && "split" in page && page.split == "sideways" && (
-					<>
-						{page.pages.map((subpage, index) => (
-							<Box
-								key={index}
-								sx={{
-									width: windowSize.width / 2,
-									height: windowSize.height,
-									overflow: "hidden",
-									float: "left",
-									outline: "1px solid black",
-								}}
-							>
-								<LoadUrl url={getPageUrl(subpage)} height={windowSize.height} />
-							</Box>
-						))}
-					</>
-				)}
-				{page && "split" in page && page.split == "updown" && (
-					<>
-						{page.pages.map((subpage, index) => (
-							<Box
-								key={index}
-								sx={{
-									width: windowSize.width,
-									height: windowSize.height / 2,
-									overflow: "hidden",
-									float: "left",
-									outline: "1px solid black",
-								}}
-							>
-								<LoadUrl url={getPageUrl(subpage)} height={windowSize.height} />
-							</Box>
-						))}
-					</>
-				)}
-				{page && "split" in page && page.split == "fourways" && (
-					<>
-						{page.pages.map((subpage, index) => (
-							<Box
-								key={index}
-								sx={{
-									width: windowSize.width / 2,
-									height: windowSize.height / 2,
-									overflow: "hidden",
-									float: "left",
-									outline: "1px solid black",
-								}}
-							>
-								<LoadUrl url={getPageUrl(subpage)} height={windowSize.height / 2} />
-							</Box>
-						))}
-					</>
+				{page && "split" in page && (
+					<Box sx={{ marginTop: "5px" }}>
+						{page.pages.map((subpage, index) => {
+							const width =
+								page.split == "sideways" || page.split == "fourways"
+									? windowSize.width / 2
+									: windowSize.width;
+							const height =
+								page.split == "updown" || page.split == "fourways"
+									? windowSize.height / 2
+									: windowSize.height;
+							return (
+								<Box
+									key={index}
+									sx={{
+										width: width,
+										height: height,
+										overflow: "hidden",
+										float: "left",
+										outline: "1px solid black",
+									}}
+								>
+									<LoadUrl url={getPageUrl(subpage)} height={height} />
+								</Box>
+							);
+						})}
+					</Box>
 				)}
 			</>
 		);

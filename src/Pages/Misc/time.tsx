@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StyledTextfit } from "./const";
 
@@ -23,7 +23,7 @@ export const TimePage = () => {
 	}, []);
 
 	return (
-		<Typography noWrap>
+		<Typography noWrap sx={{ height: "100%" }} component={Box}>
 			<StyledTextfit>{timeString}</StyledTextfit>
 		</Typography>
 	);

@@ -1,4 +1,5 @@
 import {
+	Box,
 	Checkbox,
 	FormControlLabel,
 	FormGroup,
@@ -166,8 +167,8 @@ const WhoIsOutPage: FC<{
 		<>
 			{!isDashboard && (
 				<FormGroup>
-					<div
-						style={{
+					<Box
+						sx={{
 							display: "flex",
 							flexDirection: "row",
 							minHeight: "3em",
@@ -190,7 +191,7 @@ const WhoIsOutPage: FC<{
 								}}
 							/>
 						))}
-					</div>
+					</Box>
 				</FormGroup>
 			)}
 			<TableContainer component={Paper}>

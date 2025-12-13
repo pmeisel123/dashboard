@@ -8,11 +8,11 @@ import {
 	ListItemButton,
 	ListItemIcon,
 	ListItemText,
+	Modal,
+	Link as MuiLink,
 	TextField,
+	Typography,
 } from "@mui/material";
-import MuiLink from "@mui/material/Link";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";

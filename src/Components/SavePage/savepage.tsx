@@ -19,7 +19,7 @@ import { Link, useLocation } from "react-router-dom";
 
 // Define the style for the modal content
 const style = {
-	position: "absolute" as "absolute",
+	position: "absolute",
 	top: "50%",
 	left: "50%",
 	transform: "translate(-50%, -50%)",

@@ -129,7 +129,7 @@ function Main() {
 			)}
 			<Box
 				sx={{
-					paddingLeft: isSmallOrLarger ? sideWidth + 20 + "px" : 0,
+					marginLeft: isSmallOrLarger ? sideWidth + 20 + "px" : 0,
 					transition: "padding-left 0.1s",
 				}}
 			>

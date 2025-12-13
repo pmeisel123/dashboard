@@ -78,7 +78,7 @@ export const pages = [
 	},
 	{
 		path: "/dashboard",
-		name: "Dashboard",
+		name: "Dashboards",
 		element: <Dashboard />,
 		description: (
 			<>

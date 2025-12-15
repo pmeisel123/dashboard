@@ -1,13 +1,13 @@
 import { Box, Typography } from "@mui/material";
 import type { HolidayProps } from "@src/Api";
-import { getAllUsHolidays, getDate, getDateStringWithDayOfWeek } from "@src/Api";
-import { formatDistanceToNow } from "date-fns";
+import { getAllUsHolidays, getDate, getDateDistance, getDateStringWithDayOfWeek } from "@src/Api";
 import { StyledTextfit } from "./const";
 
 export const NextHolidayPage = () => {
 	const year = new Date().getFullYear() + "";
 	let holidays = getAllUsHolidays(year);
 	const today = new Date();
+	today.setHours(0, 0, 0);
 
 	let nextholiday: HolidayProps | undefined;
 	holidays.map((holiday) => {
@@ -31,9 +31,7 @@ export const NextHolidayPage = () => {
 				<StyledTextfit>
 					{nextholiday.name} <br /> {getDateStringWithDayOfWeek(new Date(nextholiday.date))}
 					<br />
-					{formatDistanceToNow(getDate(nextholiday.date), {
-						addSuffix: true,
-					})}
+					{getDateDistance(nextholiday.date)}
 				</StyledTextfit>
 			</Typography>
 		);

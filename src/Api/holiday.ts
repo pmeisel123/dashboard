@@ -1,5 +1,6 @@
 import type { CalOptions } from "@hebcal/core";
 import { HebrewCalendar, Location } from "@hebcal/core";
+import { formatDistanceToNow } from "date-fns";
 import holidays from "date-holidays";
 import type { HolidayProps } from "./Types";
 
@@ -121,6 +122,16 @@ export const getDate = (date_string: string) => {
 	date.setSeconds(seconds);
 
 	return date;
+};
+
+export const getDateDistance = (data_string: string) => {
+	const returnValue = formatDistanceToNow(getDate(data_string), {
+		addSuffix: true,
+	});
+	if (returnValue == "less than a minute ago") {
+		return "today";
+	}
+	return returnValue;
 };
 
 export const getHolidayDayString = (dateObj: Date) => {

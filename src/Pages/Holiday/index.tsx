@@ -11,9 +11,15 @@ import {
 	TableRow,
 } from "@mui/material";
 import type { HolidayProps } from "@src/Api";
-import { getAllHolidays, getAllUsHolidays, getDateStringWithDayOfWeek, getHolidays } from "@src/Api";
+import {
+	getAllHolidays,
+	getAllUsHolidays,
+	getDate,
+	getDateDistance,
+	getDateStringWithDayOfWeek,
+	getHolidays,
+} from "@src/Api";
 import { cleanHolidayName, getHolidayDuck } from "@src/Components/Duck/const";
-import { formatDistanceToNow } from "date-fns";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 
@@ -54,7 +60,6 @@ const HolidayPage: FC<{
 	const with_ducks = searchParams.get("withDucks") != null;
 	const year_as_int = parseInt(this_year);
 
-	const today = new Date();
 	const loadParams = () => {
 		setYear(searchParams.get("year") || this_year);
 		setExtended(searchParams.get("extended") == "true");
@@ -69,18 +74,6 @@ const HolidayPage: FC<{
 	for (let val = year_as_int - 1; val <= year_as_int + 10; val++) {
 		years_choices.push(val + "");
 	}
-
-	const getDate = (date_string: string) => {
-		let date = new Date(date_string);
-		const hours = today.getHours();
-		const minutes = today.getMinutes();
-		const seconds = today.getSeconds();
-		date.setHours(hours);
-		date.setMinutes(minutes);
-		date.setSeconds(seconds);
-
-		return date;
-	};
 
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -149,11 +142,7 @@ const HolidayPage: FC<{
 									{with_ducks && <HolidayDuck day={holiday.date} name={holiday.name} />}
 								</TableCell>
 								<TableCell>{getDateStringWithDayOfWeek(getDate(holiday.date))}</TableCell>
-								<TableCell>
-									{formatDistanceToNow(getDate(holiday.date), {
-										addSuffix: true,
-									})}
-								</TableCell>
+								<TableCell>{getDateDistance(holiday.date)}</TableCell>
 							</DateRow>
 						))}
 					</TableBody>

@@ -23,7 +23,7 @@ import {
 } from "./globals";
 import type { ReportNamePaths } from "./src/Api/Types";
 
-const git_proxies: { [key: string]: ProxyOptions } = {};
+const proxies: { [key: string]: ProxyOptions } = {};
 const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};
 GITREPOS.forEach((repo, index: number) => {
 	const repo_path = "/git_" + index;
@@ -35,7 +35,7 @@ GITREPOS.forEach((repo, index: number) => {
 		url: repo.url,
 	};
 
-	git_proxies[repo_path] = {
+	proxies[repo_path] = {
 		target: repo_target,
 		changeOrigin: true,
 		secure: false,
@@ -53,6 +53,21 @@ GITREPOS.forEach((repo, index: number) => {
 		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
+if (API_CONFLUENCE_URL) {
+	proxies["/jirawiki"] = {
+		target: API_CONFLUENCE_URL,
+		changeOrigin: true,
+		headers: {
+			Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
+		},
+		rewrite: (path) => path.replace(/^\/jirawiki/, ""),
+		configure: (proxy) => {
+			proxy.on("proxyRes", (_proxyRes, req) => {
+				console.log("Received Response from Target:", req.url);
+			});
+		},
+	}
+}
 
 const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/
@@ -87,20 +102,7 @@ export default defineConfig({
 					});
 				},
 			},
-			"/jirawiki": {
-				target: API_CONFLUENCE_URL,
-				changeOrigin: true,
-				headers: {
-					Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
-				},
-				rewrite: (path) => path.replace(/^\/jirawiki/, ""),
-				configure: (proxy) => {
-					proxy.on("proxyRes", (_proxyRes, req) => {
-						console.log("Received Response from Target:", req.url);
-					});
-				},
-			},
-			...git_proxies,
+			...proxies,
 		},
 		fs: {
 			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],

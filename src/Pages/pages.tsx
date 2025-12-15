@@ -9,6 +9,7 @@ import * as Misc from "@src/Pages/Misc";
 import MyTicketsPage from "@src/Pages/MyTickets";
 import RecentTicketsPage from "@src/Pages/RecentTickets";
 import WhoIsOutPage from "@src/Pages/WhoIsOut";
+import WikiPage from "@src/Pages/Wiki";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -130,5 +131,11 @@ export const pages = [
 		element: <Misc.TextPage />,
 		description: <>Show some teext on the page</>,
 		requires: false,
+	},
+	{
+		path: "/wiki",
+		name: "Wiki Page",
+		element: <WikiPage />,
+		description: <>Wiki Page</>,
 	},
 ];

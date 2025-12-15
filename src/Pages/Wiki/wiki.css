@@ -1,0 +1,93 @@
+/*Top Bar*/
+.confluence-content-container #header .aui-header {
+	background-color: #bb2222;
+}
+/*Top Bar Text*/
+.aui-header .aui-dropdown2-trigger,
+.confluence-content-container #header .aui-header .aui-nav-link,
+.confluence-content-container #header .aui-header .aui-nav-imagelink,
+.confluence-content-container #header .aui-header a {
+	color: #00cc00;
+}
+/*Header Button Background*/
+.confluence-content-container #header .aui-header .aui-nav .aui-button-primary {
+	background-color: #ff4444;
+}
+/*Header Button Text*/
+.confluence-content-container #header .aui-header .aui-nav .aui-button-primary {
+	color: #00cc00;
+}
+/*Top Bar Menu Selected Background*/
+.confluence-content-container #header .aui-header a:focus,
+.confluence-content-container #header .aui-header a:hover,
+.confluence-content-container #header .aui-header .aui-nav-imagelink:hover,
+.confluence-content-container #header .aui-header a:active {
+	background-color: rgba(100, 9, 9, 0.48);
+}
+/*Top Bar Menu Selected Text*/
+.confluence-content-container #header .aui-header a:focus,
+.confluence-content-container #header .aui-header a:hover,
+.confluence-content-container #header .aui-header .aui-nav-imagelink:hover,
+.confluence-content-container #header .aui-header a:active {
+	color: #ff0000;
+}
+/*Top Bar Menu Item Text*/
+.aui-dropdown2-in-header.aui-style-default a,
+.confluence-content-container .aui-dropdown2-in-header.aui-style-default a:visited,
+.confluence-content-container .aui-dropdown2-in-header.aui-style-default a:link,
+.confluence-content-container .aui-dropdown2-in-header.aui-style-default:hover a,
+.confluence-content-container .aui-dropdown2-in-header.aui-style-default:hover a:visited,
+.confluence-content-container .aui-dropdown2-in-header.aui-style-default:hover a:link {
+	color: #00ff00;
+}
+/*Menu Item Selected Background*/
+.aui-dropdown2.aui-style-default:hover a:not(.aui-dropdown2-disabled):focus,
+.confluence-content-container .aui-dropdown2.aui-style-default:hover a:not(.aui-dropdown2-disabled):hover,
+.confluence-content-container .aui-dropdown2.aui-style-default:hover a.active:not(.aui-dropdown2-disabled),
+.confluence-content-container
+	.aui-dropdown2.aui-style-default:hover
+	.aui-dropdown2-radio:not(.aui-dropdown2-disabled):hover {
+	background-color: #000044;
+}
+/*Menu Item Selected Text*/
+.aui-dropdown2.aui-style-default:hover a:not(.aui-dropdown2-disabled):focus,
+.confluence-content-container .aui-dropdown2.aui-style-default:hover a:not(.aui-dropdown2-disabled):hover,
+.confluence-content-container .aui-dropdown2.aui-style-default:hover a.active:not(.aui-dropdown2-disabled),
+.confluence-content-container
+	.aui-dropdown2.aui-style-default:hover
+	.aui-dropdown2-radio:not(.aui-dropdown2-disabled):hover {
+	color: #ff00ff;
+}
+/*Search Field Background*/
+.aui-header .aui-quicksearch input[type="text"] {
+	background-color: rgba(100, 9, 9, 0.48);
+}
+/*Search Field Text*/
+.aui-header .aui-quicksearch:after,
+.confluence-content-container .aui-header .aui-quicksearch input[type="text"][type="text"]:focus {
+	color: #ff0000;
+}
+/*Heading Text*/
+h1,
+.confluence-content-container h2,
+.confluence-content-container h3,
+.confluence-content-container h4,
+.confluence-content-container .wiki-content h1,
+.confluence-content-container .wiki-content h2,
+.confluence-content-container .wiki-content h3,
+.confluence-content-container .wiki-content h4 {
+	color: #888800;
+}
+/*Links*/
+.wiki-content a,
+.confluence-content-container .wiki-content a:link,
+.confluence-content-container .wiki-content a:visited,
+.confluence-content-container .wiki-content a:focus,
+.confluence-content-container .wiki-content a:hover,
+.confluence-content-container .wiki-content a:active {
+	color: #cc00cc;
+}
+/*Sidebar*/
+.acs-side-bar {
+	background-color: #f4f5f7;
+}

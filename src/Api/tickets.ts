@@ -131,5 +131,3 @@ export const getTicketsApi = async (search: string): Promise<TicketProps[]> => {
 	}
 	return result;
 };
-
-export default function main() {}

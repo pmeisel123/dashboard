@@ -66,7 +66,7 @@ if (API_CONFLUENCE_URL) {
 				console.log("Received Response from Target:", req.url);
 			});
 		},
-	}
+	};
 }
 
 const ducks = fs.readdirSync("./src/assets/ducks/");

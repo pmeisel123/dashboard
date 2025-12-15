@@ -6,7 +6,7 @@ import { getWikiApi } from "./wiki";
 const initialState: { [key: string]: WikiPageProps } = {
 	"": {
 		title: "",
-		body: "Loading",
+		body: "",
 	},
 };
 
@@ -31,7 +31,7 @@ export const wikiSlice = createSlice({
 				if (!state[wikiKey]) {
 					state[wikiKey] = {
 						title: "",
-						body: "Loading " + wikiKey,
+						body: "",
 					};
 				}
 			})

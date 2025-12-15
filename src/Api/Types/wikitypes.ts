@@ -3,7 +3,12 @@ export interface WikiPageProps {
 	body: string;
 }
 
-export interface WikiSpaceProps {
+export interface WikiPagesProps {
 	id: string;
+	title: string;
+}
+
+export interface WikiSpaceProps {
+	key: string;
 	name: string;
 }

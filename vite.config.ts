@@ -6,6 +6,7 @@ import type { ProxyOptions } from "vite";
 import { defineConfig } from "vite";
 
 import {
+	API_CONFLUENCE_URL,
 	API_KEY,
 	API_URL,
 	API_USERNAME,
@@ -58,6 +59,7 @@ const ducks = fs.readdirSync("./src/assets/ducks/");
 export default defineConfig({
 	define: {
 		__API_URL__: JSON.stringify(API_URL),
+		__API_CONFLUENCE_URL__: JSON.stringify(API_CONFLUENCE_URL),
 		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
 		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
@@ -79,6 +81,19 @@ export default defineConfig({
 					Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
 				},
 				rewrite: (path) => path.replace(/^\/jira/, ""),
+				configure: (proxy) => {
+					proxy.on("proxyRes", (_proxyRes, req) => {
+						console.log("Received Response from Target:", req.url);
+					});
+				},
+			},
+			"/jirawiki": {
+				target: API_CONFLUENCE_URL,
+				changeOrigin: true,
+				headers: {
+					Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
+				},
+				rewrite: (path) => path.replace(/^\/jirawiki/, ""),
 				configure: (proxy) => {
 					proxy.on("proxyRes", (_proxyRes, req) => {
 						console.log("Received Response from Target:", req.url);

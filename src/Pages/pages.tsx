@@ -78,6 +78,12 @@ export const pages = [
 		),
 	},
 	{
+		path: "/wiki",
+		name: "Wiki Page",
+		element: <WikiPage />,
+		description: <>Wiki Page</>,
+	},
+	{
 		path: "/dashboard",
 		name: "Dashboards",
 		element: <Dashboard />,
@@ -131,11 +137,5 @@ export const pages = [
 		element: <Misc.TextPage />,
 		description: <>Show some teext on the page</>,
 		requires: false,
-	},
-	{
-		path: "/wiki",
-		name: "Wiki Page",
-		element: <WikiPage />,
-		description: <>Wiki Page</>,
 	},
 ];

@@ -21,7 +21,7 @@ import {
 	PORT,
 	VACATION_KEY,
 } from "./globals";
-import type { ReportNamePaths } from "./src/Api/Types";
+import type { ReportNamePaths, UserEditVacation } from "./src/Api/Types";
 
 const proxies: { [key: string]: ProxyOptions } = {};
 const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};
@@ -99,6 +99,60 @@ export default defineConfig({
 				configure: (proxy) => {
 					proxy.on("proxyRes", (_proxyRes, req) => {
 						console.log("Received Response from Target:", req.url);
+					});
+				},
+			},
+			"/post": {
+				target: "http://127.0.0.1",
+				changeOrigin: true,
+				rewrite: (path) => path.replace(/^\/post/, ""),
+				configure: (proxy) => {
+					proxy.on("proxyReq", (_proxyReq, req, res) => {
+						if (req.method === "POST") {
+							const bodyChunks: Buffer[] = [];
+
+							// 1. Collect stream chunks manually (as proxyReq doesn't support async/await directly)
+							req.on("data", (chunk) => {
+								if (Buffer.isBuffer(chunk)) {
+									bodyChunks.push(chunk);
+								} else if (typeof chunk === "string") {
+									bodyChunks.push(Buffer.from(chunk));
+								}
+							});
+
+							req.on("end", () => {
+								const requestBody = Buffer.concat(bodyChunks).toString();
+								if (req.url === "/vacation" && requestBody) {
+									try {
+										const vacations = JSON.parse(requestBody) as UserEditVacation;
+										let output = "";
+
+										Object.keys(vacations).forEach((key) => {
+											if (vacations[key]) {
+												output += `${key},${vacations[key]}\n`;
+											}
+										});
+
+										const filePath = path.join(process.cwd(), "src/assets", "vacation.csv");
+										fs.writeFileSync(filePath, output, "utf-8");
+										console.log(`File ${filePath} written successfully!`);
+									} catch (error) {
+										console.error("Error processing vacation data:", error);
+									}
+								}
+
+								// 2. IMPORTANT: Re-write the body to the proxy request.
+								// Because we "consumed" req by reading its data, the target server
+								// will receive an empty body unless we write it here.
+								if (requestBody) {
+									res.writeHead(200, { "Content-Type": "text/json" });
+									res.end(requestBody);
+								} else {
+									res.writeHead(200, { "Content-Type": "text/plain" });
+									res.end("Custom message: Proxy prevented by header check.");
+								}
+							});
+						}
 					});
 				},
 			},

@@ -8,4 +8,5 @@ export * from "./ticketsSlice";
 export type * from "./Types";
 export * from "./users";
 export * from "./usersSlice";
+export * from "./vacations";
 export * from "./wiki";

@@ -1,4 +1,5 @@
 import { getHolidayDayString } from "./holiday";
+import type { UserEditVacation } from "./Types";
 
 export const getVacationApi = async () => {
 	let results: { [key: string]: string[] } = {};
@@ -24,4 +25,17 @@ export const getVacationApi = async () => {
 		}
 	});
 	return results;
+};
+
+export const vacationUpdateApi = async (vacations: UserEditVacation) => {
+	const requestOptions = {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(vacations),
+	};
+	const response = await fetch("/post/vacation", requestOptions);
+	const data = await response;
+	return data;
 };

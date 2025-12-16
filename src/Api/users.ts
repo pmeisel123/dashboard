@@ -17,7 +17,7 @@ export const getUserGroupApi = async (userId: string) => {
 	if (ajax_result && ajax_result.groups && ajax_result.groups.items) {
 		ajax_result.groups.items.forEach((group: any) => {
 			let name = group.name;
-			if (!name.match(/(^org|jira|atlassian)/i)) {
+			if (!name.match(/(^org|jira|atlassian|confluence)/i)) {
 				groups.push(group.name);
 			}
 		});
@@ -58,6 +58,7 @@ export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 	let vacations: { [key: string]: string[] } = {};
 	await getVacationApi().then((data) => {
 		vacations = data;
+		console.log(data);
 	});
 
 	while (!last) {

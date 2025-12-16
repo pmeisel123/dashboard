@@ -8,6 +8,7 @@ import HomePage from "@src/Pages/Home";
 import * as Misc from "@src/Pages/Misc";
 import MyTicketsPage from "@src/Pages/MyTickets";
 import RecentTicketsPage from "@src/Pages/RecentTickets";
+import VacationsPage from "@src/Pages/Vacations";
 import WhoIsOutPage from "@src/Pages/WhoIsOut";
 import WikiPage from "@src/Pages/Wiki";
 
@@ -76,6 +77,12 @@ export const pages = [
 				vacations api to automaticlly pull/format the vacation data
 			</>
 		),
+	},
+	{
+		path: "/vacations",
+		name: "Edit Vacations",
+		element: <VacationsPage />,
+		description: <>Edit Vacations and save it to src/assets/vacation.csv</>,
 	},
 	{
 		path: "/wiki",

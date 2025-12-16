@@ -98,3 +98,13 @@ export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 		users: results,
 	};
 };
+
+export const userHasGroup = (user: UserProps, groups: string[]) => {
+	if (!groups.length) {
+		return true;
+	}
+	if (user.groups && user.groups.some((item) => groups.includes(item))) {
+		return true;
+	}
+	return false;
+};

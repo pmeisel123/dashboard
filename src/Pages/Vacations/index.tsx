@@ -13,7 +13,7 @@ import {
 	TextField,
 } from "@mui/material";
 import type { AppDispatch, RootState, UserEditVacation, UserProps } from "@src/Api";
-import { fetchUsersAndGroups, isUserDataRecent, vacationUpdateApi } from "@src/Api";
+import { fetchUsersAndGroups, isUserDataRecent, userHasGroup, vacationUpdateApi } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
 import type { ChangeEvent, FC, FocusEvent } from "react";
 import { useEffect, useState } from "react";
@@ -29,7 +29,7 @@ const VacationPage: FC<{
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [userVacations, setUserVacations] = useState<UserEditVacation>({});
 	let param_groups = searchParams.get("groups");
-	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
+	const [groups, setGroups] = useState<string[]>(param_groups ? param_groups.split(/,/g) : []);
 	const dispatch = useDispatch<AppDispatch>();
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -180,15 +180,20 @@ const VacationPage: FC<{
 					</TableHead>
 					<TableBody>
 						{Object.keys(allJiraUsersGroups.users).map((user_id) => {
-							const user_key = getVacationKey(allJiraUsersGroups.users[user_id]);
+							const user = allJiraUsersGroups.users[user_id];
+							const user_key = getVacationKey(user);
+							if (!userHasGroup(user, groups)) {
+								return;
+							}
 							return (
-								<TableRow key={user_id}>
-									<EstimatorCell sx={{ whiteSpace: "nowrap" }}>
-										{allJiraUsersGroups.users[user_id].name}
-									</EstimatorCell>
-									<EstimatorCell>{allJiraUsersGroups.users[user_id].email}</EstimatorCell>
+								<TableRow
+									key={user_id}
+									sx={{ display: userHasGroup(user, groups) ? "table-row" : "none" }}
+								>
+									<EstimatorCell sx={{ whiteSpace: "nowrap" }}>{user.name}</EstimatorCell>
+									<EstimatorCell>{user.email}</EstimatorCell>
 									<EstimatorCell>
-										{allJiraUsersGroups.users[user_id].vacations && (
+										{user.vacations && (
 											<TextField
 												id="search"
 												value={userVacations[user_key] || ""}
@@ -211,7 +216,7 @@ const VacationPage: FC<{
 				</Table>
 			</TableContainer>
 			<Button variant="contained" onClick={callSave}>
-				Update
+				Save
 			</Button>
 		</>
 	);

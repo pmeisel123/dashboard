@@ -11,7 +11,14 @@ import {
 	TableRow,
 } from "@mui/material";
 import type { AppDispatch, RootState } from "@src/Api";
-import { fetchUsersAndGroups, getAllUsHolidays, getDateString, getHolidayDayString, isUserDataRecent } from "@src/Api";
+import {
+	fetchUsersAndGroups,
+	getAllUsHolidays,
+	getDateString,
+	getHolidayDayString,
+	isUserDataRecent,
+	userHasGroup,
+} from "@src/Api";
 import { EstimatorCell } from "@src/Components";
 import type { ChangeEvent, FC } from "react";
 import { Fragment, useEffect, useState } from "react";
@@ -33,7 +40,7 @@ const WhoIsOutPage: FC<{
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	let param_groups = searchParams.get("groups");
-	const [groups, setGroups] = useState<String[]>(param_groups ? param_groups.split(/,/g) : []);
+	const [groups, setGroups] = useState<string[]>(param_groups ? param_groups.split(/,/g) : []);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
@@ -86,7 +93,7 @@ const WhoIsOutPage: FC<{
 			users = {};
 			Object.keys(allJiraUsersGroups.users).forEach((user_id) => {
 				const user = allJiraUsersGroups.users[user_id];
-				if (user.groups && user.groups.some((item) => groups.includes(item))) {
+				if (userHasGroup(user, groups)) {
 					users[user_id] = user;
 				}
 			});

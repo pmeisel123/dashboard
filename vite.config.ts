@@ -111,7 +111,6 @@ export default defineConfig({
 						if (req.method === "POST") {
 							const bodyChunks: Buffer[] = [];
 
-							// 1. Collect stream chunks manually (as proxyReq doesn't support async/await directly)
 							req.on("data", (chunk) => {
 								if (Buffer.isBuffer(chunk)) {
 									bodyChunks.push(chunk);

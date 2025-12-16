@@ -1,4 +1,4 @@
-import type { WikiPageProps, WikiPagesProps, WikiSpaceProps } from "./Types";
+import type { WikiPageProps, WikiPagesProps, WikiSpaceProps } from "../Types";
 
 export const getWikiApi = async (id: string): Promise<WikiPageProps> => {
 	const url = "/jirawiki/rest/api/content/" + id + "?expand=body.view";

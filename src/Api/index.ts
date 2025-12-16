@@ -9,6 +9,3 @@ export type * from "./Types";
 export * from "./users";
 export * from "./usersSlice";
 export * from "./wiki";
-export * from "./wikiPagesSlice";
-export * from "./wikiSlice";
-export * from "./wikiSpacesSlice";

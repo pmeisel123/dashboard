@@ -1,6 +1,6 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { WikiPagesProps } from "./Types";
+import type { WikiPagesProps } from "../Types";
 import { getWikiPages } from "./wiki";
 
 const initialState: { [key: string]: WikiPagesProps[] } = {

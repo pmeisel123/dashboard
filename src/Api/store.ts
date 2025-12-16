@@ -2,9 +2,9 @@ import { configureStore } from "@reduxjs/toolkit";
 import gitBranchReducer from "./gitSlice";
 import ticketsReducer from "./ticketsSlice";
 import usersGroupReducer from "./usersSlice";
-import wikiPagesReducer from "./wikiPagesSlice";
-import wikiReducer from "./wikiSlice";
-import wikiSpacesReducer from "./wikiSpacesSlice";
+import wikiPagesReducer from "./wiki/wikiPagesSlice";
+import wikiReducer from "./wiki/wikiSlice";
+import wikiSpacesReducer from "./wiki/wikiSpacesSlice";
 
 export const store = configureStore({
 	reducer: {

@@ -1,6 +1,6 @@
 // import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { WikiSpaceProps } from "./Types";
+import type { WikiSpaceProps } from "../Types";
 import { getWikiSpaces } from "./wiki";
 
 const initialState: WikiSpaceProps[] = [];

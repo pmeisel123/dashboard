@@ -84,19 +84,21 @@ export const DASHBOARDS: DashboardsProps = {
 		<>
 			{Object.keys(__DASHBOARDS__).map((key) => (
 				<Fragment key={key}>
-					<Button
-						sx={{
-							textDecoration: "underline",
-							"&:hover": {
+					<div>
+						<Button
+							sx={{
 								textDecoration: "underline",
-							},
-						}}
-						onClick={() => {
-							setDashboard(__DASHBOARDS__[key].key);
-						}}
-					>
-						{__DASHBOARDS__[key].name}
-					</Button>
+								"&:hover": {
+									textDecoration: "underline",
+								},
+							}}
+							onClick={() => {
+								setDashboard(__DASHBOARDS__[key].key);
+							}}
+						>
+							{__DASHBOARDS__[key].name}
+						</Button>
+					</div>
 					<Box>
 						{__DASHBOARDS__[key].pages.map((page, index) => (
 							<Box

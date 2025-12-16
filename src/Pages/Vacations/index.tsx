@@ -215,9 +215,11 @@ const VacationPage: FC<{
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<Button variant="contained" onClick={callSave}>
-				Save
-			</Button>
+			<div>
+				<Button variant="contained" onClick={callSave}>
+					Save
+				</Button>
+			</div>
 		</>
 	);
 };

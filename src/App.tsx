@@ -1,4 +1,4 @@
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import type { DashboardProps } from "@src/Api";
 import { store } from "@src/Api";
 import { DashboardProgress, Duck, LeftNav, TopNav } from "@src/Components";
@@ -150,11 +150,13 @@ function Main() {
 					</>
 				)}
 				{isDashboard && <DashboardProgress />}
-				<Outlet
-					context={{
-						isDashboard: isDashboard || !!dashboard,
-					}}
-				/>
+				<Stack spacing={2}>
+					<Outlet
+						context={{
+							isDashboard: isDashboard || !!dashboard,
+						}}
+					/>
+				</Stack>
 			</Box>
 			{(!dashboard || __DASHBOARD_DUCKS__) && <Duck />}
 		</>

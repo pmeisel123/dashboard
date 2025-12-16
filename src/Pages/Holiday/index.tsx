@@ -107,7 +107,7 @@ const HolidayPage: FC<{
 	return (
 		<>
 			{!isDashboard && (
-				<>
+				<div>
 					<InputLabel id="Year">Year</InputLabel>
 					<Select
 						label="Year"
@@ -115,7 +115,6 @@ const HolidayPage: FC<{
 						onChange={(event) => {
 							setYear(event.target.value);
 						}}
-						sx={{ minWidth: 100 }}
 					>
 						{years_choices.map((year) => (
 							<MenuItem key={year} value={year}>
@@ -123,7 +122,7 @@ const HolidayPage: FC<{
 							</MenuItem>
 						))}
 					</Select>
-				</>
+				</div>
 			)}
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">

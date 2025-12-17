@@ -13,7 +13,7 @@ import WhoIsOutPage from "@src/Pages/WhoIsOut";
 import WikiPage from "@src/Pages/Wiki";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
-
+declare const __ALLOW_VACATION_EDITS__: boolean;
 export const pages = [
 	{
 		path: "/",
@@ -83,6 +83,7 @@ export const pages = [
 		name: "Edit Vacations",
 		element: <VacationsPage />,
 		description: <>Edit Vacations and save it to src/assets/vacation.csv</>,
+		requires: __ALLOW_VACATION_EDITS__,
 	},
 	{
 		path: "/wiki",

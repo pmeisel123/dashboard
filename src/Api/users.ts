@@ -58,7 +58,6 @@ export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 	let vacations: { [key: string]: string[] } = {};
 	await getVacationApi().then((data) => {
 		vacations = data;
-		console.log(data);
 	});
 
 	while (!last) {

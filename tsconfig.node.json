@@ -31,5 +31,5 @@
 		"types": ["node"],
 		"verbatimModuleSyntax": true
 	},
-	"include": ["vite.config.ts", "globals.ts", "src/Api/Types"]
+	"include": ["vite.config.ts", "globals.ts", "src/Api/Types", "src/Server"]
 }

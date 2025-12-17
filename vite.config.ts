@@ -1,11 +1,14 @@
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
 import * as fs from "fs";
+import type { IncomingMessage } from "node:http";
 import path from "path";
 import type { ProxyOptions } from "vite";
 import { defineConfig } from "vite";
+import { Server } from "./src/Server/";
 
 import {
+	ALLOW_VACATION_EDITS,
 	API_CONFLUENCE_URL,
 	API_KEY,
 	API_URL,
@@ -21,7 +24,7 @@ import {
 	PORT,
 	VACATION_KEY,
 } from "./globals";
-import type { ReportNamePaths, UserEditVacation } from "./src/Api/Types";
+import type { ReportNamePaths } from "./src/Api/Types";
 
 const proxies: { [key: string]: ProxyOptions } = {};
 const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};
@@ -69,6 +72,17 @@ if (API_CONFLUENCE_URL) {
 	};
 }
 
+proxies["/server"] = {
+	target: "http://127.0.0.1",
+	changeOrigin: true,
+	rewrite: (path) => path.replace(/^\/server/, ""),
+	configure: (proxy) => {
+		proxy.on("proxyReq", (proxyReq, req: IncomingMessage, res) => {
+			Server(proxyReq, req, res);
+		});
+	},
+};
+
 const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/
 export default defineConfig({
@@ -83,6 +97,7 @@ export default defineConfig({
 		__DUCKS__: JSON.stringify(ducks),
 		__DASHBOARD_DUCKS__: JSON.stringify(DASHBOARD_DUCKS),
 		__GIT_REPOS_PATHS__: JSON.stringify(git_proxies_name_path),
+		__ALLOW_VACATION_EDITS__: JSON.stringify(ALLOW_VACATION_EDITS),
 	},
 	server: {
 		host: "0.0.0.0",
@@ -102,64 +117,11 @@ export default defineConfig({
 					});
 				},
 			},
-			"/post": {
-				target: "http://127.0.0.1",
-				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/post/, ""),
-				configure: (proxy) => {
-					proxy.on("proxyReq", (_proxyReq, req, res) => {
-						if (req.method === "POST") {
-							const bodyChunks: Buffer[] = [];
-
-							req.on("data", (chunk) => {
-								if (Buffer.isBuffer(chunk)) {
-									bodyChunks.push(chunk);
-								} else if (typeof chunk === "string") {
-									bodyChunks.push(Buffer.from(chunk));
-								}
-							});
-
-							req.on("end", () => {
-								const requestBody = Buffer.concat(bodyChunks).toString();
-								if (req.url === "/vacation" && requestBody) {
-									try {
-										const vacations = JSON.parse(requestBody) as UserEditVacation;
-										let output = "";
-
-										Object.keys(vacations).forEach((key) => {
-											if (vacations[key]) {
-												output += `${key},${vacations[key]}\n`;
-											}
-										});
-
-										const filePath = path.join(process.cwd(), "src/assets", "vacation.csv");
-										fs.writeFileSync(filePath, output, "utf-8");
-										console.log(`File ${filePath} written successfully!`);
-									} catch (error) {
-										console.error("Error processing vacation data:", error);
-									}
-								}
-
-								// 2. IMPORTANT: Re-write the body to the proxy request.
-								// Because we "consumed" req by reading its data, the target server
-								// will receive an empty body unless we write it here.
-								if (requestBody) {
-									res.writeHead(200, { "Content-Type": "text/json" });
-									res.end(requestBody);
-								} else {
-									res.writeHead(200, { "Content-Type": "text/plain" });
-									res.end("Custom message: Proxy prevented by header check.");
-								}
-							});
-						}
-					});
-				},
-			},
 			...proxies,
 		},
 		fs: {
-			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],
 			allow: ["src", "node_modules", "index.html"],
+			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "**/src/Server/**"],
 		},
 	},
 	resolve: {

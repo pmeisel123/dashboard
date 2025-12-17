@@ -35,7 +35,7 @@ export const vacationUpdateApi = async (vacations: UserEditVacation) => {
 		},
 		body: JSON.stringify(vacations),
 	};
-	const response = await fetch("/post/vacation", requestOptions);
+	const response = await fetch("/server/vacation", requestOptions);
 	const data = await response;
 	return data;
 };

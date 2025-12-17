@@ -73,7 +73,7 @@ if (API_CONFLUENCE_URL) {
 }
 
 proxies["/server"] = {
-	target: "http://127.0.0.1",
+	target: "http://127.0.0.1:" + PORT,
 	changeOrigin: true,
 	rewrite: (path) => path.replace(/^\/server/, ""),
 	configure: (proxy) => {

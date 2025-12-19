@@ -39,3 +39,11 @@ export interface ReposProps {
 	name: string;
 	url: string;
 }
+
+export interface BranchCommit {
+	sha: string;
+	message: string;
+	ticket: string | null;
+	creator: string;
+	date: string;
+}

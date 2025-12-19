@@ -1,4 +1,4 @@
-import type { BranchesAndTicket, GitBranch, ReportNamePaths, TicketCache } from "./Types";
+import type { BranchCommit, BranchesAndTicket, GitBranch, ReportNamePaths, TicketCache } from "./Types";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -130,4 +130,55 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 		branches: branches,
 		loaded: null,
 	};
+};
+
+export const getBranchesCompare = async (
+	repo_name: string,
+	branch1: string,
+	branch2: string,
+): Promise<BranchCommit[]> => {
+	const results: BranchCommit[] = [];
+	if (branch1 == branch2 || !branch1 || !branch2 || !repo_name) {
+		return results;
+	}
+	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+	const path = repo.path;
+	const url = path + "/compare/" + branch1 + "..." + branch2;
+	let response = await fetch(url, paramaters);
+	let dedup: { [key: string]: boolean } = {};
+	const ajax_result: any = await response.json();
+	if (ajax_result && ajax_result.commits) {
+		ajax_result.commits.forEach((commit: any) => {
+			let subcommit = commit.commit;
+			let creator = "";
+			let date = subcommit.author.date;
+			let ticket: null | string = null;
+			if (subcommit.author && subcommit.author.email && !subcommit.author.email.match(/noreply/)) {
+				creator = subcommit.author.email.replace(/@.*/, "");
+				date = subcommit.author.date;
+			}
+			if (subcommit.committer && subcommit.committer.email && !subcommit.committer.email.match(/noreply/)) {
+				creator = subcommit.committer.email.replace(/@.*/, "");
+				date = subcommit.committer.date;
+			}
+			const sha = commit.sha;
+			const message = subcommit.message;
+			const matches = message.match(/^([A-Z]+-[0-9]+)/);
+			if (matches) {
+				ticket = matches[1];
+			}
+			const key = message + " ---- " + creator + "----" + new Date(date).toDateString();
+			if (!dedup[key]) {
+				dedup[key] = true;
+				results.push({
+					sha: sha,
+					message: message,
+					ticket: ticket,
+					creator: creator,
+					date: date,
+				});
+			}
+		});
+	}
+	return results;
 };

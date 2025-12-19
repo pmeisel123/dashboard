@@ -44,6 +44,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let timespent: number | null = fields.timespent;
 		let parentkey: string | null = null;
 		let parentname: string | null = null;
+		let labels: string[] | null = fields.labels;
 		let isdone: boolean = !!status && __DONE_STATUS__.includes(status);
 		if (isdone) {
 			timeestimate = 0;
@@ -86,6 +87,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			parentkey: parentkey,
 			parentname: parentname,
 			isdone: isdone,
+			labels: labels,
 			customFields: custom_fields,
 		};
 	}
@@ -100,7 +102,7 @@ export const getTicketsApi = async (search: string): Promise<TicketProps[]> => {
 	const main_url =
 		"/jira/rest/api/3/search/jql?maxResults=5000&validateQuery=1&fields=" +
 		extra_fields +
-		"key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent&jql=" +
+		"key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent,labels&jql=" +
 		encodeURI(search);
 	let last = false;
 	let result: TicketProps[] = [];

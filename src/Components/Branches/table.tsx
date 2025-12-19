@@ -24,7 +24,6 @@ import { useLocation } from "react-router-dom";
 import type { rowProp } from "./const";
 
 declare const __API_URL__: string;
-const API_URL = __API_URL__;
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -94,7 +93,11 @@ const BranchesTable: FC<{
 			field: "ticket_key",
 			headerName: "Ticket Key",
 			renderCell: (params: GridRenderCellParams<rowProp>) => (
-				<Link href={(API_URL + "/browse/" + params.value) as string} target="_blank" rel="noopener noreferrer">
+				<Link
+					href={(__API_URL__ + "/browse/" + params.value) as string}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					{params.value}
 				</Link>
 			),
@@ -105,7 +108,7 @@ const BranchesTable: FC<{
 			headerName: "Ticket Summary",
 			renderCell: (params: GridRenderCellParams<rowProp>) => (
 				<Link
-					href={(API_URL + "/browse/" + params.row.ticket_key) as string}
+					href={(__API_URL__ + "/browse/" + params.row.ticket_key) as string}
 					target="_blank"
 					rel="noopener noreferrer"
 				>

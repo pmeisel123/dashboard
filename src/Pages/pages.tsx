@@ -1,5 +1,5 @@
 import type { ReportNamePaths } from "@src/Api";
-import BranchesPage from "@src/Pages/Branches";
+import { BranchesComparePage, BranchesPage } from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import DucksPage from "@src/Pages/Ducks";
 import EstimatorPage from "@src/Pages/Estimator";
@@ -51,6 +51,13 @@ export const pages = [
 		name: "Branches",
 		element: <BranchesPage />,
 		description: <>List all the git repositories and their respective branches.</>,
+		requires: !!Object.keys(__GIT_REPOS_PATHS__).length,
+	},
+	{
+		path: "/branchesCompare",
+		name: "Compare Branches",
+		element: <BranchesComparePage />,
+		description: <>Find all commits in one branch and not the other</>,
 		requires: !!Object.keys(__GIT_REPOS_PATHS__).length,
 	},
 	{

@@ -18,6 +18,7 @@ export interface TicketProps {
 	parentname: string | null;
 	isdone: boolean;
 	customFields: { [key: string]: string | null };
+	labels: string[] | null;
 }
 
 interface BaseCustomFieldProps {

@@ -153,6 +153,16 @@ const TicketTable: FC<{
 		},
 		{ field: "assignee", headerName: "assignee", flex: 1 },
 		{ field: "creator", headerName: "creator", flex: 1 },
+		{
+			field: "labels",
+			headerName: "labels",
+			flex: 1,
+			valueGetter: (_params, row) => {
+				if (row.labels) {
+					return row.labels.join(",");
+				}
+			},
+		},
 		{ field: "status", headerName: "status" },
 		{
 			field: "created",
@@ -398,6 +408,7 @@ const TicketTable: FC<{
 					"parentkey",
 					"assignee",
 					"status",
+					"labels",
 					"parentkey",
 					"timeestimate",
 					"summary",

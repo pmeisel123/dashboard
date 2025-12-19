@@ -10,7 +10,6 @@ export const API_KEY = ''; // API Key for Jira
 export const API_URL = '/'; // URL fir Jira Example: https://pmeisel.atlassian.net/
 export const API_CONFLUENCE_URL = ''; // URL for Confluence Example: https://pmeisel.atlassian.net/wiki
 export const API_USERNAME = ''; // Email address used to create the jira api key
-export const VACATION_KEY: ('email' | 'name') = 'email'; // How Jira Users and vacation api link user (by name or by email)
 export const DONE_STATUS = ['Done']; // All the status for marking a ticket as closed
 export const CUSTOM_FIELDS: CustomFieldsObjectProps = {}; // Custom fields for Jira Ticket
 /* Example
@@ -141,3 +140,7 @@ export const DASHBOARDS: DashboardsProps = {
 	},
 };
 export const DASHBOARD_DUCKS = true; // Leave as true (or set to false turn off the ducks on the dashboard, but where is the fun in that?)
+
+// Vacation
+export const VACATION_KEY: ('email' | 'name') = 'email'; // How Jira Users and vacation api link user (by name or by email)
+export const ALLOW_VACATION_EDITS = true; // Allows vacation.csv to be editted in the app

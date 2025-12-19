@@ -148,7 +148,7 @@ export const getBranchesCompare = async (
 	let dedup: { [key: string]: boolean } = {};
 	const ajax_result: any = await response.json();
 	if (ajax_result && ajax_result.commits) {
-		ajax_result.commits.forEach((commit: any) => {
+		ajax_result.commits.reverse().forEach((commit: any) => {
 			let subcommit = commit.commit;
 			let creator = "";
 			let date = subcommit.author.date;

@@ -252,9 +252,6 @@ const BranchesComparePage: FC<{
 
 	useEffect(() => {
 		let newColumnModel = getTicketColumns(localStorageName, columns);
-		if (!newColumnModel.GridSortModel.length) {
-			newColumnModel.GridSortModel = [{ field: "date", sort: "asc" }];
-		}
 		setColumnModel(newColumnModel);
 	}, []);
 	if (!Object.keys(ticketsBranches.branches).length) {

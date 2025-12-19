@@ -92,6 +92,8 @@ const BranchesComparePage: FC<{
 			getBranchesCompare(repo, branch1, branch2).then((data: BranchCommit[]) => {
 				setCommits(data);
 			});
+		} else {
+			setCommits([]);
 		}
 	}, [repo, branch1, branch2]);
 
@@ -135,7 +137,7 @@ const BranchesComparePage: FC<{
 		{
 			field: "message",
 			headerName: "Commit Mesage",
-			flex: 3,
+			flex: 6,
 			renderCell: (params: GridRenderCellParams<BranchCommit>) => {
 				const url = __GIT_REPOS_PATHS__[repo].url + "/commit/" + params.row.sha;
 				return (
@@ -148,6 +150,7 @@ const BranchesComparePage: FC<{
 		{
 			field: "date",
 			headerName: "Commit Date",
+			flex: 1,
 			valueGetter: (_params, row) => {
 				if (row.date) {
 					return new Date(row.date);
@@ -188,7 +191,7 @@ const BranchesComparePage: FC<{
 					);
 				}
 			},
-			flex: 2,
+			flex: 4,
 		},
 		{
 			field: "ticket_labels",
@@ -213,7 +216,7 @@ const BranchesComparePage: FC<{
 					return <>{user_name}</>;
 				}
 			},
-			flex: 1,
+			flex: 2,
 		},
 	];
 
@@ -263,7 +266,13 @@ const BranchesComparePage: FC<{
 				<Grid>
 					<br />
 					<InputLabel id="user">Repo</InputLabel>
-					<Select label="repo" value={repo}>
+					<Select
+						label="repo"
+						value={repo}
+						onChange={(event) => {
+							setRepo(event.target.value);
+						}}
+					>
 						{Object.keys(ticketsBranches.branches).map((value: string) => (
 							<MenuItem key={value} value={value}>
 								{value}
@@ -308,10 +317,13 @@ const BranchesComparePage: FC<{
 					</Select>
 				</Grid>
 				<Grid>
+					&nbsp;
+					<InputLabel id="none">&nbsp;</InputLabel>
 					<Button
 						onClick={() => {
+							const orig = branch1; // Technically not needed, but makes me feel better
 							setBranch1(branch2);
-							setBranch2(branch1);
+							setBranch2(orig);
 						}}
 					>
 						Swap

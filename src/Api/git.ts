@@ -143,7 +143,7 @@ export const getBranchesCompare = async (
 	}
 	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
 	const path = repo.path;
-	const url = path + "/compare/" + branch1 + "..." + branch2;
+	const url = path + "/compare/" + branch2 + "..." + branch1;
 	let response = await fetch(url, paramaters);
 	let dedup: { [key: string]: boolean } = {};
 	const ajax_result: any = await response.json();

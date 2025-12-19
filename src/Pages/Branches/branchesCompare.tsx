@@ -11,6 +11,7 @@ import type {
 	AppDispatch,
 	BranchCommit,
 	BranchesAndTicket,
+	ReportNamePaths,
 	RootState,
 	TicketProps,
 	UsersGroupPropsSlice,
@@ -32,6 +33,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
 declare const __API_URL__: string;
+declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
+
 const BranchesComparePage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
@@ -129,7 +132,19 @@ const BranchesComparePage: FC<{
 		}
 	});
 	let columns: GridColDef<BranchCommit>[] = [
-		{ field: "message", headerName: "Commit Mesage", flex: 3 },
+		{
+			field: "message",
+			headerName: "Commit Mesage",
+			flex: 3,
+			renderCell: (params: GridRenderCellParams<BranchCommit>) => {
+				const url = __GIT_REPOS_PATHS__[repo].url + "/commit/" + params.row.sha;
+				return (
+					<Link href={url} target="_blank" rel="noopener noreferrer">
+						{params.row.message}
+					</Link>
+				);
+			},
+		},
 		{
 			field: "date",
 			headerName: "Commit Date",

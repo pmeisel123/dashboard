@@ -1,8 +1,8 @@
-import type { ClientRequest, IncomingMessage, ServerResponse } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { VacationServer } from "./vacation";
 
 export const ServerMap = (req: IncomingMessage, requestBody: string | null) => {
-	if (req.url === "/vacation") {
+	if (req.url === "/server/vacation") {
 		return VacationServer(req, requestBody);
 	}
 	return false;
@@ -10,7 +10,7 @@ export const ServerMap = (req: IncomingMessage, requestBody: string | null) => {
 
 // this is a little hacky but it converts an proxy request into a server side node request
 // without having a second instance of node running
-export const Server = (_proxyReq: ClientRequest, req: IncomingMessage, res: ServerResponse) => {
+export const Server = (req: IncomingMessage, res: ServerResponse) => {
 	const bodyChunks: Buffer[] = [];
 
 	req.on("data", (chunk) => {
@@ -33,8 +33,9 @@ export const Server = (_proxyReq: ClientRequest, req: IncomingMessage, res: Serv
 				res.end(requestBody);
 			} else {
 				res.writeHead(200, { "Content-Type": "text/plain" });
-				res.end("Custom message: Proxy prevented by header check.");
+				res.end("Proxy prevented");
 			}
 		}
+		return;
 	});
 };

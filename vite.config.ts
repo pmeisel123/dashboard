@@ -1,7 +1,7 @@
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
 import * as fs from "fs";
-import type { IncomingMessage } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "path";
 import type { ProxyOptions } from "vite";
 import { defineConfig } from "vite";
@@ -75,11 +75,15 @@ if (API_CONFLUENCE_URL) {
 proxies["/server"] = {
 	target: "http://127.0.0.1:" + PORT,
 	changeOrigin: true,
-	rewrite: (path) => path.replace(/^\/server/, ""),
-	configure: (proxy) => {
-		proxy.on("proxyReq", (proxyReq, req: IncomingMessage, res) => {
-			Server(proxyReq, req, res);
+	bypass: async (req: IncomingMessage, res: ServerResponse | undefined) => {
+		if (!res) return;
+		await new Promise<void>((resolve) => {
+			Server(req, res);
+			req.on("end", () => {
+				resolve();
+			});
 		});
+		return false;
 	},
 };
 

@@ -150,7 +150,7 @@ export const getBranchesCompare = async (
 	if (ajax_result && ajax_result.commits) {
 		ajax_result.commits.reverse().forEach((commit: any) => {
 			let subcommit = commit.commit;
-			let creator = "";
+			let creator = subcommit.author.name;
 			let date = subcommit.author.date;
 			let ticket: null | string = null;
 			if (subcommit.author && subcommit.author.email && !subcommit.author.email.match(/noreply/)) {

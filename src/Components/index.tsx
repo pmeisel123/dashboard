@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 export * from "./Branches";
+export * from "./Commits";
 export * from "./const";
 export * from "./Dashboard";
 export * from "./Duck";

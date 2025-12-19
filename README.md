@@ -5,17 +5,17 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 
 ## Pages & Features
 
-| Path           | Description                                                                                                                                                                                                           |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| /              | Landing Page for the application.                                                                                                                                                                                     |
-| /Estimator     | Calculate approximate project completion dates based on Jira ticket estimates, user selection, upcoming vacations, and holidays. Useful for project planning.                                                         |
-| /MyTickets     | View tickets assigned to a specific user. The selected user is saved to local storage for convenience.                                                                                                                |
-| /RecentTickets | Find tickets that were recently filed.                                                                                                                                                                                |
-| /branches      | List all the git repositories and their respective branches.                                                                                                                                                          |
-| /branchesCompare | Show all commits to one branch that is not in another branch |
-| /holidays      | Display US bank holidays by year. To change the default filters, edit `src/API/holiday.ts` > `getHolidays`.                                                                                                           |
-| /whoisout      | Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from `src/assets/vacation.csv` via `src/API/vacations.tsx`. Need to pull vacations from your HR site.                             |
-| /dashboard     | Dashboards are configured within the `globals.ts` file. When a dashboard is loaded, the page will automatically switch between different pages. This is useful for displaying information on internal office screens. |
+| Path             | Description                                                                                                                                                                                                           |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| /                | Landing Page for the application.                                                                                                                                                                                     |
+| /Estimator       | Calculate approximate project completion dates based on Jira ticket estimates, user selection, upcoming vacations, and holidays. Useful for project planning.                                                         |
+| /MyTickets       | View tickets assigned to a specific user. The selected user is saved to local storage for convenience.                                                                                                                |
+| /RecentTickets   | Find tickets that were recently filed.                                                                                                                                                                                |
+| /branches        | List all the git repositories and their respective branches.                                                                                                                                                          |
+| /branchesCompare | Show all commits to one branch that is not in another branch                                                                                                                                                          |
+| /holidays        | Display US bank holidays by year. To change the default filters, edit `src/API/holiday.ts` > `getHolidays`.                                                                                                           |
+| /whoisout        | Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from `src/assets/vacation.csv` via `src/API/vacations.tsx`. Need to pull vacations from your HR site.                             |
+| /dashboard       | Dashboards are configured within the `globals.ts` file. When a dashboard is loaded, the page will automatically switch between different pages. This is useful for displaying information on internal office screens. |
 
 ## Install
 

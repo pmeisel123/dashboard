@@ -63,10 +63,10 @@ if (API_CONFLUENCE_URL) {
 		headers: {
 			Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
 		},
-		rewrite: (path) => path.replace(/^\/jirawiki/, ""),
+		rewrite: (path) => path.replace(/^\/jirawiki\//, ""),
 		configure: (proxy) => {
 			proxy.on("proxyRes", (_proxyRes, req) => {
-				console.log("Received Response from Target:", req.url);
+				console.log("Received Response from Target:", API_CONFLUENCE_URL + req.url);
 			});
 		},
 	};
@@ -108,13 +108,13 @@ export default defineConfig({
 		port: PORT,
 		allowedHosts: [HOST],
 		proxy: {
-			"/jira": {
+			"/jira/": {
 				target: API_URL,
 				changeOrigin: true,
 				headers: {
 					Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
 				},
-				rewrite: (path) => path.replace(/^\/jira/, ""),
+				rewrite: (path) => path.replace(/^\/jira\//, ""),
 				configure: (proxy) => {
 					proxy.on("proxyRes", (_proxyRes, req) => {
 						console.log("Received Response from Target:", req.url);

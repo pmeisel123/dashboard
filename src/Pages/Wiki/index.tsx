@@ -66,6 +66,11 @@ const WikiPage: FC<{
 		}
 	}, [pageId, spaceKey]);
 
+	const wiki_directory = __API_CONFLUENCE_URL__.replace(/https?:\/\/[^/]*/, '');
+	const wiki_regex1 = new RegExp('"' + wiki_directory, 'g');
+	const wiki_regex2 = new RegExp("'" + wiki_directory, 'g');
+	console.log(wiki_directory);
+
 	return (
 		<>
 			{!isDashboard && wikiSpaces && !!wikiSpaces.length && (
@@ -97,8 +102,8 @@ const WikiPage: FC<{
 							<FormControl size="small">
 								<InputLabel id="Page">Page</InputLabel>
 								{!!loading && (
-									<Select label="Page" value={""} sx={{ minWidth: 100 }}>
-										<MenuItem key={""} value={""}>
+									<Select label="Page" value="" sx={{ minWidth: 100 }}>
+										<MenuItem key="" value="">
 											Loading
 										</MenuItem>
 									</Select>
@@ -147,7 +152,7 @@ const WikiPage: FC<{
 					<h1>{wiki.title}</h1>
 					<div
 						className="confluence-content"
-						dangerouslySetInnerHTML={{ __html: wiki.body.replace(/"\/wiki/g, '"/jirawiki') }}
+						dangerouslySetInnerHTML={{ __html: wiki.body.replace(wiki_regex1, '"/jirawiki/').replace(wiki_regex2, "'/jirawiki/") }}
 					/>
 				</>
 			)}

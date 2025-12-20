@@ -1,5 +1,5 @@
 import { Button, Grid, InputLabel, MenuItem, Select } from "@mui/material";
-import type { BranchesAndTicket } from "@src/Api";
+import type { BranchesAndTicket, GitRelease } from "@src/Api";
 import type { Dispatch, FC, SetStateAction } from "react";
 
 export const CommitsSelector: FC<{
@@ -9,8 +9,9 @@ export const CommitsSelector: FC<{
 	setRepo: Dispatch<SetStateAction<string>>;
 	setBranch1: Dispatch<SetStateAction<string>>;
 	setBranch2: Dispatch<SetStateAction<string>>;
+	releases: GitRelease[];
 	ticketsBranches: BranchesAndTicket;
-}> = ({ repo, branch1, branch2, setRepo, setBranch1, setBranch2, ticketsBranches }) => {
+}> = ({ repo, branch1, branch2, setRepo, setBranch1, setBranch2, releases, ticketsBranches }) => {
 	return (
 		<Grid container spacing={2} sx={{ paddingBottom: 1 }}>
 			<Grid>
@@ -41,6 +42,12 @@ export const CommitsSelector: FC<{
 						setBranch1(event.target.value);
 					}}
 				>
+					{!!releases.length &&
+						releases.reverse().map((release, index) => (
+							<MenuItem key={index} value={release.tag.name}>
+								release/{release.name} ({release.tag.name})
+							</MenuItem>
+						))}
 					{repo &&
 						!!Object.keys(ticketsBranches.branches).length &&
 						ticketsBranches.branches[repo].map((value) => (
@@ -61,6 +68,12 @@ export const CommitsSelector: FC<{
 						setBranch2(event.target.value);
 					}}
 				>
+					{!!releases.length &&
+						releases.reverse().map((release, index) => (
+							<MenuItem key={index + "--" + release.name} value={release.tag.name}>
+								release/{release.name} ({release.tag.name})
+							</MenuItem>
+						))}
 					{repo &&
 						!!Object.keys(ticketsBranches.branches).length &&
 						ticketsBranches.branches[repo].map((value) => (

@@ -1,5 +1,5 @@
-import type { AppDispatch, BranchCommit, BranchesAndTicket, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, getBranchesCompare, isGitDataRecent } from "@src/Api";
+import type { AppDispatch, BranchCommit, BranchesAndTicket, GitRelease, RootState, TicketProps } from "@src/Api";
+import { fetchBranches, fetchTickets, getBranchesCompare, getReleases, isGitDataRecent } from "@src/Api";
 import { CommitsSelector, CommitsTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ const BranchesComparePage: FC<{
 	const [tickets, setTickets] = useState<{ [key: string]: TicketProps }>({});
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const [releases, setReleases] = useState<GitRelease[]>([]);
 
 	const loadParams = () => {
 		setRepo(searchParams.get("repo") || "");
@@ -94,6 +95,12 @@ const BranchesComparePage: FC<{
 		}
 	}, [dispatch]);
 	useEffect(() => {
+		getReleases(repo).then((data: GitRelease[]) => {
+			setReleases(data);
+			console.log(data);
+		});
+	}, [repo]);
+	useEffect(() => {
 		if (ticketsBranches.branches && Object.keys(ticketsBranches.branches).length == 1) {
 			setRepo(Object.keys(ticketsBranches.branches)[0]);
 		}
@@ -111,6 +118,7 @@ const BranchesComparePage: FC<{
 				setBranch1={setBranch1}
 				setBranch2={setBranch2}
 				ticketsBranches={ticketsBranches}
+				releases={releases}
 			/>
 			{repo && branch1 && branch2 && (
 				<CommitsTable

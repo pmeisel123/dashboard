@@ -1,4 +1,12 @@
-import type { BranchCommit, BranchesAndTicket, GitBranch, ReportNamePaths, TicketCache } from "./Types";
+import type {
+	BranchCommit,
+	BranchesAndTicket,
+	GitBranch,
+	GitRelease,
+	GitTag,
+	ReportNamePaths,
+	TicketCache,
+} from "./Types";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
@@ -130,6 +138,52 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 		branches: branches,
 		loaded: null,
 	};
+};
+
+export const getTags = async (repo_url: string): Promise<{ [key: string]: GitTag }> => {
+	const url = repo_url + "/tags";
+	let response = await fetch(url, paramaters);
+	const ajax_result: any = await response.json();
+	let results: { [key: string]: GitTag } = {};
+	if (ajax_result && ajax_result.length) {
+		ajax_result.forEach((tag: any) => {
+			results[tag.name] = {
+				name: tag.name,
+				commit: tag.commit,
+			};
+		});
+	}
+	return results;
+};
+
+export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
+	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+	const repo_url = repo.path;
+	const tags = await getTags(repo_url);
+	const url = repo_url + "/releases";
+	let response = await fetch(url, paramaters);
+	let results: GitRelease[] = [];
+	const ajax_result: any = await response.json();
+	if (ajax_result && ajax_result.length) {
+		ajax_result.forEach((release: any) => {
+			if (!release.tag_name) {
+				return;
+			}
+			const tag = tags[release.tag_name];
+			let creator = "";
+			if (release.author) {
+				creator = release.author.login;
+			}
+			results.push({
+				name: release.name,
+				tag: tag,
+				creator: creator,
+				publishDate: release.created_at,
+				body: release.body,
+			});
+		});
+	}
+	return results;
 };
 
 export const getBranchesCompare = async (

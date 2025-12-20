@@ -50,7 +50,7 @@ GITREPOS.forEach((repo, index: number) => {
 		},
 		configure: (proxy) => {
 			proxy.on("proxyRes", (_proxyRes, req) => {
-				console.log("Received Response from Target:", req.url);
+				console.log("Received Response from Target:", repo_target + req.url);
 			});
 		},
 		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),

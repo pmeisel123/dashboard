@@ -66,9 +66,9 @@ const WikiPage: FC<{
 		}
 	}, [pageId, spaceKey]);
 
-	const wiki_directory = __API_CONFLUENCE_URL__.replace(/https?:\/\/[^/]*/, '');
-	const wiki_regex1 = new RegExp('"' + wiki_directory, 'g');
-	const wiki_regex2 = new RegExp("'" + wiki_directory, 'g');
+	const wiki_directory = __API_CONFLUENCE_URL__.replace(/https?:\/\/[^/]*/, "");
+	const wiki_regex1 = new RegExp('"' + wiki_directory, "g");
+	const wiki_regex2 = new RegExp("'" + wiki_directory, "g");
 	console.log(wiki_directory);
 
 	return (
@@ -152,7 +152,9 @@ const WikiPage: FC<{
 					<h1>{wiki.title}</h1>
 					<div
 						className="confluence-content"
-						dangerouslySetInnerHTML={{ __html: wiki.body.replace(wiki_regex1, '"/jirawiki/').replace(wiki_regex2, "'/jirawiki/") }}
+						dangerouslySetInnerHTML={{
+							__html: wiki.body.replace(wiki_regex1, '"/jirawiki/').replace(wiki_regex2, "'/jirawiki/"),
+						}}
 					/>
 				</>
 			)}

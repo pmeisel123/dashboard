@@ -47,3 +47,19 @@ export interface BranchCommit {
 	creator: string;
 	date: string;
 }
+
+export interface GitTag {
+	name: string;
+	commit: {
+		sha: string;
+		url: string;
+	};
+}
+
+export interface GitRelease {
+	name: string;
+	tag: GitTag;
+	creator: string;
+	publishDate: string;
+	body: string;
+}

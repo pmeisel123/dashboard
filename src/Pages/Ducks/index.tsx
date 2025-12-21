@@ -20,6 +20,7 @@ function DuckPage() {
 							width: "140px",
 						}}
 						src={"/ducks/" + duck}
+						title={duck}
 					/>
 					{duck}
 				</Box>

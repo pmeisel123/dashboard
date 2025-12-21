@@ -27,6 +27,18 @@ function HomePage() {
 	}, [showHidden]);
 	return (
 		<Box>
+			{pages.map((page) => {
+				if ("requires" in page && !page.requires) {
+					return;
+				}
+				return (
+					<ListItem disablePadding key={page.path}>
+						<ListItemButton title={page.name} component={Link} to={page.path}>
+							<ListItemText primary={page.name} secondary={page.description} />
+						</ListItemButton>
+					</ListItem>
+				);
+			})}
 			<FormControlLabel
 				control={
 					<Checkbox
@@ -40,22 +52,21 @@ function HomePage() {
 				}
 				label="Show Hidden Pages"
 			/>
-			{pages.map((page) => {
-				if ("requires" in page && !page.requires && !showHidden) {
-					return;
-				}
-				return (
-					<ListItem
-						disablePadding
-						key={page.path}
-						sx={{ backgroundColor: "requires" in page && !page.requires ? "#DDD" : "none" }}
-					>
-						<ListItemButton title={page.name} component={Link} to={page.path}>
-							<ListItemText primary={page.name} secondary={page.description} />
-						</ListItemButton>
-					</ListItem>
-				);
-			})}
+			{showHidden && (
+				<>
+					{pages.map((page) => {
+						if ("requires" in page && !page.requires) {
+							return (
+								<ListItem disablePadding key={page.path} sx={{ backgroundColor: "#DDD" }}>
+									<ListItemButton title={page.name} component={Link} to={page.path}>
+										<ListItemText primary={page.name} secondary={page.description} />
+									</ListItemButton>
+								</ListItem>
+							);
+						}
+					})}
+				</>
+			)}
 			<SavePageList />
 		</Box>
 	);

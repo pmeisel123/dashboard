@@ -20,7 +20,7 @@ const router = createBrowserRouter([
 	},
 ]);
 
-const defaultLeftWidth = 150;
+const defaultLeftWidth = 175;
 
 function Main() {
 	const theme = useTheme();
@@ -131,10 +131,10 @@ function Main() {
 				sx={{
 					marginLeft: isSmallOrLarger ? sideWidth + 20 + "px" : 0,
 					paddingBottom: isDashboard || dashboard ? 0 : "75px",
-					transition: "padding-left 0.1s",
+					transition: "margin-left 225ms",
 				}}
 			>
-				{!isDashboard && !dashboard && !hideTitle && (
+				{!isDashboard && !dashboard && !hideTitle && !!currentName && (
 					<>
 						<Typography variant="h6" component={Box}>
 							{currentName}

@@ -2,23 +2,29 @@ import { Box } from "@mui/material";
 declare const __DUCKS__: string[];
 function DuckPage() {
 	return (
-		<>
+		<div>
 			{__DUCKS__.map((duck) => (
-				<Box key={duck} sx={{ float: "left" }}>
+				<Box
+					key={duck}
+					sx={{
+						float: "left",
+						textAlign: "center",
+					}}
+				>
 					<img
 						style={{
-							height: "140px",
-							width: "140px",
 							backgroundColor: "#000",
+							display: "block",
+							height: "140px",
 							margin: 10,
+							width: "140px",
 						}}
 						src={"/ducks/" + duck}
 					/>
-					<br />
 					{duck}
 				</Box>
 			))}
-		</>
+		</div>
 	);
 }
 export default DuckPage;

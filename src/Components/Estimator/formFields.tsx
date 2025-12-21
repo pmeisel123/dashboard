@@ -31,7 +31,6 @@ const FormFields: FC<{
 	var estimateSteps = [...Array(16).keys()];
 	estimateSteps = estimateSteps.concat(Array.from({ length: 9 }, (_, index) => 5 * index + 20));
 	const updateSearch = () => {
-		console.log("here");
 		setParent(localParent);
 		if (!localSearch) {
 			setSearch("");

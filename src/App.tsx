@@ -130,7 +130,7 @@ function Main() {
 			<Box
 				sx={{
 					marginLeft: isSmallOrLarger ? sideWidth + 20 + "px" : 0,
-					marginBottom: "75px",
+					paddingBottom: isDashboard || dashboard ? 0 : "75px",
 					transition: "padding-left 0.1s",
 				}}
 			>

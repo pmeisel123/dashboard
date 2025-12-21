@@ -95,7 +95,7 @@ const HolidayPage: FC<{
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
-	}, [year]);
+	}, [year, extended, withJewish]);
 	let holidays: HolidayProps[];
 	if (withJewish) {
 		holidays = getAllHolidays(year);

@@ -69,7 +69,6 @@ const WikiPage: FC<{
 	const wiki_directory = __API_CONFLUENCE_URL__.replace(/https?:\/\/[^/]*/, "");
 	const wiki_regex1 = new RegExp('"' + wiki_directory, "g");
 	const wiki_regex2 = new RegExp("'" + wiki_directory, "g");
-	console.log(wiki_directory);
 
 	return (
 		<>

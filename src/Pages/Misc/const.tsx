@@ -36,8 +36,33 @@ const useParentSize = () => {
 
 export const StyledTextfit = ({ children }: { children: ReactNode }) => {
 	const { ref, size } = useParentSize();
+	const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+	useLayoutEffect(() => {
+		const handleResize = () => {
+			setWindowSize({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		};
+
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, []);
 	return (
-		<Box ref={ref} style={{ height: size.height, width: size.width, textAlign: "center", margin: "auto" }}>
+		<Box
+			ref={ref}
+			style={{
+				maxHeight: windowSize.height,
+				maxWidth: windowSize.width,
+				height: size.height,
+				width: size.width,
+				textAlign: "center",
+				margin: "auto",
+			}}
+		>
 			<Textfit
 				mode="multi"
 				min={1}

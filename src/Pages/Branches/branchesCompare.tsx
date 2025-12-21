@@ -97,7 +97,6 @@ const BranchesComparePage: FC<{
 	useEffect(() => {
 		getReleases(repo).then((data: GitRelease[]) => {
 			setReleases(data);
-			console.log(data);
 		});
 	}, [repo]);
 	useEffect(() => {

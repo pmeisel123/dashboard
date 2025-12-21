@@ -26,6 +26,7 @@ export const DashboardIframe = styled("iframe", {
 	display: "block",
 	marginTop: "4px",
 	height: height,
+	overflow: "auto",
 	width: "100%",
 }));
 

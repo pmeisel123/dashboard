@@ -39,7 +39,7 @@ const LoadUrl: FC<{
 	height: number;
 }> = ({ url, height }) => {
 	return (
-		<Box sx={{ height: height, overflow: "hidden" }}>
+		<Box sx={{ height: height }}>
 			{url.match(/^http/) && <LoadUrlIframe url={url} height={height} />}
 			{!url.match(/^http/) && (
 				<DashboardLoadPageWrapper id="loadPage" height={height}>
@@ -63,7 +63,7 @@ function DashboardPage() {
 		const handleResize = () => {
 			setWindowSize({
 				width: window.innerWidth - 50,
-				height: window.innerHeight - 62,
+				height: window.innerHeight - 72,
 			});
 		};
 

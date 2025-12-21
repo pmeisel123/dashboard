@@ -34,15 +34,17 @@ export const TextPage: FC<{
 	}, [searchParams, searchParamsOveride]);
 
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
-		if (searchParams) {
-			newSearchParams.set("text", text);
-		} else {
-			newSearchParams.delete("text");
-		}
+		if (!searchParamsOveride) {
+			const newSearchParams = new URLSearchParams(searchParams.toString());
+			if (searchParams) {
+				newSearchParams.set("text", text);
+			} else {
+				newSearchParams.delete("text");
+			}
 
-		if (searchParams.toString() != newSearchParams.toString()) {
-			setSearchParams(newSearchParams);
+			if (searchParams.toString() != newSearchParams.toString()) {
+				setSearchParams(newSearchParams);
+			}
 		}
 	}, [text]);
 

@@ -62,7 +62,7 @@ function DashboardPage() {
 	useEffect(() => {
 		const handleResize = () => {
 			setWindowSize({
-				width: window.innerWidth - 50,
+				width: window.innerWidth - 52,
 				height: window.innerHeight - 72,
 			});
 		};

@@ -3,19 +3,17 @@ import { Box, Link, Typography, useTheme } from "@mui/material";
 import type {
 	GridColDef,
 	GridColumnVisibilityModel,
-	GridFilterModel,
 	GridRenderCellParams,
 	GridRowParams,
 	GridSlotsComponentsProps,
-	GridSortModel,
 } from "@mui/x-data-grid";
-import { DataGrid, GridFooterContainer, GridPagination, useGridApiRef } from "@mui/x-data-grid";
+import { GridFooterContainer, GridPagination } from "@mui/x-data-grid";
 import type { BranchesAndTicket, CustomFieldsProps, TicketProps, UsersGroupProps } from "@src/Api";
 import { GetBranchCreator } from "@src/Api";
-import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { Ago, defaultTableSettings, getTicketColumns } from "@src/Components";
+import type { tableSetingsProps } from "@src/Components";
+import { Ago, CustomDataGrid, defaultTableSettings } from "@src/Components";
 import type { FC } from "react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment } from "react";
 import { useLocation } from "react-router-dom";
 
 declare const __API_URL__: string;
@@ -93,10 +91,6 @@ const TicketTable: FC<{
 }) => {
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
-	const apiRef = useGridApiRef();
-	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
-		...defaultTableSettings,
-	});
 
 	const theme = useTheme();
 	let columns: GridColDef<any>[] = [
@@ -344,51 +338,16 @@ const TicketTable: FC<{
 		});
 	}
 
-	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
-		const newColumnModel = {
-			...columnModel,
-			[column]: newModel,
-		};
-		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
-		setColumnModel(newColumnModel);
+	const defaultColumnModel: tableSetingsProps = {
+		...defaultTableSettings,
 	};
-
-	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
-		handleColumnModelChange({
-			column: "GridColumnVisibilityModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleSortModelChange = (newModel: GridSortModel) => {
-		handleColumnModelChange({
-			column: "GridSortModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleFilterChange = (newModel: GridFilterModel) => {
-		handleColumnModelChange({
-			column: "GridFilterModel",
-			newModel: newModel,
-		});
-	};
-
-	useEffect(() => {
-		let columnModel = getTicketColumns(localStorageName, columns);
-
-		if (
-			defaultSort &&
-			(isDashboard || !columnModel || !columnModel.GridSortModel || !columnModel.GridSortModel.length)
-		) {
-			if (defaultSortDirection == "desc") {
-				columnModel.GridSortModel = [{ field: defaultSort, sort: "desc" }];
-			} else {
-				columnModel.GridSortModel = [{ field: defaultSort, sort: "asc" }];
-			}
+	if (defaultSort && isDashboard) {
+		if (defaultSortDirection == "desc") {
+			defaultColumnModel.GridSortModel = [{ field: defaultSort, sort: "desc" }];
+		} else {
+			defaultColumnModel.GridSortModel = [{ field: defaultSort, sort: "asc" }];
 		}
-		setColumnModel(columnModel);
-	}, []);
+	}
 
 	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
 		if (params.row.isdone) {
@@ -419,13 +378,11 @@ const TicketTable: FC<{
 				return tmp;
 			}, {} as GridColumnVisibilityModel);
 			return hide_columns;
-		} else {
-			return columnModel.GridColumnVisibilityModel;
 		}
 	};
 	return (
 		<Box sx={{ width: "100%" }}>
-			<DataGrid
+			<CustomDataGrid
 				sx={{
 					"& .MuiDataGrid-row-notowner": {
 						backgroundColor: theme.palette.grey.A200,
@@ -435,10 +392,10 @@ const TicketTable: FC<{
 					},
 				}}
 				loading={loading}
-				getRowHeight={() => "auto"}
 				rows={tickets}
 				columns={columns}
 				getRowClassName={getRowClassName}
+				defaultColumnModel={defaultColumnModel}
 				slots={{
 					footer: CustomFooterStatusComponent,
 				}}
@@ -455,18 +412,8 @@ const TicketTable: FC<{
 				}}
 				checkboxSelection={false}
 				disableRowSelectionOnClick
-				autosizeOnMount
-				autosizeOptions={{
-					includeHeaders: false,
-					includeOutliers: true,
-				}}
-				columnVisibilityModel={getVisibility()}
-				sortModel={columnModel.GridSortModel}
-				filterModel={columnModel.GridFilterModel}
-				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
-				onSortModelChange={handleSortModelChange}
-				onFilterModelChange={handleFilterChange}
-				apiRef={apiRef}
+				getVisibility={getVisibility}
+				localStorageName={localStorageName}
 			/>
 		</Box>
 	);

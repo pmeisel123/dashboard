@@ -3,6 +3,7 @@ export * from "./Branches";
 export * from "./Commits";
 export * from "./const";
 export * from "./Dashboard";
+export * from "./DataGrid";
 export * from "./Duck";
 export * from "./Estimator";
 export * from "./LeftNav";

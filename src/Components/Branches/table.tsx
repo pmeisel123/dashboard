@@ -1,12 +1,5 @@
-import { Box, Link } from "@mui/material";
-import type {
-	GridColDef,
-	GridColumnVisibilityModel,
-	GridFilterModel,
-	GridRenderCellParams,
-	GridSortModel,
-} from "@mui/x-data-grid";
-import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
+import { Link } from "@mui/material";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import type {
 	BranchesAndTicket,
 	CustomFieldsProps,
@@ -16,8 +9,8 @@ import type {
 	UsersGroupProps,
 } from "@src/Api";
 import { GetBranchCreator } from "@src/Api";
-import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { Ago, allGroups, defaultTableSettings, getTicketColumns } from "@src/Components";
+import type { tableSetingsProps } from "@src/Components";
+import { Ago, allGroups, CustomDataGrid, defaultTableSettings } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -50,12 +43,8 @@ const BranchesTable: FC<{
 }) => {
 	const location = useLocation();
 	const localStorageName = "GitTableColumns22." + location.pathname;
-	const apiRef = useGridApiRef();
 	const [rows, setRows] = useState<rowProp[]>([]);
 	const [rowsFilter, setRowsFiltered] = useState<rowProp[]>([]);
-	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
-		...defaultTableSettings,
-	});
 
 	let columns: GridColDef<any>[] = [
 		{ field: "repo", headerName: "Repo Name" },
@@ -128,27 +117,23 @@ const BranchesTable: FC<{
 			flex: 1,
 		},
 	];
-	useEffect(() => {
-		let newColumnModel = getTicketColumns(localStorageName, columns);
-
-		if (
-			defaultSort &&
-			(isDashboard || !newColumnModel || !newColumnModel.GridSortModel || !newColumnModel.GridSortModel.length)
-		) {
-			if (defaultSortDirection == "desc") {
-				newColumnModel.GridSortModel = [{ field: defaultSort, sort: "desc" }];
-			} else {
-				newColumnModel.GridSortModel = [{ field: defaultSort, sort: "asc" }];
-			}
+	const defaultColumnModel: tableSetingsProps = {
+		...defaultTableSettings,
+	};
+	if (defaultSort && isDashboard) {
+		if (defaultSortDirection == "desc") {
+			defaultColumnModel.GridSortModel = [{ field: defaultSort, sort: "desc" }];
+		} else {
+			defaultColumnModel.GridSortModel = [{ field: defaultSort, sort: "asc" }];
 		}
-		if (
-			Object.keys(__GIT_REPOS_PATHS__).length == 1 && // Only 1 repo, don't need to show the repo column
-			(!newColumnModel.GridColumnVisibilityModel || !Object.keys(newColumnModel.GridColumnVisibilityModel).length)
-		) {
-			newColumnModel.GridColumnVisibilityModel["repo"] = false;
-		}
-		setColumnModel(newColumnModel);
-	}, []);
+	}
+	if (
+		Object.keys(__GIT_REPOS_PATHS__).length == 1 && // Only 1 repo, don't need to show the repo column
+		(!defaultColumnModel.GridColumnVisibilityModel ||
+			!Object.keys(defaultColumnModel.GridColumnVisibilityModel).length)
+	) {
+		defaultColumnModel.GridColumnVisibilityModel["repo"] = false;
+	}
 
 	const getRow = (repo: string, branch: GitBranch) => {
 		const branch_name = branch.name;
@@ -242,65 +227,16 @@ const BranchesTable: FC<{
 		filterRows(rows);
 	}, [user, group]);
 
-	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
-		const newColumnModel = {
-			...columnModel,
-			[column]: newModel,
-		};
-		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
-		setColumnModel(newColumnModel);
-	};
-
-	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
-		handleColumnModelChange({
-			column: "GridColumnVisibilityModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleSortModelChange = (newModel: GridSortModel) => {
-		handleColumnModelChange({
-			column: "GridSortModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleFilterChange = (newModel: GridFilterModel) => {
-		handleColumnModelChange({
-			column: "GridFilterModel",
-			newModel: newModel,
-		});
-	};
-
 	return (
-		<Box sx={{ width: "100%" }}>
-			<DataGrid
-				getRowHeight={() => "auto"}
-				rows={rowsFilter}
-				columns={columns}
-				loading={!loaded}
-				slotProps={{
-					loadingOverlay: {
-						variant: "linear-progress",
-						noRowsVariant: "skeleton",
-					},
-				}}
-				checkboxSelection={false}
-				disableRowSelectionOnClick
-				autosizeOnMount
-				autosizeOptions={{
-					includeHeaders: false,
-					includeOutliers: true,
-				}}
-				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
-				sortModel={columnModel.GridSortModel}
-				filterModel={columnModel.GridFilterModel}
-				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
-				onSortModelChange={handleSortModelChange}
-				onFilterModelChange={handleFilterChange}
-				apiRef={apiRef}
-			/>
-		</Box>
+		<CustomDataGrid
+			rows={rowsFilter}
+			columns={columns}
+			loading={!loaded}
+			defaultColumnModel={defaultColumnModel}
+			checkboxSelection={false}
+			disableRowSelectionOnClick
+			localStorageName={localStorageName}
+		/>
 	);
 };
 export default BranchesTable;

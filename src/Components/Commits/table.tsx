@@ -1,12 +1,5 @@
-import { Box, Link } from "@mui/material";
-import type {
-	GridColDef,
-	GridColumnVisibilityModel,
-	GridFilterModel,
-	GridRenderCellParams,
-	GridSortModel,
-} from "@mui/x-data-grid";
-import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
+import { Link } from "@mui/material";
+import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import type {
 	AppDispatch,
 	BranchCommit,
@@ -17,10 +10,9 @@ import type {
 	UsersGroupPropsSlice,
 } from "@src/Api";
 import { fetchUsersAndGroups, GetBranchCreator, isUserDataRecent } from "@src/Api";
-import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { Ago, defaultTableSettings, getTicketColumns } from "@src/Components";
+import { Ago, CustomDataGrid } from "@src/Components";
 import type { FC } from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
@@ -35,11 +27,7 @@ export const CommitsTable: FC<{
 }> = ({ repo, ticketsBranches, tickets, loading, commits }) => {
 	const allJiraUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
 	const localStorageName = "CommitsTableColumns." + location.pathname;
-	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
-		...defaultTableSettings,
-	});
 	const dispatch = useDispatch<AppDispatch>();
-	const apiRef = useGridApiRef();
 
 	let columns: GridColDef<BranchCommit>[] = [
 		{
@@ -104,9 +92,9 @@ export const CommitsTable: FC<{
 		{
 			field: "ticket_labels",
 			headerName: "Ticket Labels",
-			renderCell: (params: GridRenderCellParams<BranchCommit>) => {
-				if (params.row.ticket) {
-					return <>{tickets[params.row.ticket]?.labels?.join(", ")}</>;
+			valueGetter: (_params, row) => {
+				if (row.ticket) {
+					return tickets[row.ticket]?.labels?.join(", ");
 				}
 			},
 			flex: 1,
@@ -114,15 +102,16 @@ export const CommitsTable: FC<{
 		{
 			field: "creator",
 			headerName: "Creator",
-			renderCell: (params: GridRenderCellParams<BranchCommit>) => {
-				if (params.row.creator) {
-					const user = GetBranchCreator(params.row.creator, allJiraUsersGroups);
-					let user_name = params.row.creator;
+			valueGetter: (_params, row) => {
+				if (row.creator) {
+					const user = GetBranchCreator(row.creator, allJiraUsersGroups);
+					let user_name = row.creator;
 					if (user && user.name) {
 						user_name = user.name;
 					}
-					return <>{user_name}</>;
+					return user_name;
 				}
+				return row.creator;
 			},
 			flex: 2,
 		},
@@ -134,72 +123,18 @@ export const CommitsTable: FC<{
 		}
 	}, [dispatch]);
 
-	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
-		const newColumnModel = {
-			...columnModel,
-			[column]: newModel,
-		};
-		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
-		setColumnModel(newColumnModel);
-	};
-
-	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
-		handleColumnModelChange({
-			column: "GridColumnVisibilityModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleSortModelChange = (newModel: GridSortModel) => {
-		handleColumnModelChange({
-			column: "GridSortModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleFilterChange = (newModel: GridFilterModel) => {
-		handleColumnModelChange({
-			column: "GridFilterModel",
-			newModel: newModel,
-		});
-	};
-
-	useEffect(() => {
-		let newColumnModel = getTicketColumns(localStorageName, columns);
-		setColumnModel(newColumnModel);
-	}, []);
 	if (!Object.keys(ticketsBranches.branches).length) {
 		return;
 	}
 	return (
-		<Box sx={{ width: "100%" }}>
-			<DataGrid
-				getRowHeight={() => "auto"}
-				columns={columns}
-				getRowId={(row) => row.sha}
-				rows={commits}
-				loading={loading}
-				slotProps={{
-					loadingOverlay: {
-						variant: "linear-progress",
-						noRowsVariant: "skeleton",
-					},
-				}}
-				checkboxSelection={false}
-				disableRowSelectionOnClick
-				autosizeOnMount
-				autosizeOptions={{
-					includeHeaders: false,
-					includeOutliers: true,
-				}}
-				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
-				sortModel={columnModel.GridSortModel}
-				filterModel={columnModel.GridFilterModel}
-				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
-				onSortModelChange={handleSortModelChange}
-				onFilterModelChange={handleFilterChange}
-				apiRef={apiRef}
-			/>
-		</Box>
+		<CustomDataGrid
+			columns={columns}
+			getRowId={(row) => row.sha}
+			rows={commits}
+			loading={loading}
+			checkboxSelection={false}
+			disableRowSelectionOnClick
+			localStorageName={localStorageName}
+		/>
 	);
 };

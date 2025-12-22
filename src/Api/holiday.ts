@@ -48,6 +48,9 @@ const renameHoliday = (name: string) => {
 	if (name in HOLIDAY_RENAME) {
 		return HOLIDAY_RENAME[name];
 	}
+	if (name.match("Pesach")) {
+		name = name.replace(/Pesach/, "Passover");
+	}
 	return name;
 };
 

@@ -5,6 +5,7 @@ const holiday_images: { [key: string]: string[] } = {
 	Veterans: ["military.png"],
 	Memorial: ["military.png"],
 	Thanksgiving: ["turkey.png", "thanksgiving.png"],
+	Tax: ["tax.png"],
 	"Black Friday": ["black.png"],
 	"Cyber Monday": ["cyber.png"],
 	Halloween: ["trick.gif", "ghost.gif", "ghost2.png", "vampire.png"],

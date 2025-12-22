@@ -1,4 +1,6 @@
 import {
+	Checkbox,
+	FormControlLabel,
 	Grid,
 	InputLabel,
 	MenuItem,
@@ -57,7 +59,7 @@ const HolidayPage: FC<{
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [year, setYear] = useState<string>(searchParams.get("year") || this_year);
 	const [holidayCategory, setHolidayCategory] = useState<"Bank" | "Extended" | "Jewish and Extended">("Bank");
-	const with_ducks = searchParams.get("withDucks") != null;
+	const [withDucks, setwithDucks] = useState<boolean>(searchParams.get("withDucks") == "true");
 	const year_as_int = parseInt(this_year);
 
 	const loadParams = () => {
@@ -68,6 +70,7 @@ const HolidayPage: FC<{
 				setHolidayCategory(cat);
 			}
 		}
+		setwithDucks(searchParams.get("withDucks") == "true");
 	};
 
 	useEffect(() => {
@@ -91,10 +94,15 @@ const HolidayPage: FC<{
 		} else {
 			newSearchParams.delete("holidayCategory");
 		}
+		if (withDucks) {
+			newSearchParams.set("withDucks", "true");
+		} else {
+			newSearchParams.delete("withDucks");
+		}
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
-	}, [year, holidayCategory]);
+	}, [year, holidayCategory, withDucks]);
 	let holidays: HolidayProps[];
 	if (holidayCategory == "Jewish and Extended") {
 		holidays = getAllHolidays(year);
@@ -142,6 +150,28 @@ const HolidayPage: FC<{
 							))}
 						</Select>
 					</Grid>
+					<Grid size={{ xs: 12, md: 3 }}>
+						<FormControlLabel
+							control={
+								<Checkbox
+									checked={withDucks}
+									onChange={(event) => {
+										if (event.target.checked) {
+											setwithDucks(true);
+										} else {
+											setwithDucks(false);
+										}
+									}}
+									name="With Ducks"
+									value="true"
+								/>
+							}
+							label="With Ducks"
+							sx={{
+								display: "inline",
+							}}
+						/>
+					</Grid>
 				</Grid>
 			)}
 			<TableContainer component={Paper}>
@@ -158,7 +188,7 @@ const HolidayPage: FC<{
 							<DateRow date={holiday.date} key={holiday.name + holiday.date}>
 								<TableCell>
 									{holiday.name}
-									{with_ducks && <HolidayDuck day={holiday.date} name={holiday.name} />}
+									{withDucks && <HolidayDuck day={holiday.date} name={holiday.name} />}
 								</TableCell>
 								<TableCell>{getDateStringWithDayOfWeek(getDate(holiday.date))}</TableCell>
 								<TableCell>{getDateDistance(holiday.date)}</TableCell>

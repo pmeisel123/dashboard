@@ -34,6 +34,7 @@ const EstimatorPage: FC<{
 	const freezeParams = useRef(false);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
+	const [lastDay, setLastDay] = useState<string>("");
 
 	const loadParams = () => {
 		defaultDefaultEstimate = parseInt(searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "");
@@ -159,6 +160,9 @@ const EstimatorPage: FC<{
 					/>
 				</>
 			)}
+			{(search || parent) && !!tickets.length && !!lastDay && (
+				<strong>Work will be completed on {lastDay}</strong>
+			)}
 			{(search || parent) && (
 				<TicketTable
 					tickets={tickets}
@@ -173,14 +177,18 @@ const EstimatorPage: FC<{
 				/>
 			)}
 			{(search || parent) && !!tickets.length && (
-				<Calendar
-					users={users}
-					group={group}
-					allJiraUsersGroups={allJiraUsersGroups}
-					totalTimEstimate={totalTimEstimate}
-					visibleUsers={visibleUsers}
-					isDashboard={isDashboard}
-				/>
+				<>
+					{!!lastDay && <strong>Work will be completed on {lastDay}</strong>}
+					<Calendar
+						users={users}
+						group={group}
+						allJiraUsersGroups={allJiraUsersGroups}
+						totalTimEstimate={totalTimEstimate}
+						visibleUsers={visibleUsers}
+						isDashboard={isDashboard}
+						setLastDay={setLastDay}
+					/>
+				</>
 			)}
 		</>
 	);

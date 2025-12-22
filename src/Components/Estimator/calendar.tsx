@@ -1,7 +1,7 @@
 import { Paper, Table, TableBody, TableContainer, TableHead, TableRow } from "@mui/material";
 import { getDateString, getHolidayDayString, getHolidays, type UsersGroupProps } from "@src/Api";
 import { allGroups } from "@src/Components";
-import type { FC } from "react";
+import type { Dispatch, FC, SetStateAction } from "react";
 import { EstimatorCell } from "./const";
 
 interface cellData {
@@ -19,7 +19,8 @@ const Calendar: FC<{
 	totalTimEstimate: number;
 	visibleUsers: Set<string>;
 	isDashboard?: boolean;
-}> = ({ allJiraUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard }) => {
+	setLastDay: Dispatch<SetStateAction<string>>;
+}> = ({ allJiraUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard, setLastDay }) => {
 	if (!Object.keys(allJiraUsersGroups.users).length) {
 		return <></>;
 	}
@@ -63,7 +64,6 @@ const Calendar: FC<{
 	let rows: cellData[][] = [];
 	let extra = true;
 	let max_rows = 30;
-	let last_day = "";
 	while ((remainingTimEstimate > 0 || extra) && max_rows) {
 		max_rows--;
 		if (!remainingTimEstimate) {
@@ -122,7 +122,7 @@ const Calendar: FC<{
 					remainingTimEstimate = 0;
 				}
 				if (!remainingTimEstimate) {
-					last_day = getDateString(current_day);
+					setLastDay(getDateString(current_day));
 					description = "WORK COMPLETE!!!";
 				}
 			}
@@ -141,7 +141,6 @@ const Calendar: FC<{
 
 	return (
 		<>
-			<strong>Work will be completed on {last_day}</strong>
 			{!isDashboard && (
 				<>
 					<br />

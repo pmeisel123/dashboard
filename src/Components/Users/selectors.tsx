@@ -175,7 +175,6 @@ export const UsersSelector: FC<{
 		<>
 			<CustomDataGrid
 				localStorageName={localStorageName}
-				getRowHeight={() => "auto"}
 				rows={Object.values(allJiraUsersGroups.users)}
 				columns={columns}
 				checkboxSelection={true}

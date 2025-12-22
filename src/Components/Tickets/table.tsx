@@ -126,14 +126,7 @@ const TicketTable: FC<{
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{params.row.parentkey}
-							</Link>
-							: &#x200b;
-							<Link
-								href={(__API_URL__ + "/browse/" + params.row.parentkey) as string}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
+								{params.row.parentkey}: &#x200b;
 								{params.row.parentname}
 							</Link>
 						</>
@@ -145,15 +138,15 @@ const TicketTable: FC<{
 			flex: 2,
 			minWidth: 125,
 		},
-		{ field: "assignee", headerName: "assignee", flex: 1 },
-		{ field: "creator", headerName: "creator", flex: 1 },
+		{ field: "assignee", headerName: "assignee", flex: 2 },
+		{ field: "creator", headerName: "creator", flex: 2 },
 		{
 			field: "labels",
 			headerName: "labels",
 			flex: 1,
 			valueGetter: (_params, row) => {
 				if (row.labels) {
-					return row.labels.join(",");
+					return row.labels.join(", ");
 				}
 			},
 		},
@@ -262,7 +255,7 @@ const TicketTable: FC<{
 		columns.push({
 			field: "branches",
 			headerName: "Git Branches",
-			flex: 2,
+			flex: 3,
 			valueGetter: (_params, row) => {
 				const ticket_branches = ticketsBranches.tickets[row.key];
 				if (ticket_branches) {

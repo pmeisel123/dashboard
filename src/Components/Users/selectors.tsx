@@ -174,12 +174,6 @@ export const UsersSelector: FC<{
 	return (
 		<>
 			<CustomDataGrid
-				sx={{
-					"& .MuiDataGrid-cell": {
-						display: "flex",
-						alignItems: "center",
-					},
-				}}
 				localStorageName={localStorageName}
 				getRowHeight={() => "auto"}
 				rows={Object.values(allJiraUsersGroups.users)}

@@ -1,3 +1,4 @@
+import type { SxProps, Theme } from "@mui/material";
 import { Box } from "@mui/material";
 import type {
 	DataGridProps,
@@ -17,6 +18,7 @@ interface CustomDataGridProps extends DataGridProps {
 	defaultColumnModel?: tableSetingsProps;
 	apiRef?: MutableRefObject<GridApi | null>;
 	onFilterModelChange?: (newModel: GridFilterModel) => void;
+	sx?: SxProps<Theme>;
 	getVisibility?: () => GridColumnVisibilityModel | undefined;
 }
 
@@ -27,6 +29,7 @@ export const CustomDataGrid = ({
 	getVisibility,
 	apiRef,
 	onFilterModelChange,
+	sx,
 	...props
 }: CustomDataGridProps) => {
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
@@ -106,6 +109,15 @@ export const CustomDataGrid = ({
 	return (
 		<Box sx={{ width: "100%" }}>
 			<DataGrid
+				sx={[
+					{
+						"& .MuiDataGrid-cell": {
+							display: "flex",
+							alignItems: "center",
+						},
+					},
+					...(Array.isArray(sx) ? sx : [sx]),
+				]}
 				columns={columns}
 				getRowHeight={() => "auto"}
 				slotProps={{

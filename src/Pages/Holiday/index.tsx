@@ -1,4 +1,5 @@
 import {
+	Grid,
 	InputLabel,
 	MenuItem,
 	Paper,
@@ -55,15 +56,18 @@ const HolidayPage: FC<{
 	const this_year = new Date().getFullYear() + "";
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [year, setYear] = useState<string>(searchParams.get("year") || this_year);
-	const [extended, setExtended] = useState<boolean>(searchParams.get("extended") == "true");
-	const [withJewish, setWithJewish] = useState<boolean>(searchParams.get("withJewish") == "true");
+	const [holidayCategory, setHolidayCategory] = useState<"Bank" | "Extended" | "Jewish and Extended">("Bank");
 	const with_ducks = searchParams.get("withDucks") != null;
 	const year_as_int = parseInt(this_year);
 
 	const loadParams = () => {
 		setYear(searchParams.get("year") || this_year);
-		setExtended(searchParams.get("extended") == "true");
-		setWithJewish(searchParams.get("withJewish") == "true");
+		const cat = searchParams.get("holidayCategory");
+		if (cat) {
+			if (cat == "Extended" || cat == "Jewish and Extended" || cat == "Bank") {
+				setHolidayCategory(cat);
+			}
+		}
 	};
 
 	useEffect(() => {
@@ -82,24 +86,19 @@ const HolidayPage: FC<{
 		} else {
 			newSearchParams.delete("year");
 		}
-		if (extended) {
-			newSearchParams.set("extended", "true");
+		if (holidayCategory && holidayCategory != "Bank") {
+			newSearchParams.set("holidayCategory", holidayCategory);
 		} else {
-			newSearchParams.delete("extended");
-		}
-		if (withJewish) {
-			newSearchParams.set("withJewish", "true");
-		} else {
-			newSearchParams.delete("withJewish");
+			newSearchParams.delete("holidayCategory");
 		}
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);
 		}
-	}, [year, extended, withJewish]);
+	}, [year, holidayCategory]);
 	let holidays: HolidayProps[];
-	if (withJewish) {
+	if (holidayCategory == "Jewish and Extended") {
 		holidays = getAllHolidays(year);
-	} else if (extended) {
+	} else if (holidayCategory == "Extended") {
 		holidays = getAllUsHolidays(year);
 	} else {
 		holidays = getHolidays(year);
@@ -107,22 +106,43 @@ const HolidayPage: FC<{
 	return (
 		<>
 			{!isDashboard && (
-				<div>
-					<InputLabel id="Year">Year</InputLabel>
-					<Select
-						label="Year"
-						value={year}
-						onChange={(event) => {
-							setYear(event.target.value);
-						}}
-					>
-						{years_choices.map((year) => (
-							<MenuItem key={year} value={year}>
-								{year}
-							</MenuItem>
-						))}
-					</Select>
-				</div>
+				<Grid container spacing={2}>
+					<Grid size={{ xs: 12, md: 3 }}>
+						<InputLabel id="Year">Year</InputLabel>
+						<Select
+							label="Year"
+							value={year}
+							onChange={(event) => {
+								setYear(event.target.value);
+							}}
+						>
+							{years_choices.map((year) => (
+								<MenuItem key={year} value={year}>
+									{year}
+								</MenuItem>
+							))}
+						</Select>
+					</Grid>
+					<Grid size={{ xs: 12, md: 3 }}>
+						<InputLabel id="holidayCategory">Holiday Category</InputLabel>
+						<Select
+							label="Holiday Category"
+							value={holidayCategory}
+							onChange={(event) => {
+								const cat = event.target.value;
+								if (cat == "Extended" || cat == "Jewish and Extended" || cat == "Bank") {
+									setHolidayCategory(cat);
+								}
+							}}
+						>
+							{["Bank", "Extended", "Jewish and Extended"].map((category) => (
+								<MenuItem key={category} value={category}>
+									{category}
+								</MenuItem>
+							))}
+						</Select>
+					</Grid>
+				</Grid>
 			)}
 			<TableContainer component={Paper}>
 				<Table aria-label="simple table">

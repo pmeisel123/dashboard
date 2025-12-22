@@ -1,17 +1,18 @@
+import type { SelectChangeEvent } from "@mui/material";
 import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
 import type {
 	GridColDef,
-	GridColumnVisibilityModel,
+	GridFilterInputValueProps,
+	GridFilterItem,
 	GridFilterModel,
 	GridFilterOperator,
 	GridRenderCellParams,
-	GridSortModel,
 } from "@mui/x-data-grid";
-import { DataGrid, gridFilteredSortedRowEntriesSelector, useGridApiRef } from "@mui/x-data-grid";
+import { gridFilteredSortedRowEntriesSelector, useGridApiRef } from "@mui/x-data-grid";
 import type { UserProps, UsersGroupProps } from "@src/Api";
 import { getDayString } from "@src/Api";
-import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
-import { allGroups, defaultTableSettings, getTicketColumns } from "@src/Components";
+import type { tableSetingsProps } from "@src/Components";
+import { allGroups, CustomDataGrid, defaultTableSettings, getTicketColumns } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { Fragment, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
@@ -48,47 +49,35 @@ export const UsersSelector: FC<{
 		...defaultTableSettings,
 	});
 
-	const customOperator: GridFilterOperator<UsersGroupProps, string[]> = {
+	const customOperator: GridFilterOperator<UserProps, string> = {
 		label: "has",
 		value: "Contains",
-		getApplyFilterFn: () => {
-			if (!group) {
-				setGroup(allGroups);
+		getApplyFilterFn: (filterItem: GridFilterItem) => {
+			if (!filterItem.value || filterItem.value === allGroups) {
+				return null;
 			}
-			return (cellValue) => {
-				if (!cellValue) {
-					return false;
-				}
+			return (_cellValue, row: UserProps) => {
 				if (!group || group == allGroups) {
 					return true;
 				}
-				return cellValue.includes(group);
+				return row.groups?.includes(group) ?? false;
 			};
 		},
-		InputComponent: () => {
+		InputComponent: (props: GridFilterInputValueProps) => {
+			const { item, applyValue } = props;
+			const handleFilterChange = (event: SelectChangeEvent<string>) => {
+				const val = event.target.value;
+				applyValue({ ...item, value: val });
+				setGroup(val === allGroups ? "" : val);
+			};
+
 			return (
 				<FormControl size="small">
 					<InputLabel id="UserGroup">Group</InputLabel>
 					<Select
 						label="Group"
-						value={group}
-						onChange={(event) => {
-							if (event.target.value) {
-								handleColumnModelChange({
-									column: "GridFilterModel",
-									newModel: {
-										items: [
-											{
-												field: "groups",
-												operator: "Contains",
-												value: event.target.value,
-											},
-										],
-									},
-								});
-								setGroup(event.target.value);
-							}
-						}}
+						value={item.value || allGroups}
+						onChange={handleFilterChange}
 						sx={{ minWidth: 100 }}
 					>
 						<MenuItem key={allGroups} value={allGroups}>
@@ -122,6 +111,9 @@ export const UsersSelector: FC<{
 			headerName: "Groups",
 			flex: 1,
 			filterOperators: [customOperator],
+			valueGetter: (_params, row) => {
+				return row.groups.join(",");
+			},
 		},
 		{
 			field: "vacations",
@@ -143,37 +135,12 @@ export const UsersSelector: FC<{
 		},
 	];
 
-	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
-		const newColumnModel = {
-			...columnModel,
-			[column]: newModel,
-		};
-		localStorage.setItem(localStorageName, JSON.stringify(newColumnModel));
-		setColumnModel(newColumnModel);
-	};
-
-	const handleColumnVisibilityModelChange = (newModel: GridColumnVisibilityModel) => {
-		handleColumnModelChange({
-			column: "GridColumnVisibilityModel",
-			newModel: newModel,
-		});
-	};
-
-	const handleSortModelChange = (newModel: GridSortModel) => {
-		handleColumnModelChange({
-			column: "GridSortModel",
-			newModel: newModel,
-		});
-	};
-
 	const handleFilterChange = (newModel: GridFilterModel) => {
 		if (newModel.items.length && !newModel.items.some((filter) => filter.field === "groups")) {
 			setGroup(allGroups);
+		} else {
+			setGroup("");
 		}
-		handleColumnModelChange({
-			column: "GridFilterModel",
-			newModel: newModel,
-		});
 	};
 
 	useEffect(() => {
@@ -206,13 +173,14 @@ export const UsersSelector: FC<{
 	}, [allJiraUsersGroups.users, columnModel.GridFilterModel]);
 	return (
 		<>
-			<DataGrid
+			<CustomDataGrid
 				sx={{
 					"& .MuiDataGrid-cell": {
 						display: "flex",
 						alignItems: "center",
 					},
 				}}
+				localStorageName={localStorageName}
 				getRowHeight={() => "auto"}
 				rows={Object.values(allJiraUsersGroups.users)}
 				columns={columns}
@@ -242,11 +210,6 @@ export const UsersSelector: FC<{
 					type: "include",
 					ids: new Set(users),
 				}}
-				columnVisibilityModel={columnModel.GridColumnVisibilityModel}
-				sortModel={columnModel.GridSortModel}
-				filterModel={columnModel.GridFilterModel}
-				onColumnVisibilityModelChange={handleColumnVisibilityModelChange}
-				onSortModelChange={handleSortModelChange}
 				onFilterModelChange={handleFilterChange}
 				apiRef={apiRef}
 			/>

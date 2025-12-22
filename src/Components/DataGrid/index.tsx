@@ -1,13 +1,22 @@
 import { Box } from "@mui/material";
-import type { DataGridProps, GridColumnVisibilityModel, GridFilterModel, GridSortModel } from "@mui/x-data-grid";
+import type {
+	DataGridProps,
+	GridApi,
+	GridColumnVisibilityModel,
+	GridFilterModel,
+	GridSortModel,
+} from "@mui/x-data-grid";
 import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import type { tableSetingsProps, updateGridModelProps } from "@src/Components";
 import { defaultTableSettings, getTicketColumns } from "@src/Components";
+import type { MutableRefObject } from "react";
 import { useEffect, useState } from "react";
 
 interface CustomDataGridProps extends DataGridProps {
 	localStorageName: string;
 	defaultColumnModel?: tableSetingsProps;
+	apiRef?: MutableRefObject<GridApi | null>;
+	onFilterModelChange?: (newModel: GridFilterModel) => void;
 	getVisibility?: () => GridColumnVisibilityModel | undefined;
 }
 
@@ -16,12 +25,16 @@ export const CustomDataGrid = ({
 	columns,
 	defaultColumnModel,
 	getVisibility,
+	apiRef,
+	onFilterModelChange,
 	...props
 }: CustomDataGridProps) => {
 	const [columnModel, setColumnModel] = useState<tableSetingsProps>({
 		...defaultTableSettings,
 	});
-	const apiRef = useGridApiRef();
+	if (!apiRef) {
+		apiRef = useGridApiRef();
+	}
 	const handleColumnModelChange = ({ column, newModel }: updateGridModelProps) => {
 		const newColumnModel = {
 			...columnModel,
@@ -50,6 +63,9 @@ export const CustomDataGrid = ({
 			column: "GridFilterModel",
 			newModel: newModel,
 		});
+		if (onFilterModelChange) {
+			onFilterModelChange(newModel);
+		}
 	};
 
 	const handleVisibility = () => {

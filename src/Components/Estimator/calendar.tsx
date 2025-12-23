@@ -1,5 +1,6 @@
 import { Paper, Table, TableBody, TableContainer, TableHead, TableRow } from "@mui/material";
-import { getDateString, getHolidayDayString, getHolidays, type UsersGroupProps } from "@src/Api";
+import type { HolidayProps, UsersGroupProps } from "@src/Api";
+import { getAllUsHolidays, getDateString, getHolidayDayString } from "@src/Api";
 import { allGroups } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { EstimatorCell } from "./const";
@@ -28,19 +29,19 @@ const Calendar: FC<{
 	today.setHours(0, 0, 0, 0);
 	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 	// Get holidays for a specific year
-	const usHolidays = getHolidays(today.getFullYear().toString()).filter((holiday) => {
+	const thisYearUsHolidays = getAllUsHolidays(today.getFullYear().toString()).filter((holiday) => {
 		return new Date(holiday.date) >= today;
 	});
-	const nextYearUsHolidays = getHolidays(nextyear.getFullYear().toString()).filter((holiday) => {
+	const nextYearUsHolidays = getAllUsHolidays(nextyear.getFullYear().toString()).filter((holiday) => {
 		return new Date(holiday.date) <= nextyear;
 	});
 
-	const allUsHolidays = [...usHolidays, ...nextYearUsHolidays].reduce(
+	const usHolidays = [...thisYearUsHolidays, ...nextYearUsHolidays].reduce(
 		(newFormat, holiday) => {
-			newFormat[holiday.date] = holiday.name;
+			newFormat[holiday.date] = holiday;
 			return newFormat;
 		},
-		{} as Record<string, string>,
+		{} as Record<string, HolidayProps>,
 	);
 
 	const current_day = new Date();
@@ -83,10 +84,18 @@ const Calendar: FC<{
 				working = 0;
 			} else {
 				const holiday_string = getHolidayDayString(current_day);
-				if (allUsHolidays[holiday_string]) {
-					description = allUsHolidays[getHolidayDayString(current_day)];
+				let skip = false;
+				const holiday = usHolidays[holiday_string];
+				if (holiday) {
+					description = holiday.name;
 					title = description;
-				} else {
+					if (holiday.bank) {
+						skip = true;
+					} else {
+						title += "\n\n";
+					}
+				}
+				if (!skip) {
 					local_users.forEach((user_id) => {
 						const user = allJiraUsersGroups.users[user_id];
 						if (!user || !user.vacations || !user.vacations.includes(holiday_string)) {
@@ -169,11 +178,16 @@ const Calendar: FC<{
 												isPartial={cell.working && cell.working != user_count ? true : false}
 											>
 												{getDateString(cell.day)}
-												<br />
-												{cell.description ? (
-													<>{cell.description}</>
-												) : (
+												{!!cell.description && (
 													<>
+														<br />
+														{cell.description}
+														{!!cell.working && <br />}
+													</>
+												)}
+												{!!cell.working && (
+													<>
+														<br />
 														Working: {cell.working}
 														<br />
 														Work Left: {cell.workleft}

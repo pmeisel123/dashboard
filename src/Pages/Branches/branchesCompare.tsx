@@ -1,5 +1,20 @@
-import type { AppDispatch, BranchCommit, BranchesAndTicket, GitRelease, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, getBranchesCompare, getReleases, isGitDataRecent } from "@src/Api";
+import type {
+	AppDispatch,
+	BranchCommit,
+	BranchesAndTicket,
+	GitRelease,
+	LatestRelease,
+	RootState,
+	TicketProps,
+} from "@src/Api";
+import {
+	fetchBranches,
+	fetchTickets,
+	getBranchesCompare,
+	getLatetRelease,
+	getReleases,
+	isGitDataRecent,
+} from "@src/Api";
 import { CommitsSelector, CommitsTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -19,30 +34,64 @@ const BranchesComparePage: FC<{
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(false);
 	const [releases, setReleases] = useState<GitRelease[]>([]);
+	const [latestRelease, setLatestRelease] = useState<LatestRelease | null>();
+	const [useLatestRelease, setUseLatestRelease] = useState<boolean>(searchParams.get("useLatestRelease") == "true");
 
 	const loadParams = () => {
 		setRepo(searchParams.get("repo") || "");
-		setBranch1(searchParams.get("branch1") || "");
-		setBranch2(searchParams.get("branch2") || "");
+		if (searchParams.get("useLatestRelease") != "true") {
+			setBranch1(searchParams.get("branch1") || "");
+			setBranch2(searchParams.get("branch2") || "");
+		}
+		setUseLatestRelease(searchParams.get("useLatestRelease") == "true");
 	};
 	useEffect(() => {
 		loadParams();
 	}, [searchParams]);
 
 	useEffect(() => {
+		if (
+			useLatestRelease &&
+			latestRelease &&
+			releases.length &&
+			repo &&
+			Object.keys(ticketsBranches.branches).length
+		) {
+			setBranch2(latestRelease.tag);
+			if (ticketsBranches.branches[repo]) {
+				if (branch1 != "main" && ticketsBranches.branches[repo].some((branch) => branch.name == "main")) {
+					setBranch1("main");
+				}
+				if (branch1 != "master" && ticketsBranches.branches[repo].some((branch) => branch.name == "master")) {
+					setBranch1("master");
+				}
+			}
+		}
+	}, [useLatestRelease, latestRelease, releases, ticketsBranches.branches]);
+
+	useEffect(() => {
 		if (!searchParamsOveride) {
 			const newSearchParams = new URLSearchParams(searchParams.toString());
 			if (repo != "") {
 				newSearchParams.set("repo", repo);
-				if (branch1 != "") {
-					newSearchParams.set("branch1", branch1);
-				} else {
+				if (useLatestRelease && latestRelease && releases.length) {
 					newSearchParams.delete("branch1");
-				}
-				if (branch2 != "") {
-					newSearchParams.set("branch2", branch2);
-				} else {
 					newSearchParams.delete("branch2");
+					newSearchParams.set("useLatestRelease", "true");
+				} else {
+					if (!useLatestRelease && latestRelease && releases.length) {
+						newSearchParams.delete("useLatestRelease");
+					}
+					if (branch1 != "") {
+						newSearchParams.set("branch1", branch1);
+					} else {
+						newSearchParams.delete("branch1");
+					}
+					if (branch2 != "") {
+						newSearchParams.set("branch2", branch2);
+					} else {
+						newSearchParams.delete("branch2");
+					}
 				}
 			} else {
 				newSearchParams.delete("repo");
@@ -64,7 +113,7 @@ const BranchesComparePage: FC<{
 		} else {
 			setCommits([]);
 		}
-	}, [repo, branch1, branch2]);
+	}, [repo, branch1, branch2, useLatestRelease, latestRelease, releases]);
 
 	useEffect(() => {
 		let ticket_search = "";
@@ -98,6 +147,12 @@ const BranchesComparePage: FC<{
 		getReleases(repo).then((data: GitRelease[]) => {
 			setReleases(data);
 		});
+		getLatetRelease(repo).then((data: LatestRelease | null) => {
+			if (!data) {
+				setUseLatestRelease(false);
+			}
+			setLatestRelease(data);
+		});
 	}, [repo]);
 	useEffect(() => {
 		if (ticketsBranches.branches && Object.keys(ticketsBranches.branches).length == 1) {
@@ -117,6 +172,8 @@ const BranchesComparePage: FC<{
 				setBranch1={setBranch1}
 				setBranch2={setBranch2}
 				ticketsBranches={ticketsBranches}
+				useLatestRelease={useLatestRelease}
+				setUseLatestRelease={setUseLatestRelease}
 				releases={releases}
 			/>
 			{repo && branch1 && branch2 && (

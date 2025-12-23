@@ -63,3 +63,8 @@ export interface GitRelease {
 	publishDate: string;
 	body: string;
 }
+
+export interface LatestRelease {
+	name: string;
+	tag: string;
+}

@@ -4,6 +4,7 @@ import type {
 	GitBranch,
 	GitRelease,
 	GitTag,
+	LatestRelease,
 	ReportNamePaths,
 	TicketCache,
 } from "./Types";
@@ -184,6 +185,20 @@ export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
 		});
 	}
 	return results;
+};
+export const getLatetRelease = async (repo_name: string): Promise<LatestRelease | null> => {
+	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+	const repo_url = repo.path;
+	const url = repo_url + "/releases/latest";
+	let response = await fetch(url, paramaters);
+	const ajax_result: any = await response.json();
+	if (ajax_result) {
+		return {
+			name: ajax_result.name,
+			tag: ajax_result.tag_name,
+		};
+	}
+	return null;
 };
 
 export const getBranchesCompare = async (

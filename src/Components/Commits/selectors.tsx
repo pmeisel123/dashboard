@@ -1,4 +1,4 @@
-import { Button, Grid, InputLabel, MenuItem, Select } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, Grid, InputLabel, MenuItem, Select } from "@mui/material";
 import type { BranchesAndTicket, GitRelease } from "@src/Api";
 import type { Dispatch, FC, SetStateAction } from "react";
 
@@ -11,7 +11,20 @@ export const CommitsSelector: FC<{
 	setBranch2: Dispatch<SetStateAction<string>>;
 	releases: GitRelease[];
 	ticketsBranches: BranchesAndTicket;
-}> = ({ repo, branch1, branch2, setRepo, setBranch1, setBranch2, releases, ticketsBranches }) => {
+	useLatestRelease: boolean;
+	setUseLatestRelease: Dispatch<SetStateAction<boolean>>;
+}> = ({
+	repo,
+	branch1,
+	branch2,
+	setRepo,
+	setBranch1,
+	setBranch2,
+	releases,
+	ticketsBranches,
+	useLatestRelease,
+	setUseLatestRelease,
+}) => {
 	return (
 		<Grid container spacing={2} sx={{ paddingBottom: 1 }}>
 			<Grid>
@@ -22,6 +35,8 @@ export const CommitsSelector: FC<{
 					value={repo}
 					onChange={(event) => {
 						setRepo(event.target.value);
+						console.log("here");
+						setUseLatestRelease(false);
 					}}
 				>
 					{Object.keys(ticketsBranches.branches).map((value: string) => (
@@ -32,6 +47,28 @@ export const CommitsSelector: FC<{
 				</Select>
 			</Grid>
 			<Grid>
+				<br />
+				<br />
+				<FormControlLabel
+					control={
+						<Checkbox
+							checked={useLatestRelease}
+							onChange={(event) => {
+								setUseLatestRelease(event.target.checked);
+							}}
+							name="Changes since latest relaese"
+							value="Changes since latest relaese"
+						/>
+					}
+					label={
+						<>
+							Changes since <br />
+							latest relaese
+						</>
+					}
+				/>
+			</Grid>
+			<Grid>
 				Find all commits in
 				<InputLabel id="branch1">Branch 1</InputLabel>
 				<Select
@@ -40,6 +77,7 @@ export const CommitsSelector: FC<{
 					sx={{ minWidth: 300 }}
 					onChange={(event) => {
 						setBranch1(event.target.value);
+						setUseLatestRelease(false);
 					}}
 				>
 					{!!releases.length &&
@@ -66,6 +104,8 @@ export const CommitsSelector: FC<{
 					sx={{ minWidth: 300 }}
 					onChange={(event) => {
 						setBranch2(event.target.value);
+						console.log("here");
+						setUseLatestRelease(false);
 					}}
 				>
 					{!!releases.length &&
@@ -91,6 +131,8 @@ export const CommitsSelector: FC<{
 						const orig = branch1; // Technically not needed, but makes me feel better
 						setBranch1(branch2);
 						setBranch2(orig);
+						console.log("here");
+						setUseLatestRelease(false);
 					}}
 				>
 					Swap

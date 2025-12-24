@@ -35,7 +35,6 @@ export const CommitsSelector: FC<{
 					value={repo}
 					onChange={(event) => {
 						setRepo(event.target.value);
-						console.log("here");
 						setUseLatestRelease(false);
 					}}
 				>
@@ -104,7 +103,6 @@ export const CommitsSelector: FC<{
 					sx={{ minWidth: 300 }}
 					onChange={(event) => {
 						setBranch2(event.target.value);
-						console.log("here");
 						setUseLatestRelease(false);
 					}}
 				>
@@ -131,7 +129,6 @@ export const CommitsSelector: FC<{
 						const orig = branch1; // Technically not needed, but makes me feel better
 						setBranch1(branch2);
 						setBranch2(orig);
-						console.log("here");
 						setUseLatestRelease(false);
 					}}
 				>

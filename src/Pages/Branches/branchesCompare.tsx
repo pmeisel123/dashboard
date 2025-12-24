@@ -2,18 +2,19 @@ import type {
 	AppDispatch,
 	BranchCommit,
 	BranchesAndTicket,
-	GitRelease,
+	GitReleaseSlice,
 	LatestRelease,
 	RootState,
 	TicketProps,
 } from "@src/Api";
 import {
 	fetchBranches,
+	fetchReleases,
 	fetchTickets,
 	getBranchesCompare,
 	getLatetRelease,
-	getReleases,
 	isGitDataRecent,
+	isGitReleasesRecent,
 } from "@src/Api";
 import { CommitsSelector, CommitsTable } from "@src/Components";
 import type { FC } from "react";
@@ -26,6 +27,7 @@ const BranchesComparePage: FC<{
 }> = ({ searchParamsOveride }) => {
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
+	const releases: { [key: string]: GitReleaseSlice } = useSelector((state: RootState) => state.gitReleasesState);
 	const [repo, setRepo] = useState<string>(searchParams.get("repo") || "");
 	const [branch1, setBranch1] = useState<string>(searchParams.get("branch1") || "");
 	const [branch2, setBranch2] = useState<string>(searchParams.get("branch2") || "");
@@ -33,7 +35,6 @@ const BranchesComparePage: FC<{
 	const [tickets, setTickets] = useState<{ [key: string]: TicketProps }>({});
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(false);
-	const [releases, setReleases] = useState<GitRelease[]>([]);
 	const [latestRelease, setLatestRelease] = useState<LatestRelease | null>();
 	const [useLatestRelease, setUseLatestRelease] = useState<boolean>(searchParams.get("useLatestRelease") == "true");
 
@@ -53,8 +54,9 @@ const BranchesComparePage: FC<{
 		if (
 			useLatestRelease &&
 			latestRelease &&
-			releases.length &&
 			repo &&
+			releases[repo] &&
+			releases[repo].releases.length &&
 			Object.keys(ticketsBranches.branches).length
 		) {
 			setBranch2(latestRelease.tag);
@@ -74,12 +76,12 @@ const BranchesComparePage: FC<{
 			const newSearchParams = new URLSearchParams(searchParams.toString());
 			if (repo != "") {
 				newSearchParams.set("repo", repo);
-				if (useLatestRelease && latestRelease && releases.length) {
+				if (useLatestRelease && latestRelease && releases[repo] && releases[repo].releases.length) {
 					newSearchParams.delete("branch1");
 					newSearchParams.delete("branch2");
 					newSearchParams.set("useLatestRelease", "true");
 				} else {
-					if (!useLatestRelease && latestRelease && releases.length) {
+					if (!useLatestRelease && latestRelease && releases[repo] && releases[repo].releases.length) {
 						newSearchParams.delete("useLatestRelease");
 					}
 					if (branch1 != "") {
@@ -143,10 +145,16 @@ const BranchesComparePage: FC<{
 			dispatch(fetchBranches());
 		}
 	}, [dispatch]);
+
 	useEffect(() => {
-		getReleases(repo).then((data: GitRelease[]) => {
-			setReleases(data);
-		});
+		if (repo) {
+			if (!releases[repo] || !isGitReleasesRecent(releases[repo])) {
+				dispatch(fetchReleases(repo));
+			}
+		}
+	}, [dispatch, repo]);
+
+	useEffect(() => {
 		getLatetRelease(repo).then((data: LatestRelease | null) => {
 			if (!data) {
 				setUseLatestRelease(false);
@@ -174,7 +182,7 @@ const BranchesComparePage: FC<{
 				ticketsBranches={ticketsBranches}
 				useLatestRelease={useLatestRelease}
 				setUseLatestRelease={setUseLatestRelease}
-				releases={releases}
+				releases={releases[repo]?.releases || []}
 			/>
 			{repo && branch1 && branch2 && (
 				<CommitsTable

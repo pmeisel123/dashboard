@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import gitBranchReducer from "./git/gitBranchesSlice";
+import gitReleasesReducer from "./git/gitReleasesSlice";
 import ticketsReducer from "./ticketsSlice";
 import usersGroupReducer from "./usersSlice";
 import wikiPagesReducer from "./wiki/wikiPagesSlice";
@@ -11,6 +12,7 @@ export const store = configureStore({
 		usersAndGroupsState: usersGroupReducer,
 		ticketsState: ticketsReducer,
 		gitBranchState: gitBranchReducer,
+		gitReleasesState: gitReleasesReducer,
 		wikiReducer: wikiReducer,
 		wikiSpacesReducer: wikiSpacesReducer,
 		wikiPagesReducer: wikiPagesReducer,

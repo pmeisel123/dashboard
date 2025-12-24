@@ -64,6 +64,11 @@ export interface GitRelease {
 	body: string;
 }
 
+export interface GitReleaseSlice {
+	releases: GitRelease[];
+	loaded: number | null;
+}
+
 export interface LatestRelease {
 	name: string;
 	tag: string;

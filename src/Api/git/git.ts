@@ -186,8 +186,15 @@ export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
 	}
 	return results;
 };
+
 export const getLatetRelease = async (repo_name: string): Promise<LatestRelease | null> => {
+	if (!repo_name) {
+		return null;
+	}
 	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+	if (!repo) {
+		return null;
+	}
 	const repo_url = repo.path;
 	const url = repo_url + "/releases/latest";
 	let response = await fetch(url, paramaters);

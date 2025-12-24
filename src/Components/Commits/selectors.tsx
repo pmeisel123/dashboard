@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControlLabel, Grid, InputLabel, MenuItem, Select } from "@mui/material";
+import { Button, Grid, InputLabel, MenuItem, Select, FormControlLabel, Checkbox } from "@mui/material";
 import type { BranchesAndTicket, GitRelease } from "@src/Api";
 import type { Dispatch, FC, SetStateAction } from "react";
 
@@ -11,20 +11,9 @@ export const CommitsSelector: FC<{
 	setBranch2: Dispatch<SetStateAction<string>>;
 	releases: GitRelease[];
 	ticketsBranches: BranchesAndTicket;
-	useLatestRelease: boolean;
+	useLatestRelease: boolean,
 	setUseLatestRelease: Dispatch<SetStateAction<boolean>>;
-}> = ({
-	repo,
-	branch1,
-	branch2,
-	setRepo,
-	setBranch1,
-	setBranch2,
-	releases,
-	ticketsBranches,
-	useLatestRelease,
-	setUseLatestRelease,
-}) => {
+}> = ({ repo, branch1, branch2, setRepo, setBranch1, setBranch2, releases, ticketsBranches, useLatestRelease, setUseLatestRelease }) => {
 	return (
 		<Grid container spacing={2} sx={{ paddingBottom: 1 }}>
 			<Grid>
@@ -35,7 +24,7 @@ export const CommitsSelector: FC<{
 					value={repo}
 					onChange={(event) => {
 						setRepo(event.target.value);
-						console.log("here");
+						console.log('here');
 						setUseLatestRelease(false);
 					}}
 				>
@@ -47,8 +36,7 @@ export const CommitsSelector: FC<{
 				</Select>
 			</Grid>
 			<Grid>
-				<br />
-				<br />
+				<br /><br />
 				<FormControlLabel
 					control={
 						<Checkbox
@@ -60,12 +48,7 @@ export const CommitsSelector: FC<{
 							value="Changes since latest relaese"
 						/>
 					}
-					label={
-						<>
-							Changes since <br />
-							latest relaese
-						</>
-					}
+					label={(<>Changes since <br />latest relaese</>)}
 				/>
 			</Grid>
 			<Grid>
@@ -104,7 +87,7 @@ export const CommitsSelector: FC<{
 					sx={{ minWidth: 300 }}
 					onChange={(event) => {
 						setBranch2(event.target.value);
-						console.log("here");
+						console.log('here');
 						setUseLatestRelease(false);
 					}}
 				>
@@ -131,7 +114,7 @@ export const CommitsSelector: FC<{
 						const orig = branch1; // Technically not needed, but makes me feel better
 						setBranch1(branch2);
 						setBranch2(orig);
-						console.log("here");
+						console.log('here');
 						setUseLatestRelease(false);
 					}}
 				>

@@ -4,9 +4,9 @@ import type {
 	GitBranch,
 	GitRelease,
 	GitTag,
-	LatestRelease,
 	ReportNamePaths,
 	TicketCache,
+	LatestRelease,
 } from "./Types";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
@@ -186,7 +186,7 @@ export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
 	}
 	return results;
 };
-export const getLatetRelease = async (repo_name: string): Promise<LatestRelease | null> => {
+export const getLatetRelease = async (repo_name: string): Promise<(LatestRelease | null)> => {
 	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
 	const repo_url = repo.path;
 	const url = repo_url + "/releases/latest";
@@ -196,7 +196,7 @@ export const getLatetRelease = async (repo_name: string): Promise<LatestRelease 
 		return {
 			name: ajax_result.name,
 			tag: ajax_result.tag_name,
-		};
+		}
 	}
 	return null;
 };

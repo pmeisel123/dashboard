@@ -1,6 +1,6 @@
 import { Paper, Table, TableBody, TableContainer, TableHead, TableRow } from "@mui/material";
-import type { HolidayProps, UsersGroupProps } from "@src/Api";
-import { getAllUsHolidays, getDateString, getHolidayDayString } from "@src/Api";
+import { getDateString, getHolidayDayString, getAllUsHolidays } from "@src/Api";
+import type { UsersGroupProps, HolidayProps } from "@src/Api";
 import { allGroups } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { EstimatorCell } from "./const";
@@ -36,7 +36,7 @@ const Calendar: FC<{
 		return new Date(holiday.date) <= nextyear;
 	});
 
-	const usHolidays = [...thisYearUsHolidays, ...nextYearUsHolidays].reduce(
+	const usHolidays = [...thisYearUsHolidays, ...nextYearUsHolidays]	.reduce(
 		(newFormat, holiday) => {
 			newFormat[holiday.date] = holiday;
 			return newFormat;
@@ -182,7 +182,7 @@ const Calendar: FC<{
 													<>
 														<br />
 														{cell.description}
-														{!!cell.working && <br />}
+														{!!cell.working && (<br />)}
 													</>
 												)}
 												{!!cell.working && (

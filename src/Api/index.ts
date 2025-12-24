@@ -1,5 +1,4 @@
 export * from "./git";
-export * from "./gitSlice";
 export * from "./holiday";
 export * from "./misc";
 export * from "./store";

@@ -65,6 +65,6 @@ export interface GitRelease {
 }
 
 export interface LatestRelease {
-	name: string,
-	tag: string
+	name: string;
+	tag: string;
 }

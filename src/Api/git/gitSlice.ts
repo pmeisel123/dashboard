@@ -1,7 +1,7 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import type { BranchesAndTicket } from "../Types";
 import { getBranches } from "./git";
-import type { BranchesAndTicket } from "./Types";
 
 const initialState: BranchesAndTicket = {
 	branches: {},

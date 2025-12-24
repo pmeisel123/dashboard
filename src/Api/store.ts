@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import gitBranchReducer from "./git/gitSlice";
+import gitBranchReducer from "./git/gitBranchesSlice";
 import ticketsReducer from "./ticketsSlice";
 import usersGroupReducer from "./usersSlice";
 import wikiPagesReducer from "./wiki/wikiPagesSlice";

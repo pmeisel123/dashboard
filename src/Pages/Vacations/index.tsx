@@ -13,7 +13,7 @@ import {
 	TextField,
 } from "@mui/material";
 import type { AppDispatch, RootState, UserEditVacation, UserProps } from "@src/Api";
-import { fetchUsersAndGroups, isUserDataRecent, userHasGroup, vacationUpdateApi } from "@src/Api";
+import { fetchUsersAndGroups, isSliceRecent, userHasGroup, vacationUpdateApi } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
 import type { ChangeEvent, FC, FocusEvent } from "react";
 import { useEffect, useState } from "react";
@@ -76,7 +76,7 @@ const VacationPage: FC<{
 	}, [searchParams]);
 
 	useEffect(() => {
-		if (!isUserDataRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);

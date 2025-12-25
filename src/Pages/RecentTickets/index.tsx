@@ -1,6 +1,6 @@
 import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, getJiraDayString, isGitDataRecent } from "@src/Api";
+import { fetchBranches, fetchTickets, getJiraDayString, isSliceRecent } from "@src/Api";
 import { TicketTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ const RecentTicketsPage: FC<{
 	const dispatch = useDispatch<AppDispatch>();
 
 	useEffect(() => {
-		if (!isGitDataRecent(ticketsBranches)) {
+		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
 	}, [dispatch, ticketsBranches]);

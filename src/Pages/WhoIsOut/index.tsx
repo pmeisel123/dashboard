@@ -16,7 +16,7 @@ import {
 	getAllUsHolidays,
 	getDateString,
 	getHolidayDayString,
-	isUserDataRecent,
+	isSliceRecent,
 	userHasGroup,
 } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
@@ -53,7 +53,7 @@ const WhoIsOutPage: FC<{
 	}, [searchParams]);
 
 	useEffect(() => {
-		if (!isUserDataRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);

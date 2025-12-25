@@ -1,5 +1,5 @@
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, fetchUsersAndGroups, isGitDataRecent, isUserDataRecent } from "@src/Api";
+import { fetchBranches, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -75,10 +75,10 @@ const EstimatorPage: FC<{
 		});
 	};
 	useEffect(() => {
-		if (!isUserDataRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
-		if (!isGitDataRecent(ticketsBranches)) {
+		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
 		getFunc();

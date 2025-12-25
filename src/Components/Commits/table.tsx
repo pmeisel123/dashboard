@@ -9,7 +9,7 @@ import type {
 	TicketProps,
 	UsersGroupPropsSlice,
 } from "@src/Api";
-import { fetchUsersAndGroups, GetBranchCreator, isUserDataRecent } from "@src/Api";
+import { fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
 import { Ago, CustomDataGrid } from "@src/Components";
 import type { FC } from "react";
 import { useEffect } from "react";
@@ -118,7 +118,7 @@ export const CommitsTable: FC<{
 	];
 
 	useEffect(() => {
-		if (!isUserDataRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);

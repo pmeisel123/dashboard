@@ -2,19 +2,18 @@ import type {
 	AppDispatch,
 	BranchCommit,
 	BranchesAndTicket,
+	GitLatestReleaseSlice,
 	GitReleaseSlice,
-	LatestRelease,
 	RootState,
 	TicketProps,
 } from "@src/Api";
 import {
 	fetchBranches,
+	fetchLatestRelease,
 	fetchReleases,
 	fetchTickets,
 	getBranchesCompare,
-	getLatetRelease,
-	isGitDataRecent,
-	isGitReleasesRecent,
+	isSliceRecent,
 } from "@src/Api";
 import { CommitsSelector, CommitsTable } from "@src/Components";
 import type { FC } from "react";
@@ -28,6 +27,9 @@ const BranchesComparePage: FC<{
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
 	const releases: { [key: string]: GitReleaseSlice } = useSelector((state: RootState) => state.gitReleasesState);
+	const latestRelease: { [key: string]: GitLatestReleaseSlice } = useSelector(
+		(state: RootState) => state.gitLatestReleaseState,
+	);
 	const [repo, setRepo] = useState<string>(searchParams.get("repo") || "");
 	const [branch1, setBranch1] = useState<string>(searchParams.get("branch1") || "");
 	const [branch2, setBranch2] = useState<string>(searchParams.get("branch2") || "");
@@ -35,7 +37,6 @@ const BranchesComparePage: FC<{
 	const [tickets, setTickets] = useState<{ [key: string]: TicketProps }>({});
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(false);
-	const [latestRelease, setLatestRelease] = useState<LatestRelease | null>();
 	const [useLatestRelease, setUseLatestRelease] = useState<boolean>(searchParams.get("useLatestRelease") == "true");
 
 	const loadParams = () => {
@@ -53,13 +54,15 @@ const BranchesComparePage: FC<{
 	useEffect(() => {
 		if (
 			useLatestRelease &&
-			latestRelease &&
 			repo &&
+			latestRelease[repo] &&
+			latestRelease[repo].release &&
+			latestRelease[repo].release.tag &&
 			releases[repo] &&
 			releases[repo].releases.length &&
 			Object.keys(ticketsBranches.branches).length
 		) {
-			setBranch2(latestRelease.tag);
+			setBranch2(latestRelease[repo].release.tag);
 			if (ticketsBranches.branches[repo]) {
 				if (branch1 != "main" && ticketsBranches.branches[repo].some((branch) => branch.name == "main")) {
 					setBranch1("main");
@@ -72,16 +75,17 @@ const BranchesComparePage: FC<{
 	}, [useLatestRelease, latestRelease, releases, ticketsBranches.branches]);
 
 	useEffect(() => {
+		let isMounted = true;
 		if (!searchParamsOveride) {
 			const newSearchParams = new URLSearchParams(searchParams.toString());
 			if (repo != "") {
 				newSearchParams.set("repo", repo);
-				if (useLatestRelease && latestRelease && releases[repo] && releases[repo].releases.length) {
+				if (useLatestRelease && latestRelease[repo] && releases[repo] && releases[repo].releases.length) {
 					newSearchParams.delete("branch1");
 					newSearchParams.delete("branch2");
 					newSearchParams.set("useLatestRelease", "true");
 				} else {
-					if (!useLatestRelease && latestRelease && releases[repo] && releases[repo].releases.length) {
+					if (!useLatestRelease && latestRelease[repo] && releases[repo] && releases[repo].releases.length) {
 						newSearchParams.delete("useLatestRelease");
 					}
 					if (branch1 != "") {
@@ -108,13 +112,20 @@ const BranchesComparePage: FC<{
 		}
 		if (repo && branch1 && branch2) {
 			setLoading(true);
-			getBranchesCompare(repo, branch1, branch2).then((data: BranchCommit[]) => {
-				setLoading(false);
-				setCommits(data);
-			});
+			const loadData = async () => {
+				const localcommits = await getBranchesCompare(repo, branch1, branch2);
+				if (isMounted) {
+					setCommits(localcommits);
+					setLoading(false);
+				}
+			};
+			loadData();
 		} else {
 			setCommits([]);
 		}
+		return () => {
+			isMounted = false;
+		};
 	}, [repo, branch1, branch2, useLatestRelease, latestRelease, releases]);
 
 	useEffect(() => {
@@ -141,32 +152,27 @@ const BranchesComparePage: FC<{
 	}, [commits]);
 
 	useEffect(() => {
-		if (!isGitDataRecent(ticketsBranches)) {
+		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
 	}, [dispatch]);
 
 	useEffect(() => {
 		if (repo) {
-			if (!releases[repo] || !isGitReleasesRecent(releases[repo])) {
+			if (!releases[repo] || !isSliceRecent(releases[repo])) {
 				dispatch(fetchReleases(repo));
+			}
+			if (!latestRelease[repo] || !isSliceRecent(latestRelease[repo])) {
+				dispatch(fetchLatestRelease(repo));
 			}
 		}
 	}, [dispatch, repo]);
 
 	useEffect(() => {
-		getLatetRelease(repo).then((data: LatestRelease | null) => {
-			if (!data) {
-				setUseLatestRelease(false);
-			}
-			setLatestRelease(data);
-		});
-	}, [repo]);
-	useEffect(() => {
 		if (ticketsBranches.branches && Object.keys(ticketsBranches.branches).length == 1) {
 			setRepo(Object.keys(ticketsBranches.branches)[0]);
 		}
-	});
+	}, [ticketsBranches]);
 	if (!Object.keys(ticketsBranches.branches).length) {
 		return;
 	}

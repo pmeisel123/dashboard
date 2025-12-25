@@ -17,9 +17,9 @@ const WikiPage: FC<{
 	const [pageId, setPageId] = useState<string>(searchParams.get("PageId") || "");
 	const [spaceKey, setSpaceKey] = useState<string>(searchParams.get("SpaceKey") || "");
 	const [loading, setLoading] = useState<boolean>(true);
-	const wikiSpaces: WikiSpaceProps[] = useSelector((state: RootState) => state.wikiSpacesReducer);
-	const wikiPages: WikiPagesProps[] = useSelector((state: RootState) => state.wikiPagesReducer[spaceKey]);
-	const wiki: WikiPageProps = useSelector((state: RootState) => state.wikiReducer[pageId]);
+	const wikiSpaces: WikiSpaceProps[] = useSelector((state: RootState) => state.wikiSpacesState);
+	const wikiPages: WikiPagesProps[] = useSelector((state: RootState) => state.wikiPagesState[spaceKey]);
+	const wiki: WikiPageProps = useSelector((state: RootState) => state.wikiState[pageId]);
 	const dispatch = useDispatch<AppDispatch>();
 	const loadPage = () => {
 		if (pageId) {

@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import type { AppDispatch, BranchesAndTicket, RootState, TicketProps, UsersGroupPropsSlice } from "@src/Api";
-import { fetchBranches, fetchTickets, fetchUsersAndGroups, isGitDataRecent, isUserDataRecent } from "@src/Api";
+import { fetchBranches, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { BranchesTable, UserSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -50,10 +50,10 @@ const BranchesPage: FC<{
 	}, [group, user]);
 
 	useEffect(() => {
-		if (!isGitDataRecent(ticketsBranches)) {
+		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
-		if (!isUserDataRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);

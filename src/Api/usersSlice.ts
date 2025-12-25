@@ -26,10 +26,4 @@ export const usersGroupSlice = createSlice({
 		});
 	},
 });
-export const isUserDataRecent = (usersAndGroups: UsersGroupPropsSlice) => {
-	// The user api does a lot of sub api calls
-	// This is allows it to cache for 10 minutes
-	const TEN_MINUTES_MS = 1000 * 60 * 10;
-	return usersAndGroups.loaded && usersAndGroups.loaded > Date.now() - TEN_MINUTES_MS;
-};
 export default usersGroupSlice.reducer;

@@ -73,3 +73,8 @@ export interface LatestRelease {
 	name: string;
 	tag: string;
 }
+
+export interface GitLatestReleaseSlice {
+	release: LatestRelease | null;
+	loaded: number | null;
+}

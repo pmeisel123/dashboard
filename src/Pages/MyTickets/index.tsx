@@ -1,14 +1,7 @@
 import type { SelectChangeEvent } from "@mui/material";
 import { Checkbox, Grid, InputLabel, ListItemText, MenuItem, Select } from "@mui/material";
 import type { AppDispatch, CustomFieldsProps, ReportNamePaths, RootState, TicketProps } from "@src/Api";
-import {
-	fetchBranches,
-	fetchTickets,
-	fetchUsersAndGroups,
-	GetBranchCreator,
-	isGitDataRecent,
-	isUserDataRecent,
-} from "@src/Api";
+import { fetchBranches, fetchTickets, fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -72,10 +65,10 @@ const MyTicketsPage: FC<{
 	}, [searchParams]);
 
 	useEffect(() => {
-		if (!isUserDataRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups)) {
 			dispatch(fetchUsersAndGroups());
 		}
-		if (!isGitDataRecent(ticketsBranches)) {
+		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
 	}, [dispatch]);

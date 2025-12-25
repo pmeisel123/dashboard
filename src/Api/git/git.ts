@@ -187,7 +187,7 @@ export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
 	return results;
 };
 
-export const getLatetRelease = async (repo_name: string): Promise<LatestRelease | null> => {
+export const getLatestRelease = async (repo_name: string): Promise<LatestRelease | null> => {
 	if (!repo_name) {
 		return null;
 	}

@@ -80,7 +80,7 @@ export const CommitsSelector: FC<{
 					}}
 				>
 					{!!releases.length &&
-						releases.reverse().map((release, index) => (
+						releases.map((release, index) => (
 							<MenuItem key={index} value={release.tag.name}>
 								release/{release.name} ({release.tag.name})
 							</MenuItem>
@@ -107,7 +107,7 @@ export const CommitsSelector: FC<{
 					}}
 				>
 					{!!releases.length &&
-						releases.reverse().map((release, index) => (
+						releases.map((release, index) => (
 							<MenuItem key={index + "--" + release.name} value={release.tag.name}>
 								release/{release.name} ({release.tag.name})
 							</MenuItem>

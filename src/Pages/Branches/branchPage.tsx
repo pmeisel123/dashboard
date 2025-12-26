@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
+declare const __API_URL__: string;
+
 const BranchesPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
@@ -53,7 +55,7 @@ const BranchesPage: FC<{
 		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches());
 		}
-		if (!isSliceRecent(allJiraUsersGroups)) {
+		if (!isSliceRecent(allJiraUsersGroups) && __API_URL__) {
 			dispatch(fetchUsersAndGroups());
 		}
 	}, [dispatch]);
@@ -62,7 +64,10 @@ const BranchesPage: FC<{
 		if (ticketsBranches && ticketsBranches.tickets && Object.keys(ticketsBranches.tickets).length) {
 			jira_search = 'key IN ("' + Object.keys(ticketsBranches.tickets).join('", "') + '")';
 		}
-		if (jira_search) {
+		if (!__API_URL__) {
+			setLoaded(true);
+		}
+		if (jira_search && __API_URL__) {
 			setJiraSearch(jira_search);
 			dispatch(fetchTickets(jira_search)).then((data) => {
 				if (data && data.payload) {
@@ -79,29 +84,35 @@ const BranchesPage: FC<{
 		}
 	}, [ticketsBranches]);
 	useEffect(() => {
-		if (tickets) {
-			tickets.forEach((ticket) => {
-				const key = ticket.key;
-				setTicketKeys((ticketKeys) => {
-					ticketKeys[key] = ticket;
-					return ticketKeys;
+		if (__API_URL__) {
+			if (tickets) {
+				tickets.forEach((ticket) => {
+					const key = ticket.key;
+					setTicketKeys((ticketKeys) => {
+						ticketKeys[key] = ticket;
+						return ticketKeys;
+					});
 				});
-			});
-			if (Object.keys(ticketKeys).length) {
-				setLoaded(true);
+				if (Object.keys(ticketKeys).length) {
+					setLoaded(true);
+				}
 			}
+		} else {
+			setLoaded(true);
 		}
 	}, [tickets]);
 
 	return (
 		<Box sx={{ width: "100%" }}>
-			<UserSelector
-				allJiraUsersGroups={allJiraUsersGroups}
-				group={group}
-				setGroup={setGroup}
-				user={user}
-				setUser={setUser}
-			/>
+			{!!__API_URL__ && (
+				<UserSelector
+					allJiraUsersGroups={allJiraUsersGroups}
+					group={group}
+					setGroup={setGroup}
+					user={user}
+					setUser={setUser}
+				/>
+			)}
 			<BranchesTable
 				loaded={loaded}
 				ticketsBranches={ticketsBranches}

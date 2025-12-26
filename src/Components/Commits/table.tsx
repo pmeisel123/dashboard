@@ -59,47 +59,6 @@ export const CommitsTable: FC<{
 			},
 		},
 		{
-			field: "ticket_key",
-			headerName: "Ticket Key",
-			renderCell: (params: GridRenderCellParams<BranchCommit>) => (
-				<Link
-					href={(__API_URL__ + "/browse/" + params.row.ticket) as string}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{params.row.ticket}
-				</Link>
-			),
-		},
-		{
-			field: "ticket_summary",
-			headerName: "Ticket Summary",
-			renderCell: (params: GridRenderCellParams<BranchCommit>) => {
-				if (params.row.ticket && params.row.ticket in tickets) {
-					return (
-						<Link
-							href={(__API_URL__ + "/browse/" + params.row.ticket) as string}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{tickets[params.row.ticket].summary}
-						</Link>
-					);
-				}
-			},
-			flex: 4,
-		},
-		{
-			field: "ticket_labels",
-			headerName: "Ticket Labels",
-			valueGetter: (_params, row) => {
-				if (row.ticket) {
-					return tickets[row.ticket]?.labels?.join(", ");
-				}
-			},
-			flex: 1,
-		},
-		{
 			field: "creator",
 			headerName: "Creator",
 			valueGetter: (_params, row) => {
@@ -116,6 +75,52 @@ export const CommitsTable: FC<{
 			flex: 2,
 		},
 	];
+	if (__API_URL__) {
+		columns = [
+			...columns,
+			{
+				field: "ticket_key",
+				headerName: "Ticket Key",
+				renderCell: (params: GridRenderCellParams<BranchCommit>) => (
+					<Link
+						href={(__API_URL__ + "/browse/" + params.row.ticket) as string}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{params.row.ticket}
+					</Link>
+				),
+			},
+			{
+				field: "ticket_summary",
+				headerName: "Ticket Summary",
+				renderCell: (params: GridRenderCellParams<BranchCommit>) => {
+					if (params.row.ticket && params.row.ticket in tickets) {
+						return (
+							<Link
+								href={(__API_URL__ + "/browse/" + params.row.ticket) as string}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{tickets[params.row.ticket].summary}
+							</Link>
+						);
+					}
+				},
+				flex: 4,
+			},
+			{
+				field: "ticket_labels",
+				headerName: "Ticket Labels",
+				valueGetter: (_params, row) => {
+					if (row.ticket) {
+						return tickets[row.ticket]?.labels?.join(", ");
+					}
+				},
+				flex: 1,
+			},
+		];
+	}
 
 	useEffect(() => {
 		if (!isSliceRecent(allJiraUsersGroups)) {

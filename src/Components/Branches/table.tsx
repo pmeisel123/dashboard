@@ -78,45 +78,50 @@ const BranchesTable: FC<{
 			headerName: "Last Commit Message",
 			flex: 1,
 		},
-		{
-			field: "ticket_key",
-			headerName: "Ticket Key",
-			renderCell: (params: GridRenderCellParams<rowProp>) => (
-				<Link
-					href={(__API_URL__ + "/browse/" + params.value) as string}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{params.value}
-				</Link>
-			),
-			flex: 1,
-		},
-		{
-			field: "ticket_summary",
-			headerName: "Ticket Summary",
-			renderCell: (params: GridRenderCellParams<rowProp>) => (
-				<Link
-					href={(__API_URL__ + "/browse/" + params.row.ticket_key) as string}
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{params.value}
-				</Link>
-			),
-			flex: 1,
-		},
-		{
-			field: "ticket_assignee",
-			headerName: "Ticket Assignee",
-			flex: 1,
-		},
-		{
-			field: "ticket_status",
-			headerName: "Ticket Status",
-			flex: 1,
-		},
 	];
+	if (__API_URL__) {
+		columns = [
+			...columns,
+			{
+				field: "ticket_key",
+				headerName: "Ticket Key",
+				renderCell: (params: GridRenderCellParams<rowProp>) => (
+					<Link
+						href={(__API_URL__ + "/browse/" + params.value) as string}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{params.value}
+					</Link>
+				),
+				flex: 1,
+			},
+			{
+				field: "ticket_summary",
+				headerName: "Ticket Summary",
+				renderCell: (params: GridRenderCellParams<rowProp>) => (
+					<Link
+						href={(__API_URL__ + "/browse/" + params.row.ticket_key) as string}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{params.value}
+					</Link>
+				),
+				flex: 1,
+			},
+			{
+				field: "ticket_assignee",
+				headerName: "Ticket Assignee",
+				flex: 1,
+			},
+			{
+				field: "ticket_status",
+				headerName: "Ticket Status",
+				flex: 1,
+			},
+		];
+	}
 	const defaultColumnModel: tableSetingsProps = {
 		...defaultTableSettings,
 	};

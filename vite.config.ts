@@ -56,17 +56,33 @@ GITREPOS.forEach((repo, index: number) => {
 		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
-if (API_CONFLUENCE_URL) {
+if (API_CONFLUENCE_URL && API_KEY) {
 	proxies["/jirawiki"] = {
 		target: API_CONFLUENCE_URL,
 		changeOrigin: true,
 		headers: {
-			Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
+			Authorization: "Basic " + btoa(API_USERNAME + ":" + (API_KEY as string)),
 		},
 		rewrite: (path) => path.replace(/^\/jirawiki\//, ""),
 		configure: (proxy) => {
 			proxy.on("proxyRes", (_proxyRes, req) => {
 				console.log("Received Response from Target:", API_CONFLUENCE_URL + req.url);
+			});
+		},
+	};
+}
+
+if (API_URL && API_KEY) {
+	proxies["/jira/"] = {
+		target: API_URL,
+		changeOrigin: true,
+		headers: {
+			Authorization: "Basic " + btoa(API_USERNAME + ":" + (API_KEY as string)),
+		},
+		rewrite: (path) => path.replace(/^\/jira\//, ""),
+		configure: (proxy) => {
+			proxy.on("proxyRes", (_proxyRes, req) => {
+				console.log("Received Response from Target:", req.url);
 			});
 		},
 	};
@@ -91,8 +107,8 @@ const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/
 export default defineConfig({
 	define: {
-		__API_URL__: JSON.stringify(API_URL),
-		__API_CONFLUENCE_URL__: JSON.stringify(API_CONFLUENCE_URL),
+		__API_URL__: JSON.stringify(API_KEY ? API_URL : ""),
+		__API_CONFLUENCE_URL__: JSON.stringify(API_KEY ? API_CONFLUENCE_URL : ""),
 		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
 		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
@@ -107,22 +123,7 @@ export default defineConfig({
 		host: "0.0.0.0",
 		port: PORT,
 		allowedHosts: [HOST],
-		proxy: {
-			"/jira/": {
-				target: API_URL,
-				changeOrigin: true,
-				headers: {
-					Authorization: "Basic " + btoa(API_USERNAME + ":" + API_KEY),
-				},
-				rewrite: (path) => path.replace(/^\/jira\//, ""),
-				configure: (proxy) => {
-					proxy.on("proxyRes", (_proxyRes, req) => {
-						console.log("Received Response from Target:", req.url);
-					});
-				},
-			},
-			...proxies,
-		},
+		proxy: proxies,
 		fs: {
 			allow: ["src", "node_modules", "index.html"],
 			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "**/src/Server/**"],

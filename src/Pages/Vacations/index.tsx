@@ -32,6 +32,7 @@ const VacationPage: FC<{
 	const [groups, setGroups] = useState<string[]>(param_groups ? param_groups.split(/,/g) : []);
 	const dispatch = useDispatch<AppDispatch>();
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
+	const [loading, setLoading] = useState<boolean>(false);
 
 	const getVacationKey = (user: UserProps) => {
 		let vacation_key: string = user.name || "";
@@ -134,8 +135,11 @@ const VacationPage: FC<{
 			}
 		});
 		if (valid) {
+			setLoading(true);
 			vacationUpdateApi(userVacations).then(() => {
-				dispatch(fetchUsersAndGroups());
+				dispatch(fetchUsersAndGroups()).then(() => {
+					setLoading(false);
+				});
 			});
 		}
 	};
@@ -216,8 +220,8 @@ const VacationPage: FC<{
 				</Table>
 			</TableContainer>
 			<div>
-				<Button variant="contained" onClick={callSave}>
-					Save
+				<Button variant="contained" onClick={callSave} disabled={loading}>
+					{loading ? "Saving..." : "Save"}
 				</Button>
 			</div>
 		</>

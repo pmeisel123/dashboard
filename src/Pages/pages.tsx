@@ -14,6 +14,8 @@ import WikiPage from "@src/Pages/Wiki";
 
 declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 declare const __ALLOW_VACATION_EDITS__: boolean;
+declare let __API_URL__: string;
+declare const __API_CONFLUENCE_URL__: string;
 export const pages = [
 	{
 		path: "/",
@@ -31,6 +33,7 @@ export const pages = [
 				vacations, and holidays. Useful for project planning.
 			</>
 		),
+		requires: !!__API_URL__,
 	},
 	{
 		path: "/MyTickets",
@@ -39,12 +42,14 @@ export const pages = [
 		description: (
 			<>View tickets assigned to a specific user. The selected user is saved to local storage for convenience.</>
 		),
+		requires: !!__API_URL__,
 	},
 	{
 		path: "/RecentTickets",
 		name: "Recent Tickets",
 		element: <RecentTicketsPage />,
 		description: <>Find tickets that were recently filed.</>,
+		requires: !!__API_URL__,
 	},
 	{
 		path: "/branches",
@@ -84,6 +89,7 @@ export const pages = [
 				vacations api to automaticlly pull/format the vacation data
 			</>
 		),
+		requires: !!__API_URL__,
 	},
 	{
 		path: "/vacations",
@@ -97,6 +103,7 @@ export const pages = [
 		name: "Wiki Page",
 		element: <WikiPage />,
 		description: <>Wiki Page</>,
+		requires: !!__API_CONFLUENCE_URL__,
 	},
 	{
 		path: "/dashboard",

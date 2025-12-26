@@ -83,7 +83,7 @@ const WhoIsOutPage: FC<{
 	);
 	let rows: cellData[][] = [];
 
-	const current_day = today;
+	const current_day = new Date();
 	current_day.setDate(current_day.getDate() - current_day.getDay());
 	current_day.setHours(0, 0, 0, 0);
 

@@ -96,7 +96,7 @@ export const pages = [
 		name: "Edit Vacations",
 		element: <VacationsPage />,
 		description: <>Edit Vacations and save it to src/assets/vacation.csv</>,
-		requires: __ALLOW_VACATION_EDITS__,
+		requires: __ALLOW_VACATION_EDITS__ && !!__API_URL__,
 	},
 	{
 		path: "/wiki",

@@ -107,17 +107,22 @@ const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/
 export default defineConfig({
 	define: {
-		__API_URL__: JSON.stringify(API_KEY ? API_URL : ""),
+		__ALLOW_VACATION_EDITS__: JSON.stringify(ALLOW_VACATION_EDITS),
 		__API_CONFLUENCE_URL__: JSON.stringify(API_KEY ? API_CONFLUENCE_URL : ""),
-		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
-		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
+		__API_KEY_DEFINED__: JSON.stringify(API_KEY ? true : false),
+		__API_URL__: JSON.stringify(API_KEY ? API_URL : ""),
+		__API_USERNAME_DEFINED__: JSON.stringify(API_USERNAME ? true : false),
 		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
 		__DASHBOARDS__: JSON.stringify(DASHBOARDS || {}),
+		__DASHBOARD_DUCKS__: JSON.stringify(DASHBOARD_DUCKS),
 		__DASHBOARD_SPEED_SECONDS__: JSON.stringify(DASHBOARD_SPEED_SECONDS || {}),
 		__DUCKS__: JSON.stringify(ducks),
-		__DASHBOARD_DUCKS__: JSON.stringify(DASHBOARD_DUCKS),
+		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
+		__GITTOKEN_DEFINED__: JSON.stringify(GITTOKEN ? true : false),
+		__HOST__: JSON.stringify(HOST),
+		__PORT__: JSON.stringify(PORT),
+		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
 		__GIT_REPOS_PATHS__: JSON.stringify(git_proxies_name_path),
-		__ALLOW_VACATION_EDITS__: JSON.stringify(ALLOW_VACATION_EDITS),
 	},
 	server: {
 		host: "0.0.0.0",

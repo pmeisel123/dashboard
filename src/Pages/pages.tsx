@@ -2,6 +2,7 @@ import type { ReportNamePaths } from "@src/Api";
 import { BranchesComparePage, BranchesPage } from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import DucksPage from "@src/Pages/Ducks";
+import EditConfig from "@src/Pages/EditConfig";
 import EstimatorPage from "@src/Pages/Estimator";
 import HolidayPage from "@src/Pages/Holiday";
 import HomePage from "@src/Pages/Home";
@@ -117,6 +118,12 @@ export const pages = [
 				This is useful for displaying information on internal office screens.
 			</>
 		),
+	},
+	{
+		path: "/Edit Config",
+		name: "Edit Config",
+		element: <EditConfig />,
+		description: <>Allow Editting of the config for this site</>,
 	},
 	{
 		path: "/ducks",

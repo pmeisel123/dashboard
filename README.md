@@ -29,7 +29,7 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 2. Install dependencies
 
 ```bash
-   npm install
+   npm install --legacy-peer-deps
 ```
 
 3. Configure settings:

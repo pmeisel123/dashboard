@@ -51,3 +51,5 @@ export interface HolidayProps {
 	type: string;
 	bank?: boolean;
 }
+
+export type VacationKeyType = 'email' | 'name';

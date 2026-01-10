@@ -1,0 +1,278 @@
+import { Add, Delete, Info } from "@mui/icons-material";
+import type { TooltipProps } from "@mui/material";
+import {
+	Box,
+	Button,
+	Grid,
+	IconButton,
+	InputAdornment,
+	InputLabel,
+	Link,
+	styled,
+	TextField,
+	Tooltip,
+	tooltipClasses,
+} from "@mui/material";
+import type { CustomFieldsObjectProps } from "@src/Api/Types";
+import { JiraCustomFields } from "@src/Components";
+import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
+
+const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: "#f5f5f9",
+		color: "rgba(0, 0, 0, 0.87)",
+		maxWidth: 220,
+		fontSize: theme.typography.pxToRem(12),
+		border: "1px solid #dadde9",
+		pointerEvents: "auto",
+	},
+})) as typeof Tooltip;
+
+export const EditJiraConfigTab: FC<{
+	apiKey: string;
+	setApiKey: Dispatch<SetStateAction<string>>;
+	apiUrl: string;
+	setApiUrl: Dispatch<SetStateAction<string>>;
+	apiConfluenceUrl: string;
+	setApiConfluenceUrl: Dispatch<SetStateAction<string>>;
+	userName: string;
+	setUserName: Dispatch<SetStateAction<string>>;
+	doneStatus: string[];
+	setDoneStaus: Dispatch<SetStateAction<string[]>>;
+	customFields: CustomFieldsObjectProps;
+	setCustomFields: Dispatch<SetStateAction<CustomFieldsObjectProps>>;
+	editApiKey: boolean;
+	setEditApiKey: Dispatch<SetStateAction<boolean>>;
+	editUserKey: boolean;
+	setEditUserKey: Dispatch<SetStateAction<boolean>>;
+}> = ({
+	apiKey,
+	setApiKey,
+	apiUrl,
+	setApiUrl,
+	apiConfluenceUrl,
+	setApiConfluenceUrl,
+	userName,
+	setUserName,
+	doneStatus,
+	setDoneStaus,
+	customFields,
+	setCustomFields,
+	editApiKey,
+	setEditApiKey,
+	editUserKey,
+	setEditUserKey,
+}) => {
+	const handleEditDoneStatus = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
+		const newItems = doneStatus.map((item, i) => {
+			if (i === index) {
+				return event.target.value;
+			}
+			return item;
+		});
+		setDoneStaus(newItems);
+	};
+	const handleDeleteDoneStatus = (index: number) => {
+		const newItems = doneStatus.filter((_, i) => i !== index);
+		setDoneStaus(newItems);
+	};
+	const handleAddDoneStatus = () => {
+		setDoneStaus([...doneStatus, ""]);
+	};
+	return (
+		<Box sx={{ width: "100%" }}>
+			<InputLabel id="api_key">Api Key</InputLabel>
+			<br />
+			{!editApiKey && (
+				<Grid container spacing={2} sx={{ width: "100%" }}>
+					<Grid size={{ xs: 12, md: 2 }}>
+						<Button
+							variant="contained"
+							color="primary"
+							onClick={() => {
+								setEditApiKey(true);
+							}}
+						>
+							Override current API key
+						</Button>
+					</Grid>
+					<Grid size={{ xs: 12, md: 2 }}>
+						An Existing API key already exists
+						<br />
+						<Link href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">
+							Jira Api tokens
+						</Link>
+					</Grid>
+				</Grid>
+			)}
+			{editApiKey && (
+				<TextField
+					id="api_key"
+					value={apiKey}
+					onChange={(event) => {
+						setApiKey(event.target.value);
+					}}
+					fullWidth
+					InputProps={{
+						endAdornment: (
+							<InputAdornment position="end">
+								<HtmlTooltip
+									title={
+										<>
+											Input your Jira API key here
+											<br />
+											<Link
+												href="https://id.atlassian.com/manage-profile/security/api-tokens"
+												target="_blank"
+											>
+												Jira Api tokens
+											</Link>
+										</>
+									}
+									disableInteractive={false}
+									arrow
+									placement="right"
+								>
+									<Info style={{ cursor: "pointer" }} color="action" />
+								</HtmlTooltip>
+							</InputAdornment>
+						),
+					}}
+				/>
+			)}
+			<InputLabel id="username">User Name</InputLabel>
+			{!editUserKey && (
+				<Grid container spacing={2}>
+					<Grid size={{ xs: 12, md: 2 }}>
+						<Button
+							variant="contained"
+							color="primary"
+							onClick={() => {
+								setEditUserKey(true);
+							}}
+						>
+							Override current API User name
+						</Button>
+					</Grid>
+					<Grid size={{ xs: 12, md: 2 }} sx={{ padding: "10px 0" }}>
+						An Existing API User Name already exists
+					</Grid>
+				</Grid>
+			)}
+			{editUserKey && (
+				<TextField
+					id="username"
+					value={userName}
+					onChange={(event) => {
+						setUserName(event.target.value);
+					}}
+					fullWidth
+					InputProps={{
+						endAdornment: (
+							<InputAdornment position="end">
+								<HtmlTooltip
+									title={<>Input your Jira Username key here</>}
+									disableInteractive={false}
+									arrow
+									placement="right"
+								>
+									<Info style={{ cursor: "pointer" }} color="action" />
+								</HtmlTooltip>
+							</InputAdornment>
+						),
+					}}
+				/>
+			)}
+			<InputLabel id="ApiUrl">Api Url</InputLabel>
+			<TextField
+				id="ApiUrl"
+				value={apiUrl}
+				fullWidth
+				onChange={(event) => {
+					setApiUrl(event.target.value);
+				}}
+				InputProps={{
+					endAdornment: (
+						<InputAdornment position="end">
+							<HtmlTooltip
+								title={
+									<>
+										Input your Jira API url here
+										<br />
+										Example: https://pmeisel.atlassian.net/
+									</>
+								}
+								disableInteractive={false}
+								arrow
+								placement="right"
+							>
+								<Info style={{ cursor: "pointer" }} color="action" />
+							</HtmlTooltip>
+						</InputAdornment>
+					),
+				}}
+			/>
+			<InputLabel id="ApiConfluenceUrl">Api Confluence Url</InputLabel>
+			<TextField
+				id="ApiConfluenceUrl"
+				value={apiConfluenceUrl}
+				fullWidth
+				onChange={(event) => {
+					setApiConfluenceUrl(event.target.value);
+				}}
+				InputProps={{
+					endAdornment: (
+						<InputAdornment position="end">
+							<HtmlTooltip
+								title={
+									<>
+										Input your Jira Confluience API url here
+										<br />
+										Example: https://pmeisel.atlassian.net/wiki/
+									</>
+								}
+								disableInteractive={false}
+								arrow
+								placement="right"
+							>
+								<Info style={{ cursor: "pointer" }} color="action" />
+							</HtmlTooltip>
+						</InputAdornment>
+					),
+				}}
+			/>
+			<InputLabel id="DoneStatus">
+				Done Status
+				<IconButton edge="end" aria-label="delete" onClick={() => handleAddDoneStatus()}>
+					<Add titleAccess="Add" />
+				</IconButton>
+			</InputLabel>
+			<Grid container spacing={1}>
+				{doneStatus.map((doneStatus, index) => (
+					<Grid size={{ xs: 12, sm: 6, md: 2, lg: 1.5 }} key={index}>
+						<TextField
+							fullWidth
+							key={index}
+							value={doneStatus}
+							onChange={(e) => handleEditDoneStatus(e, index)}
+							InputProps={{
+								endAdornment: (
+									<IconButton
+										edge="end"
+										aria-label="delete"
+										onClick={() => handleDeleteDoneStatus(index)}
+									>
+										<Delete titleAccess="Delete" />
+									</IconButton>
+								),
+							}}
+						/>
+					</Grid>
+				))}
+			</Grid>
+			<JiraCustomFields customFields={customFields} setCustomFields={setCustomFields} />
+		</Box>
+	);
+};

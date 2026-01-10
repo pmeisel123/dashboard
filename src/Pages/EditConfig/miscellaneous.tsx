@@ -1,6 +1,6 @@
-import { Grid, InputLabel, TextField, RadioGroup, Radio, FormLabel, FormControlLabel } from "@mui/material";
-import type { Dispatch, FC, SetStateAction, ChangeEvent } from "react";
-import type { VacationKeyType } from '@src/Api/Types';
+import { FormControlLabel, FormLabel, Grid, InputLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import type { VacationKeyType } from "@src/Api/Types";
+import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
 
 export const EditMiscellaneousConfigTab: FC<{
 	host: string;
@@ -9,7 +9,7 @@ export const EditMiscellaneousConfigTab: FC<{
 	setPort: Dispatch<SetStateAction<string>>;
 	vacationKey: VacationKeyType;
 	setVacationKey: Dispatch<SetStateAction<VacationKeyType>>;
-}> = ({ host, setHost, port, setPort, vacationKey, setVacationKey}) => {
+}> = ({ host, setHost, port, setPort, vacationKey, setVacationKey }) => {
 	const handleVacationChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setVacationKey(event.target.value as VacationKeyType);
 	};
@@ -60,7 +60,9 @@ export const EditMiscellaneousConfigTab: FC<{
 					/>
 				</Grid>
 			</Grid>
-			<FormLabel id="vacationKey">Vacation key (How Jira Users and vacation api link user (by name or by email)</FormLabel>
+			<FormLabel id="vacationKey">
+				Vacation key (How Jira Users and vacation api link user (by name or by email)
+			</FormLabel>
 			<RadioGroup
 				row
 				aria-labelledby="vacationKey"

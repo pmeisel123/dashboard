@@ -13,13 +13,11 @@ export const JiraEditCustomFieldKey: FC<{
 	const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 	useEffect(() => {
 		if (localKey != currentKey) {
-			console.log(1);
 			setLocalKey(currentKey);
 		}
 	}, [currentKey]);
 	useEffect(() => {
 		if (localKey != currentKey) {
-			console.log(2);
 			if (customFields[localKey]) {
 				setIsDuplicate(true);
 			} else {

@@ -120,7 +120,7 @@ export const pages = [
 		),
 	},
 	{
-		path: "/Edit Config",
+		path: "/EditConfig",
 		name: "Edit Config",
 		element: <EditConfig />,
 		description: <>Allow Editting of the config for this site</>,

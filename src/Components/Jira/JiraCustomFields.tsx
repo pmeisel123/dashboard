@@ -157,8 +157,7 @@ export const JiraCustomFields: FC<{
 						<HtmlTooltip
 							title={
 								<>
-									You can see all the fields
-									<br />
+									You can see all the fields&nbsp;
 									<Link href="/jira/rest/api/3/field" target="_blank">
 										here
 									</Link>

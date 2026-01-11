@@ -1,8 +1,9 @@
+import * as MuiIcons from "@mui/icons-material";
 import { Add, Delete } from "@mui/icons-material";
-import { Box, IconButton, InputLabel } from "@mui/material";
-import type { CustomFieldsObjectProps } from "@src/Api/Types";
+import { Grid, IconButton, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import type { CustomFieldsObjectProps, CustomFieldsProps } from "@src/Api/Types";
 import type { Dispatch, FC, SetStateAction } from "react";
-import { useState } from "react";
+import { createElement, useState } from "react";
 import { JiraEditCustomFieldKey } from "./JiraCustomFieldKey";
 
 interface EditableRow {
@@ -32,18 +33,7 @@ export const JiraCustomFields: FC<{
 			setCustomFields(newItems);
 		}
 	};
-	/*
-	const handleEditCustomField = (oldkey: string, key: string, value: CustomFieldsProps) => {
-		const newItems = {...customFields};
-		if (oldkey != key) {
-			if (newItems)
-			delete newItems[oldkey];
-		}
-		newItems[key] = value;
-		setCustomFields(newItems);
-	};
-	*/
-	const handleDeleteCustomFields = (index: number) => {
+	const handleDeleteCustomField = (index: number) => {
 		const oldkey = rows[index].key;
 		const newItems = { ...customFields };
 		delete newItems[oldkey];
@@ -68,6 +58,83 @@ export const JiraCustomFields: FC<{
 		});
 		setRows(new_rows);
 	};
+	const handleEditNameCustomField = (index: number, value: string) => {
+		const newItems = { ...customFields };
+		const key = rows[index].key;
+		if (newItems[key].Name != value) {
+			newItems[key].Name = value;
+			setCustomFields(newItems);
+		}
+	};
+	const handleEditTypeCustomField = (index: number, value: "Text" | "User" | "Link") => {
+		const newItems = { ...customFields };
+		const key = rows[index].key;
+		if (newItems[key].Type != value) {
+			newItems[key] = {
+				Name: newItems[key].Name,
+				Type: value,
+			} as CustomFieldsProps;
+			setCustomFields(newItems);
+		}
+	};
+	const getSubType = (field: CustomFieldsProps) => {
+		if ("LinkIcon" in field) {
+			return "Icon";
+		}
+		if ("LinkText" in field) {
+			return "Text";
+		}
+		return "Url";
+	};
+	const setSubType = (index: number, value: "Icon" | "Text" | "Url") => {
+		const key = rows[index].key;
+		const currentSubType = getSubType(customFields[key]);
+		if (currentSubType == value) {
+			return;
+		}
+		const newItems = { ...customFields };
+		if (value == "Url") {
+			newItems[key] = {
+				Name: newItems[key].Name,
+				Type: "Link",
+			} as CustomFieldsProps;
+		}
+		if (value == "Text") {
+			newItems[key] = {
+				Name: newItems[key].Name,
+				Type: "Link",
+				LinkText: "",
+			} as CustomFieldsProps;
+		}
+		if (value == "Icon") {
+			newItems[key] = {
+				Name: newItems[key].Name,
+				Type: "Link",
+				LinkIcon: "Link",
+			} as CustomFieldsProps;
+		}
+		setCustomFields(newItems);
+	};
+	const setSubIconType = (index: number, value: keyof typeof MuiIcons) => {
+		const newItems = { ...customFields };
+		const key = rows[index].key;
+		newItems[key] = {
+			Name: newItems[key].Name,
+			Type: "Link",
+			LinkIcon: value,
+		} as CustomFieldsProps;
+		setCustomFields(newItems);
+	};
+	const setSubTextType = (index: number, value: string) => {
+		const newItems = { ...customFields };
+		const key = rows[index].key;
+		newItems[key] = {
+			Name: newItems[key].Name,
+			Type: "Link",
+			LinkText: value,
+		} as CustomFieldsProps;
+		setCustomFields(newItems);
+	};
 	return (
 		<>
 			<InputLabel id="CustomJiraFields">
@@ -81,19 +148,114 @@ export const JiraCustomFields: FC<{
 					<Add titleAccess="Add" />
 				</IconButton>
 			</InputLabel>
-			{rows.map((item, index) => (
-				<Box key={index}>
-					<JiraEditCustomFieldKey
-						customFields={customFields}
-						updateRow={updateRow}
-						currentKey={item.key}
-						index={index}
-					/>
-					<IconButton edge="end" aria-label="delete" onClick={() => handleDeleteCustomFields(index)}>
-						<Delete titleAccess="Delete" />
-					</IconButton>
-				</Box>
-			))}
+			<Grid container spacing={1} sx={{ width: "100%" }} alignItems="center">
+				<Grid sx={{ width: "30px" }}></Grid>
+				<Grid size={{ xs: 12, md: 3 }}>
+					<InputLabel>Jira Api Field</InputLabel>
+				</Grid>
+				<Grid size={{ xs: 12, md: 3 }}>
+					<InputLabel>Name</InputLabel>
+				</Grid>
+				<Grid sx={{ width: "90px" }}>
+					<InputLabel>Type</InputLabel>
+				</Grid>
+				<Grid sx={{ width: "90px" }}>
+					<InputLabel>Subtype</InputLabel>
+				</Grid>
+			</Grid>
+			{rows.map((item, index) => {
+				const key = rows[index].key;
+				return (
+					<Grid key={index} container spacing={1} sx={{ width: "100%" }} alignItems="center">
+						<Grid sx={{ width: "30px" }}>
+							<IconButton aria-label="delete" onClick={() => handleDeleteCustomField(index)}>
+								<Delete titleAccess="Delete" />
+							</IconButton>
+						</Grid>
+						<Grid size={{ xs: 12, md: 3 }}>
+							<JiraEditCustomFieldKey
+								customFields={customFields}
+								updateRow={updateRow}
+								currentKey={item.key}
+								index={index}
+							/>
+						</Grid>
+						<Grid size={{ xs: 12, md: 3 }}>
+							<TextField
+								id="Name"
+								value={customFields[key].Name}
+								onChange={(event) => {
+									handleEditNameCustomField(index, event.target.value);
+								}}
+								fullWidth
+							/>
+						</Grid>
+						<Grid sx={{ width: "90px" }}>
+							<Select
+								value={customFields[key].Type}
+								onChange={(event) => {
+									handleEditTypeCustomField(index, event.target.value);
+								}}
+								sx={{ width: "100%" }}
+							>
+								{["Text", "User", "Link"].map((value) => (
+									<MenuItem key={value} value={value}>
+										{value}
+									</MenuItem>
+								))}
+							</Select>
+						</Grid>
+						<Grid sx={{ width: "90px" }}>
+							{customFields[key].Type == "Link" && (
+								<Select
+									value={getSubType(customFields[key])}
+									onChange={(event) => {
+										setSubType(index, event.target.value);
+									}}
+									sx={{ width: "100%" }}
+								>
+									{["Icon", "Text", "Url"].map((value) => (
+										<MenuItem key={value} value={value}>
+											{value}
+										</MenuItem>
+									))}
+								</Select>
+							)}
+						</Grid>
+						<Grid size="grow">
+							{customFields[key].Type == "Link" && getSubType(customFields[key]) == "Icon" && (
+								<Select
+									value={customFields[key].LinkIcon}
+									onChange={(event) => {
+										setSubIconType(index, event.target.value);
+									}}
+									sx={{ width: "100%" }}
+								>
+									{Object.keys(MuiIcons)
+										.filter((name) => !name.match(/(Outlined|Rounded|TwoTone|Sharp)$/))
+										.map((value) => (
+											<MenuItem key={value} value={value}>
+												{createElement(MuiIcons[value as keyof typeof MuiIcons], {
+													sx: { mr: 1 },
+												})}
+												{value}
+											</MenuItem>
+										))}
+								</Select>
+							)}
+							{customFields[key].Type == "Link" && getSubType(customFields[key]) == "Text" && (
+								<TextField
+									value={customFields[key].LinkText}
+									onChange={(event) => {
+										setSubTextType(index, event.target.value);
+									}}
+									fullWidth
+								/>
+							)}
+						</Grid>
+					</Grid>
+				);
+			})}
 		</>
 	);
 };

@@ -87,7 +87,7 @@ export const EditJiraConfigTab: FC<{
 			<br />
 			{!editApiKey && (
 				<Grid container spacing={2} sx={{ width: "100%" }}>
-					<Grid size={{ xs: 12, md: 2 }}>
+					<Grid sx={{ width: "325px" }}>
 						<Button
 							variant="contained"
 							color="primary"
@@ -98,7 +98,7 @@ export const EditJiraConfigTab: FC<{
 							Override current API key
 						</Button>
 					</Grid>
-					<Grid size={{ xs: 12, md: 2 }}>
+					<Grid size={{ xs: 12, md: 5 }}>
 						An Existing API key already exists
 						<br />
 						<Link href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">
@@ -145,7 +145,7 @@ export const EditJiraConfigTab: FC<{
 			<InputLabel id="username">User Name</InputLabel>
 			{!editUserKey && (
 				<Grid container spacing={2}>
-					<Grid size={{ xs: 12, md: 2 }}>
+					<Grid sx={{ width: "325px" }}>
 						<Button
 							variant="contained"
 							color="primary"

@@ -30,13 +30,16 @@ export const JiraEditCustomFieldKey: FC<{
 	}, [localKey]);
 
 	return (
-		<TextField
-			id="currenKey"
-			value={localKey}
-			onChange={(event) => {
-				setLocalKey(event.target.value);
-			}}
-			helperText={isDuplicate ? "Duplicate Key" : ""}
-		/>
+		<>
+			<TextField
+				id="currenKey"
+				value={localKey}
+				onChange={(event) => {
+					setLocalKey(event.target.value);
+				}}
+				helperText={isDuplicate ? "Duplicate Key" : ""}
+				fullWidth
+			/>
+		</>
 	);
 };

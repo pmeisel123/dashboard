@@ -1,8 +1,34 @@
 import { Add, Delete, Info } from "@mui/icons-material";
-import { Box, Button, Grid, IconButton, InputAdornment, InputLabel, Link, TextField } from "@mui/material";
+import type { TooltipProps } from "@mui/material";
+import {
+	Box,
+	Button,
+	Grid,
+	IconButton,
+	InputAdornment,
+	InputLabel,
+	Link,
+	styled,
+	TextField,
+	Tooltip,
+	tooltipClasses,
+} from "@mui/material";
 import type { CustomFieldsObjectProps } from "@src/Api/Types";
-import { HtmlTooltip, JiraCustomFields } from "@src/Components";
+import { JiraCustomFields } from "@src/Components";
 import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
+
+const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: "#f5f5f9",
+		color: "rgba(0, 0, 0, 0.87)",
+		maxWidth: 220,
+		fontSize: theme.typography.pxToRem(12),
+		border: "1px solid #dadde9",
+		pointerEvents: "auto",
+	},
+})) as typeof Tooltip;
 
 export const EditJiraConfigTab: FC<{
 	apiKey: string;

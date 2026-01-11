@@ -222,7 +222,7 @@ export const JiraCustomFields: FC<{
 							padding: { xs: "10px", md: 0 },
 						}}
 					>
-						<Grid sx={{ width: "30px", paddingTop: "7px", display: { xs: "none", md: "flex" } }}>
+						<Grid sx={{ width: "30px", paddingTop: "7px", display: { xs: "none", md: "block" } }}>
 							<IconButton aria-label="delete" onClick={() => handleDeleteCustomField(index)}>
 								<Delete titleAccess="Delete" />
 							</IconButton>

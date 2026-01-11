@@ -235,10 +235,12 @@ export const JiraCustomFields: FC<{
 										.filter((name) => !name.match(/(Outlined|Rounded|TwoTone|Sharp)$/))
 										.map((value) => (
 											<MenuItem key={value} value={value}>
-												{createElement(MuiIcons[value as keyof typeof MuiIcons], {
-													sx: { mr: 1 },
-												})}
-												{value}
+												<div style={{ alignItems: "center", display: "flex" }}>
+													{createElement(MuiIcons[value as keyof typeof MuiIcons], {
+														sx: { marginRight: "10px", height: "22px" },
+													})}
+													{value}
+												</div>
 											</MenuItem>
 										))}
 								</Select>

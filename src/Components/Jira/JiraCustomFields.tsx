@@ -1,9 +1,10 @@
 import * as MuiIcons from "@mui/icons-material";
-import { Add, Delete } from "@mui/icons-material";
-import { Grid, IconButton, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Add, Delete, Info } from "@mui/icons-material";
+import { Grid, IconButton, InputLabel, Link, MenuItem, Select, TextField } from "@mui/material";
 import type { CustomFieldsObjectProps, CustomFieldsProps } from "@src/Api/Types";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { createElement, useState } from "react";
+import { HtmlTooltip } from "./const";
 import { JiraEditCustomFieldKey } from "./JiraCustomFieldKey";
 
 interface EditableRow {
@@ -151,7 +152,25 @@ export const JiraCustomFields: FC<{
 			<Grid container spacing={1} sx={{ width: "100%" }} alignItems="center">
 				<Grid sx={{ width: "30px" }}></Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel>Jira Api Field</InputLabel>
+					<InputLabel>
+						Jira Api Field
+						<HtmlTooltip
+							title={
+								<>
+									You can see all the fields
+									<br />
+									<Link href="/jira/rest/api/3/field" target="_blank">
+										here
+									</Link>
+								</>
+							}
+							disableInteractive={false}
+							arrow
+							placement="right"
+						>
+							<Info style={{ cursor: "pointer" }} color="action" />
+						</HtmlTooltip>
+					</InputLabel>
 				</Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
 					<InputLabel>Name</InputLabel>

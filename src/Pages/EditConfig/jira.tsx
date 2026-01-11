@@ -1,7 +1,7 @@
 import { Add, Delete, Info } from "@mui/icons-material";
 import { Box, Button, Grid, IconButton, InputAdornment, InputLabel, Link, TextField } from "@mui/material";
 import type { CustomFieldsObjectProps } from "@src/Api/Types";
-import { JiraCustomFields, HtmlTooltip } from "@src/Components";
+import { HtmlTooltip, JiraCustomFields } from "@src/Components";
 import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
 
 export const EditJiraConfigTab: FC<{

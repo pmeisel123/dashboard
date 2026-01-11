@@ -48,3 +48,8 @@ export type CustomFieldsProps = CustomFieldsPropsText | CustomFieldsPropsUser | 
 export interface CustomFieldsObjectProps {
 	[key: string]: CustomFieldsProps;
 }
+
+export interface CustomFieldsFromJiraProps {
+	Key: string;
+	Name: string;
+}

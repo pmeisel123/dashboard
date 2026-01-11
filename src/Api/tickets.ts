@@ -1,4 +1,4 @@
-import type { CustomFieldsProps, TicketProps } from "./Types";
+import type { CustomFieldsFromJiraProps, CustomFieldsProps, TicketProps } from "./Types";
 declare const __DONE_STATUS__: string[];
 
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
@@ -132,4 +132,28 @@ export const getTicketsApi = async (search: string): Promise<TicketProps[]> => {
 		}
 	}
 	return result;
+};
+
+export const getCustomFieldsApi = async (): Promise<CustomFieldsFromJiraProps[]> => {
+	const url = "/jira/rest/api/3/field";
+	const paramaters = {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	};
+	let response = await fetch(url, paramaters);
+	const ajax_result: any[] = await response.json();
+	const results: CustomFieldsFromJiraProps[] = [];
+	ajax_result.forEach((record: any) => {
+		const key = record.key;
+		const name = record.name;
+		if (key.match(/^customfield_/)) {
+			results.push({
+				Key: key,
+				Name: name,
+			});
+		}
+	});
+	return results;
 };

@@ -1,6 +1,6 @@
 import * as MuiIcons from "@mui/icons-material";
 import { Add, Delete, Info } from "@mui/icons-material";
-import { Grid, IconButton, InputLabel, Link, MenuItem, Select, TextField } from "@mui/material";
+import { Grid, IconButton, InputLabel, Link, MenuItem, Select, TextField, Tooltip } from "@mui/material";
 import type { CustomFieldsObjectProps, CustomFieldsProps } from "@src/Api/Types";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { createElement, useState } from "react";
@@ -140,14 +140,18 @@ export const JiraCustomFields: FC<{
 		<>
 			<InputLabel id="CustomJiraFields">
 				Custom Jira Fields
-				<IconButton
-					edge="end"
-					aria-label="delete"
-					onClick={() => handleAddCustomField()}
-					disabled={!!customFields[""]}
-				>
-					<Add titleAccess="Add" />
-				</IconButton>
+				<Tooltip title={customFields[""] ? "There is already a blank Jira API field" : ""} arrow>
+					<span>
+						<IconButton
+							edge="end"
+							aria-label="delete"
+							onClick={() => handleAddCustomField()}
+							disabled={!!customFields[""]}
+						>
+							<Add titleAccess="Add" />
+						</IconButton>
+					</span>
+				</Tooltip>
 			</InputLabel>
 			<Grid container spacing={1} sx={{ width: "100%" }} alignItems="center">
 				<Grid sx={{ width: "30px" }}></Grid>
@@ -172,7 +176,7 @@ export const JiraCustomFields: FC<{
 					</InputLabel>
 				</Grid>
 				<Grid size={{ xs: 12, md: 3 }}>
-					<InputLabel>Name</InputLabel>
+					<InputLabel>Local Name</InputLabel>
 				</Grid>
 				<Grid sx={{ width: "90px" }}>
 					<InputLabel>Type</InputLabel>

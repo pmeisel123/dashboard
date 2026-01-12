@@ -1,21 +1,22 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Tab } from "@mui/material";
+import type { CustomFieldsObjectProps, RepoNamePaths, VacationKeyType } from "@src/Api/Types";
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
+import { EditGitConfigTab } from "./git";
 import { EditJiraConfigTab } from "./jira";
 import { EditMiscellaneousConfigTab } from "./miscellaneous";
-// import type { CustomFieldsObjectProps, DashboardsProps, ReposProps, VacationKeyType } from './src/Api/Types';
-import type { CustomFieldsObjectProps, VacationKeyType } from "@src/Api/Types";
+
+const Debug = false;
 
 declare const __HOST__: string;
 declare const __PORT__: number;
 declare const __VACATION_KEY__: VacationKeyType;
-declare const __API_KEY_DEFINED__: boolean;
 declare const __API_URL__: string;
 declare const __API_CONFLUENCE_URL__: string;
-declare const __API_USERNAME_DEFINED__: boolean;
 declare const __CUSTOM_FIELDS__: CustomFieldsObjectProps;
 declare const __DONE_STATUS__: string[];
+declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 
 function EditConfigPage() {
 	const [tab, setTab] = useState<string>("Miscellaneous");
@@ -28,8 +29,8 @@ function EditConfigPage() {
 	const [userName, setUserName] = useState<string>("");
 	const [doneStatus, setDoneStaus] = useState<string[]>(__DONE_STATUS__ || []);
 	const [customFields, setCustomFields] = useState<CustomFieldsObjectProps>(__CUSTOM_FIELDS__ || {});
-	const [editApiKey, setEditApiKey] = useState<boolean>(!__API_KEY_DEFINED__);
-	const [editUserKey, setsetEditUserKey] = useState<boolean>(!__API_USERNAME_DEFINED__);
+	const [gitRepoPaths, setGitRepoPaths] = useState<{ [key: string]: RepoNamePaths }>(__GIT_REPOS_PATHS__ || {});
+	const [gitToken, setGitToken] = useState<string>("");
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
 	};
@@ -67,39 +68,44 @@ function EditConfigPage() {
 						setDoneStaus={setDoneStaus}
 						customFields={customFields}
 						setCustomFields={setCustomFields}
-						editApiKey={editApiKey}
-						setEditApiKey={setEditApiKey}
-						editUserKey={editUserKey}
-						setEditUserKey={setsetEditUserKey}
 					/>
 				</TabPanel>
-				<TabPanel value="Git">Git</TabPanel>
+				<TabPanel value="Git">
+					<EditGitConfigTab
+						gitToken={gitToken}
+						setGitToken={setGitToken}
+						gitRepoPaths={gitRepoPaths}
+						setGitRepoPaths={setGitRepoPaths}
+					/>
+				</TabPanel>
 				<TabPanel value="Dashboards">Dashboards</TabPanel>
 			</TabContext>
-			Fields: <br />
-			tab: {tab}
-			<br />
-			host: {host}
-			<br />
-			port: {port}
-			<br />
-			vacationKey: {vacationKey}
-			<br />
-			apiKey={apiKey}
-			<br />
-			apiUrl={apiUrl}
-			<br />
-			apiConfluenceUrl={apiConfluenceUrl}
-			<br />
-			userName={userName}
-			<br />
-			doneStatus=["{doneStatus.join('", "')}"]
-			<br />
-			editApiKey={editApiKey ? "true" : "false"}
-			<br />
-			editUserKey={editUserKey ? "true" : "false"}
-			<pre>customFields={JSON.stringify(customFields, null, 2)}</pre>
-			<br />
+			{Debug && (
+				<>
+					Fields: <br />
+					tab: {tab}
+					<br />
+					host: {host}
+					<br />
+					port: {port}
+					<br />
+					vacationKey: {vacationKey}
+					<br />
+					apiKey={apiKey}
+					<br />
+					apiUrl={apiUrl}
+					<br />
+					apiConfluenceUrl={apiConfluenceUrl}
+					<br />
+					userName={userName}
+					<br />
+					doneStatus=["{doneStatus.join('", "')}"]
+					<pre>customFields={JSON.stringify(customFields, null, 2)}</pre>
+					gitToken={gitToken}
+					<pre>gitRepoPaths={JSON.stringify(gitRepoPaths, null, 2)}</pre>
+					<br />
+				</>
+			)}
 		</>
 	);
 }

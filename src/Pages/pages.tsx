@@ -1,4 +1,4 @@
-import type { ReportNamePaths } from "@src/Api";
+import type { RepoNamePaths } from "@src/Api";
 import { BranchesComparePage, BranchesPage } from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import DucksPage from "@src/Pages/Ducks";
@@ -13,7 +13,7 @@ import VacationsPage from "@src/Pages/Vacations";
 import WhoIsOutPage from "@src/Pages/WhoIsOut";
 import WikiPage from "@src/Pages/Wiki";
 
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
+declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 declare const __ALLOW_VACATION_EDITS__: boolean;
 declare let __API_URL__: string;
 declare const __API_CONFLUENCE_URL__: string;

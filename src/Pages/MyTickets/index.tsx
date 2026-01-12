@@ -1,6 +1,6 @@
 import type { SelectChangeEvent } from "@mui/material";
 import { Checkbox, Grid, InputLabel, ListItemText, MenuItem, Select } from "@mui/material";
-import type { AppDispatch, CustomFieldsProps, ReportNamePaths, RootState, TicketProps } from "@src/Api";
+import type { AppDispatch, CustomFieldsProps, RepoNamePaths, RootState, TicketProps } from "@src/Api";
 import { fetchBranches, fetchTickets, fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
 import type { FC } from "react";
@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 
 declare const __DONE_STATUS__: string[];
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
+declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 const allUserFieldsMap: { [key: string]: string } = {
 	assignee: "Assignee",

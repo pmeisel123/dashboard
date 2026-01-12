@@ -3,6 +3,9 @@ import { Box, Button, Grid, IconButton, InputAdornment, InputLabel, Link, TextFi
 import type { CustomFieldsObjectProps } from "@src/Api/Types";
 import { HtmlTooltip, JiraCustomFields } from "@src/Components";
 import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
+import { useState } from "react";
+
+declare const __API_KEY_DEFINED__: boolean;
 
 export const EditJiraConfigTab: FC<{
 	apiKey: string;
@@ -17,10 +20,6 @@ export const EditJiraConfigTab: FC<{
 	setDoneStaus: Dispatch<SetStateAction<string[]>>;
 	customFields: CustomFieldsObjectProps;
 	setCustomFields: Dispatch<SetStateAction<CustomFieldsObjectProps>>;
-	editApiKey: boolean;
-	setEditApiKey: Dispatch<SetStateAction<boolean>>;
-	editUserKey: boolean;
-	setEditUserKey: Dispatch<SetStateAction<boolean>>;
 }> = ({
 	apiKey,
 	setApiKey,
@@ -34,11 +33,8 @@ export const EditJiraConfigTab: FC<{
 	setDoneStaus,
 	customFields,
 	setCustomFields,
-	editApiKey,
-	setEditApiKey,
-	editUserKey,
-	setEditUserKey,
 }) => {
+	const [editApiKey, setEditApiKey] = useState<boolean>(!__API_KEY_DEFINED__);
 	const handleEditDoneStatus = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
 		const newItems = doneStatus.map((item, i) => {
 			if (i === index) {
@@ -58,7 +54,6 @@ export const EditJiraConfigTab: FC<{
 	return (
 		<Box sx={{ width: "100%" }}>
 			<InputLabel id="api_key">Api Key</InputLabel>
-			<br />
 			{!editApiKey && (
 				<Grid container spacing={2} sx={{ width: "100%" }}>
 					<Grid sx={{ width: "325px" }}>
@@ -69,7 +64,7 @@ export const EditJiraConfigTab: FC<{
 								setEditApiKey(true);
 							}}
 						>
-							Override current API key
+							Override current API key and name
 						</Button>
 					</Grid>
 					<Grid size={{ xs: 12, md: 5 }}>
@@ -89,6 +84,7 @@ export const EditJiraConfigTab: FC<{
 						setApiKey(event.target.value);
 					}}
 					fullWidth
+					helperText=" "
 					InputProps={{
 						endAdornment: (
 							<InputAdornment position="end">
@@ -117,31 +113,22 @@ export const EditJiraConfigTab: FC<{
 				/>
 			)}
 			<InputLabel id="username">User Name</InputLabel>
-			{!editUserKey && (
+			{!editApiKey && (
 				<Grid container spacing={2}>
-					<Grid sx={{ width: "325px" }}>
-						<Button
-							variant="contained"
-							color="primary"
-							onClick={() => {
-								setEditUserKey(true);
-							}}
-						>
-							Override current API User name
-						</Button>
-					</Grid>
+					<Grid sx={{ width: "325px" }}></Grid>
 					<Grid size={{ xs: 12, md: 2 }} sx={{ padding: "10px 0" }}>
 						An Existing API User Name already exists
 					</Grid>
 				</Grid>
 			)}
-			{editUserKey && (
+			{editApiKey && (
 				<TextField
 					id="username"
 					value={userName}
 					onChange={(event) => {
 						setUserName(event.target.value);
 					}}
+					helperText=" "
 					fullWidth
 					InputProps={{
 						endAdornment: (
@@ -164,6 +151,8 @@ export const EditJiraConfigTab: FC<{
 				id="ApiUrl"
 				value={apiUrl}
 				fullWidth
+				disabled={!apiKey || !userName}
+				helperText={!apiKey || !userName ? "Enter Api Key and username to update" : " "}
 				onChange={(event) => {
 					setApiUrl(event.target.value);
 				}}
@@ -193,6 +182,8 @@ export const EditJiraConfigTab: FC<{
 				id="ApiConfluenceUrl"
 				value={apiConfluenceUrl}
 				fullWidth
+				disabled={!apiKey || !userName}
+				helperText={!apiKey || !userName ? "Enter Api Key and username to update" : " "}
 				onChange={(event) => {
 					setApiConfluenceUrl(event.target.value);
 				}}
@@ -228,6 +219,7 @@ export const EditJiraConfigTab: FC<{
 					<Grid size={{ xs: 12, sm: 6, md: 2, lg: 1.5 }} key={index}>
 						<TextField
 							fullWidth
+							helperText=" "
 							key={index}
 							value={doneStatus}
 							onChange={(e) => handleEditDoneStatus(e, index)}

@@ -6,6 +6,7 @@ export * from "./Dashboard";
 export * from "./DataGrid";
 export * from "./Duck";
 export * from "./Estimator";
+export * from "./GitConfig";
 export * from "./Jira";
 export * from "./LeftNav";
 export * from "./SavePage";

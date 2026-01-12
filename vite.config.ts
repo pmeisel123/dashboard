@@ -24,10 +24,10 @@ import {
 	PORT,
 	VACATION_KEY,
 } from "./globals";
-import type { ReportNamePaths } from "./src/Api/Types";
+import type { RepoNamePaths } from "./src/Api/Types";
 
 const proxies: { [key: string]: ProxyOptions } = {};
-const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};
+const git_proxies_name_path: { [key: string]: RepoNamePaths } = {};
 GITREPOS.forEach((repo, index: number) => {
 	const repo_path = "/git_" + index;
 	const repo_name = repo.name;

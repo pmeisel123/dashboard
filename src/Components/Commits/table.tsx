@@ -4,7 +4,7 @@ import type {
 	AppDispatch,
 	BranchCommit,
 	BranchesAndTicket,
-	ReportNamePaths,
+	RepoNamePaths,
 	RootState,
 	TicketProps,
 	UsersGroupPropsSlice,
@@ -15,7 +15,7 @@ import type { FC } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
+declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 declare const __API_URL__: string;
 
 export const CommitsTable: FC<{

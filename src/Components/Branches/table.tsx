@@ -4,7 +4,7 @@ import type {
 	BranchesAndTicket,
 	CustomFieldsProps,
 	GitBranch,
-	ReportNamePaths,
+	RepoNamePaths,
 	TicketProps,
 	UsersGroupProps,
 } from "@src/Api";
@@ -18,7 +18,7 @@ import type { rowProp } from "./const";
 
 declare const __API_URL__: string;
 declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
+declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 
 const BranchesTable: FC<{
 	ticketsBranches: BranchesAndTicket;

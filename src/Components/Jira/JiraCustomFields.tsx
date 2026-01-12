@@ -2,15 +2,16 @@ import * as MuiIcons from "@mui/icons-material";
 import { Add, Delete, Info } from "@mui/icons-material";
 import { Grid, IconButton, InputLabel, Link, MenuItem, Select, TextField, Tooltip } from "@mui/material";
 import { getCustomFieldsApi } from "@src/Api";
-import type { CustomFieldsFromJiraProps, CustomFieldsObjectProps, CustomFieldsProps } from "@src/Api/Types";
+import type {
+	CustomFieldsFromJiraProps,
+	CustomFieldsObjectProps,
+	CustomFieldsProps,
+	EditableRow,
+} from "@src/Api/Types";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { createElement, useEffect, useState } from "react";
 import { HtmlTooltip } from "./const";
 import { JiraEditCustomFieldKey } from "./JiraCustomFieldKey";
-
-interface EditableRow {
-	key: string;
-}
 
 export const JiraCustomFields: FC<{
 	customFields: CustomFieldsObjectProps;

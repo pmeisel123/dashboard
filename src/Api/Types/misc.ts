@@ -53,3 +53,7 @@ export interface HolidayProps {
 }
 
 export type VacationKeyType = "email" | "name";
+
+export interface EditableRow {
+	key: string;
+}

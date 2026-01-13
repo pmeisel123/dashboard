@@ -20,6 +20,7 @@ declare const __DONE_STATUS__: string[];
 declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 declare const __DASHBOARDS__: { [key: string]: DashboardProps };
 declare const __DASHBOARD_SPEED_SECONDS__: number;
+declare const __DASHBOARD_DUCKS__: boolean;
 
 function EditConfigPage() {
 	const [tab, setTab] = useState<string>("Miscellaneous");
@@ -36,6 +37,7 @@ function EditConfigPage() {
 	const [gitToken, setGitToken] = useState<string>("");
 	const [dashboards, setDashboards] = useState<{ [key: string]: DashboardProps }>(__DASHBOARDS__ || {});
 	const [dashboardSpeed, setDashboardSpeed] = useState<number>(__DASHBOARD_SPEED_SECONDS__ || 10);
+	const [dashboardDucks, setDashboardDucks] = useState<boolean>(__DASHBOARD_DUCKS__ || true);
 
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
@@ -90,6 +92,8 @@ function EditConfigPage() {
 						setDashboardSpeed={setDashboardSpeed}
 						dashboards={dashboards}
 						setDashboards={setDashboards}
+						dashboardDucks={dashboardDucks}
+						setDashboardDucks={setDashboardDucks}
 					/>
 				</TabPanel>
 			</TabContext>
@@ -118,6 +122,7 @@ function EditConfigPage() {
 					<pre>gitRepoPaths={JSON.stringify(gitRepoPaths, null, 2)}</pre>
 					dashboardSpeed={dashboardSpeed}
 					<pre>dashboards={JSON.stringify(dashboards, null, 2)}</pre>
+					dashboardDucks={JSON.stringify(dashboardDucks)}
 					<br />
 				</>
 			)}

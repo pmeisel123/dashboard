@@ -1,29 +1,29 @@
-interface DashboardSinglePageProps {
+export interface DashboardSinglePageProps {
 	name: string;
 	url: string;
 }
 
-type twoPages = [DashboardSinglePageProps, DashboardSinglePageProps];
-type fourPages = [
+export type twoPages = [DashboardSinglePageProps, DashboardSinglePageProps];
+export type fourPages = [
 	DashboardSinglePageProps,
 	DashboardSinglePageProps,
 	DashboardSinglePageProps,
 	DashboardSinglePageProps,
 ];
 
-interface DashboardPageSplitSidewaysProps {
+export interface DashboardPageSplitSidewaysProps {
 	name: string;
 	split: "sideways";
 	pages: twoPages;
 }
 
-interface DashboardPageSplitUpDownProps {
+export interface DashboardPageSplitUpDownProps {
 	name: string;
 	split: "updown";
 	pages: twoPages;
 }
 
-interface DashboardPageSplitFourWaysProps {
+export interface DashboardPageSplitFourWaysProps {
 	name: string;
 	split: "fourways";
 	pages: fourPages;

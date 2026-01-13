@@ -1,9 +1,10 @@
 import { Add, Delete } from "@mui/icons-material";
 import { Box, Grid, IconButton, InputLabel, TextField, Tooltip } from "@mui/material";
-import type { DashboardProps, EditableRow } from "@src/Api/Types";
+import type { DashboardPageProps, DashboardProps, EditableRow } from "@src/Api/Types";
 import { UniqueTextFieldFieldKey } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useState } from "react";
+import { EditPages } from "./EditPages";
 
 export const EditDashboardList: FC<{
 	dashboards: { [key: string]: DashboardProps };
@@ -64,6 +65,15 @@ export const EditDashboardList: FC<{
 		newItems[current_key].name = newValue;
 		setDashboards(newItems);
 	};
+
+	const getUpdatePages = (index: number) => {
+		return (pages: DashboardPageProps[]) => {
+			const current_key = rows[index].key;
+			const newItems = { ...dashboards };
+			newItems[current_key].pages = pages;
+			setDashboards(newItems);
+		};
+	};
 	return (
 		<>
 			<InputLabel id="dashboards">
@@ -79,9 +89,10 @@ export const EditDashboardList: FC<{
 			{rows.map((item, index) => {
 				const key = item.key;
 				return (
-					<Box sx={{ border: "1px solid gray", marginBottom: "10px", padding: "10px 0" }}>
-						<Grid container spacing={2} sx={{ width: "100%" }} key={index}>
-							<Grid sx={{ width: "30px", paddingTop: "7px", display: { xs: "none", md: "block" } }}>
+					<Box sx={{ border: "1px solid gray", marginBottom: "10px", padding: "10px 0" }} key={index}>
+						<Grid container spacing={2} sx={{ width: "100%" }}>
+							<Grid sx={{ width: "30px", paddingTop: "7px" }}>
+								<InputLabel id="key">&nbsp;</InputLabel>
 								<IconButton aria-label="delete" onClick={() => deletRow(index)}>
 									<Delete titleAccess="Delete" />
 								</IconButton>
@@ -106,10 +117,7 @@ export const EditDashboardList: FC<{
 								/>
 							</Grid>
 						</Grid>
-						<Box sx={{ paddingLeft: "30px" }}>
-							<InputLabel id="pages">Pages</InputLabel>
-							<pre>pages={JSON.stringify(dashboards[key].pages, null, 2)}</pre>
-						</Box>
+						<EditPages pages={dashboards[key].pages} setPages={getUpdatePages(index)} subPage={false} />
 					</Box>
 				);
 			})}

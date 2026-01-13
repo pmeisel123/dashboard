@@ -1,7 +1,7 @@
 import { Add, Delete, Info } from "@mui/icons-material";
 import { Box, Button, Grid, IconButton, InputAdornment, InputLabel, Link, TextField, Tooltip } from "@mui/material";
 import type { EditableRow, RepoNamePaths } from "@src/Api/Types";
-import { HtmlTooltip, RepoFieldKey } from "@src/Components";
+import { HtmlTooltip, UniqueTextFieldFieldKey } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useState } from "react";
 
@@ -22,7 +22,7 @@ export const EditGitConfigTab: FC<{
 			})),
 	);
 
-	const updateRow = (index: number, newKey: string) => {
+	const updateRowKey = (index: number, newKey: string) => {
 		const current_key = rows[index].key;
 		if (current_key != newKey) {
 			const new_rows = [...rows];
@@ -49,7 +49,7 @@ export const EditGitConfigTab: FC<{
 		newItems[current_key].url = value;
 		setGitRepoPaths(newItems);
 	};
-	const handleAddRepo = () => {
+	const addRow = () => {
 		const newItems = { ...gitRepoPaths };
 		const newKey = "";
 		if (!newItems[newKey]) {
@@ -126,7 +126,7 @@ export const EditGitConfigTab: FC<{
 					}}
 				/>
 			)}
-			<InputLabel id="api_key">
+			<InputLabel id="repos">
 				Git Repos
 				<Tooltip
 					title={
@@ -142,7 +142,7 @@ export const EditGitConfigTab: FC<{
 						<IconButton
 							edge="end"
 							aria-label="delete"
-							onClick={() => handleAddRepo()}
+							onClick={() => addRow()}
 							disabled={!gitToken || !!gitRepoPaths[""]}
 						>
 							<Add titleAccess="Add" />
@@ -160,9 +160,9 @@ export const EditGitConfigTab: FC<{
 							</IconButton>
 						</Grid>
 						<Grid size={{ xs: 12, md: 3 }}>
-							<RepoFieldKey
-								gitRepoPaths={gitRepoPaths}
-								updateRow={updateRow}
+							<UniqueTextFieldFieldKey
+								object={gitRepoPaths}
+								updateRow={updateRowKey}
 								currentKey={key}
 								index={index}
 								disabled={!gitToken}

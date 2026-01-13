@@ -1,8 +1,9 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Tab } from "@mui/material";
-import type { CustomFieldsObjectProps, RepoNamePaths, VacationKeyType } from "@src/Api/Types";
+import type { CustomFieldsObjectProps, DashboardProps, RepoNamePaths, VacationKeyType } from "@src/Api/Types";
 import type { SyntheticEvent } from "react";
 import { useState } from "react";
+import { EditDashboardConfigTab } from "./dashboard";
 import { EditGitConfigTab } from "./git";
 import { EditJiraConfigTab } from "./jira";
 import { EditMiscellaneousConfigTab } from "./miscellaneous";
@@ -17,6 +18,8 @@ declare const __API_CONFLUENCE_URL__: string;
 declare const __CUSTOM_FIELDS__: CustomFieldsObjectProps;
 declare const __DONE_STATUS__: string[];
 declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
+declare const __DASHBOARDS__: { [key: string]: DashboardProps };
+declare const __DASHBOARD_SPEED_SECONDS__: number;
 
 function EditConfigPage() {
 	const [tab, setTab] = useState<string>("Miscellaneous");
@@ -31,6 +34,9 @@ function EditConfigPage() {
 	const [customFields, setCustomFields] = useState<CustomFieldsObjectProps>(__CUSTOM_FIELDS__ || {});
 	const [gitRepoPaths, setGitRepoPaths] = useState<{ [key: string]: RepoNamePaths }>(__GIT_REPOS_PATHS__ || {});
 	const [gitToken, setGitToken] = useState<string>("");
+	const [dashboards, setDashboards] = useState<{ [key: string]: DashboardProps }>(__DASHBOARDS__ || {});
+	const [dashboardSpeed, setDashboardSpeed] = useState<number>(__DASHBOARD_SPEED_SECONDS__ || 10);
+
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
 	};
@@ -78,7 +84,14 @@ function EditConfigPage() {
 						setGitRepoPaths={setGitRepoPaths}
 					/>
 				</TabPanel>
-				<TabPanel value="Dashboards">Dashboards</TabPanel>
+				<TabPanel value="Dashboards">
+					<EditDashboardConfigTab
+						dashboardSpeed={dashboardSpeed}
+						setDashboardSpeed={setDashboardSpeed}
+						dashboards={dashboards}
+						setDashboards={setDashboards}
+					/>
+				</TabPanel>
 			</TabContext>
 			{Debug && (
 				<>
@@ -103,6 +116,8 @@ function EditConfigPage() {
 					<pre>customFields={JSON.stringify(customFields, null, 2)}</pre>
 					gitToken={gitToken}
 					<pre>gitRepoPaths={JSON.stringify(gitRepoPaths, null, 2)}</pre>
+					dashboardSpeed={dashboardSpeed}
+					<pre>dashboards={JSON.stringify(dashboards, null, 2)}</pre>
 					<br />
 				</>
 			)}

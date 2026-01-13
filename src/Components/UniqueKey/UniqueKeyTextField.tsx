@@ -1,15 +1,14 @@
 import { TextField } from "@mui/material";
-import type { RepoNamePaths } from "@src/Api/Types";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 
-export const RepoFieldKey: FC<{
-	gitRepoPaths: { [key: string]: RepoNamePaths };
+export const UniqueTextFieldFieldKey: FC<{
+	object: { [key: string]: any };
 	updateRow: (index: number, newKey: string) => void;
 	currentKey: string;
 	disabled: boolean;
 	index: number;
-}> = ({ gitRepoPaths, updateRow, currentKey, disabled, index }) => {
+}> = ({ object, updateRow, currentKey, disabled, index }) => {
 	const [localKey, setLocalKey] = useState<string>(currentKey);
 	const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 	useEffect(() => {
@@ -19,7 +18,7 @@ export const RepoFieldKey: FC<{
 	}, [currentKey]);
 	useEffect(() => {
 		if (localKey != currentKey) {
-			if (localKey in gitRepoPaths) {
+			if (localKey in object) {
 				setIsDuplicate(true);
 			} else {
 				setIsDuplicate(false);

@@ -1,8 +1,9 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Button, Tab } from "@mui/material";
+import { Alert, Button, Tab } from "@mui/material";
 import type { AppDispatch, ReposProps, RootState } from "@src/Api";
-import { fetchConfig, isSliceRecent, postConfigApi } from "@src/Api";
+import { fetchConfig, fetchUsersAndGroups, isSliceRecent, postConfigApi } from "@src/Api";
 import type {
+	ConfigProps,
 	ConfigPropsFile,
 	CustomFieldsObjectProps,
 	DashboardProps,
@@ -106,8 +107,10 @@ function EditConfigPage() {
 			GITREPOS: repos,
 		};
 		postConfigApi(newConfig).then(() => {
-			dispatch(fetchConfig()).then(() => {
+			dispatch(fetchConfig()).then((data) => {
 				setLoading(false);
+				console.log(data);
+				dispatch(fetchUsersAndGroups(data.payload as ConfigProps));
 			});
 		});
 	};
@@ -117,13 +120,28 @@ function EditConfigPage() {
 	}
 	return (
 		<>
+			{!config.ALLOW_CONFIG_EDIT && (
+				<Alert severity="warning">
+					Edits Have Been Disabled
+					<br />
+					To turn it back on, connect to the server, end edit config.json by hand and change
+					<br />
+					ALLOW_CONFIG_EDIT: false to ALLOW_CONFIG_EDIT: true
+					<br />
+				</Alert>
+			)}
 			<TabContext value={tab}>
 				<TabList onChange={handleChange}>
 					<Tab label="Miscellaneous" value="Miscellaneous" />
 					<Tab label="Jira" value="Jira" />
 					<Tab label="Git" value="Git" />
 					<Tab label="Dashboards" value="Dashboards" />
-					<Button variant="contained" onClick={save} sx={{ marginLeft: "100px", width: "4em" }}>
+					<Button
+						variant="contained"
+						onClick={save}
+						sx={{ marginLeft: "100px", width: "4em" }}
+						disabled={!config.ALLOW_CONFIG_EDIT}
+					>
 						Save
 					</Button>
 				</TabList>
@@ -186,14 +204,17 @@ function EditConfigPage() {
 						/>
 					)}
 					{!config.ALLOW_DASHBOARD_EDIT && (
-						<>
-							Edit Dashboard has been turned off. Need to turn it back on from the server, by editting
-							Config.json by hand and changing ALLOW_DASHBOARD_EDIT: false to ALLOW_DASHBOARD_EDIT: true
-						</>
+						<Alert severity="warning">
+							Edit Dashboard has been turned off.
+							<br />
+							To turn it back on, connect to the server, end edit config.json by hand and change
+							<br />
+							ALLOW_DASHBOARD_EDIT: false to ALLOW_DASHBOARD_EDIT: true
+						</Alert>
 					)}
 				</TabPanel>
 			</TabContext>
-			<Button variant="contained" onClick={save} sx={{ width: "4em" }}>
+			<Button variant="contained" onClick={save} sx={{ width: "4em" }} disabled={!config.ALLOW_CONFIG_EDIT}>
 				Save
 			</Button>
 			{Debug && (

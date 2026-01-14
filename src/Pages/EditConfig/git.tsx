@@ -5,15 +5,14 @@ import { HtmlTooltip, UniqueTextFieldFieldKey } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useState } from "react";
 
-declare const __GITTOKEN_DEFINED__: boolean;
-
 export const EditGitConfigTab: FC<{
 	gitToken: string;
 	setGitToken: Dispatch<SetStateAction<string>>;
 	gitRepoPaths: { [key: string]: RepoNamePaths };
 	setGitRepoPaths: Dispatch<SetStateAction<{ [key: string]: RepoNamePaths }>>;
-}> = ({ gitToken, setGitToken, gitRepoPaths, setGitRepoPaths }) => {
-	const [editToken, setEditToken] = useState<boolean>(!__GITTOKEN_DEFINED__);
+	editToken: boolean;
+	setEditToken: Dispatch<SetStateAction<boolean>>;
+}> = ({ gitToken, setGitToken, gitRepoPaths, setGitRepoPaths, editToken, setEditToken }) => {
 	const [rows, setRows] = useState<EditableRow[]>(() =>
 		Object.keys(gitRepoPaths)
 			.sort()

@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import type { AppDispatch, BranchesAndTicket, RootState, TicketProps, UsersGroupPropsSlice } from "@src/Api";
+import type { AppDispatch, RootState, TicketProps } from "@src/Api";
 import { fetchBranches, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { BranchesTable, UserSelector } from "@src/Components";
 import type { FC } from "react";
@@ -13,8 +13,8 @@ const BranchesPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
-	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
-	const allJiraUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);

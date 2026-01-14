@@ -1,8 +1,11 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Tab } from "@mui/material";
+import type { AppDispatch, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent } from "@src/Api";
 import type { CustomFieldsObjectProps, DashboardProps, RepoNamePaths, VacationKeyType } from "@src/Api/Types";
 import type { SyntheticEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { EditDashboardConfigTab } from "./dashboard";
 import { EditGitConfigTab } from "./git";
 import { EditJiraConfigTab } from "./jira";
@@ -10,39 +13,64 @@ import { EditMiscellaneousConfigTab } from "./miscellaneous";
 
 const Debug = false;
 
-declare const __HOST__: string;
-declare const __PORT__: number;
-declare const __VACATION_KEY__: VacationKeyType;
-declare const __API_URL__: string;
-declare const __API_CONFLUENCE_URL__: string;
-declare const __CUSTOM_FIELDS__: CustomFieldsObjectProps;
-declare const __DONE_STATUS__: string[];
-declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
-declare const __DASHBOARDS__: { [key: string]: DashboardProps };
-declare const __DASHBOARD_SPEED_SECONDS__: number;
-declare const __DASHBOARD_DUCKS__: boolean;
-
 function EditConfigPage() {
 	const [tab, setTab] = useState<string>("Miscellaneous");
-	const [host, setHost] = useState<string>(__HOST__ || "");
-	const [port, setPort] = useState<string>(__PORT__ + "" || "3000");
-	const [vacationKey, setVacationKey] = useState<VacationKeyType>(__VACATION_KEY__ || "email");
+	const [host, setHost] = useState<string>("");
+	const [port, setPort] = useState<number>(3000);
+	const [vacationKey, setVacationKey] = useState<VacationKeyType>("email");
 	const [apiKey, setApiKey] = useState<string>("");
-	const [apiUrl, setApiUrl] = useState<string>(__API_URL__ || "");
-	const [apiConfluenceUrl, setApiConfluenceUrl] = useState<string>(__API_CONFLUENCE_URL__ || "");
+	const [apiUrl, setApiUrl] = useState<string>("");
+	const [apiConfluenceUrl, setApiConfluenceUrl] = useState<string>("");
 	const [userName, setUserName] = useState<string>("");
-	const [doneStatus, setDoneStaus] = useState<string[]>(__DONE_STATUS__ || []);
-	const [customFields, setCustomFields] = useState<CustomFieldsObjectProps>(__CUSTOM_FIELDS__ || {});
-	const [gitRepoPaths, setGitRepoPaths] = useState<{ [key: string]: RepoNamePaths }>(__GIT_REPOS_PATHS__ || {});
+	const [doneStatus, setDoneStaus] = useState<string[]>([]);
+	const [customFields, setCustomFields] = useState<CustomFieldsObjectProps>({});
+	const [gitRepoPaths, setGitRepoPaths] = useState<{ [key: string]: RepoNamePaths }>({});
 	const [gitToken, setGitToken] = useState<string>("");
-	const [dashboards, setDashboards] = useState<{ [key: string]: DashboardProps }>(__DASHBOARDS__ || {});
-	const [dashboardSpeed, setDashboardSpeed] = useState<number>(__DASHBOARD_SPEED_SECONDS__ || 10);
-	const [dashboardDucks, setDashboardDucks] = useState<boolean>(__DASHBOARD_DUCKS__ || true);
+	const [dashboards, setDashboards] = useState<{ [key: string]: DashboardProps }>({});
+	const [dashboardSpeed, setDashboardSpeed] = useState<number>(10);
+	const [dashboardDucks, setDashboardDucks] = useState<boolean>(true);
+	const config = useSelector((state: RootState) => state.configState);
+	const dispatch = useDispatch<AppDispatch>();
+	const [loading, setLoading] = useState<boolean>(true);
+	const [allowVacationEdit, setAllowVacationEdit] = useState<boolean>(true);
+	const [editApiKey, setEditApiKey] = useState<boolean>(true);
+	const [editToken, setEditToken] = useState<boolean>(true);
 
+	useEffect(() => {
+		if (isSliceRecent(config)) {
+			setLoading(false);
+		} else {
+			setLoading(true);
+			dispatch(fetchConfig()).then(() => {
+				setLoading(false);
+			});
+		}
+	}, [dispatch]);
+	useEffect(() => {
+		setLoading(false);
+		console.log(config);
+		setHost(config.HOST);
+		setPort(config.PORT);
+		setVacationKey(config.VACATION_KEY);
+		setAllowVacationEdit(config.ALLOW_VACATION_EDITS);
+		setApiConfluenceUrl(config.API_CONFLUENCE_URL);
+		setEditApiKey(!config.API_KEY_DEFINED);
+		setApiUrl(config.API_URL);
+		setEditToken(!config.GITTOKEN_DEFINED);
+		setCustomFields(config.CUSTOM_FIELDS);
+		setDashboards(config.DASHBOARDS);
+		setDashboardDucks(config.DASHBOARD_DUCKS);
+		setDashboardSpeed(config.DASHBOARD_SPEED_SECONDS);
+		setDoneStaus(config.DONE_STATUS);
+		setGitRepoPaths(config.GIT_REPOS_PATHS);
+	}, [config]);
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
 	};
 
+	if (loading) {
+		return <></>;
+	}
 	return (
 		<>
 			<TabContext value={tab}>
@@ -60,6 +88,9 @@ function EditConfigPage() {
 						setPort={setPort}
 						vacationKey={vacationKey}
 						setVacationKey={setVacationKey}
+						allowVacationEdit={allowVacationEdit}
+						setAllowVacationEdit={setAllowVacationEdit}
+						origVacationEdit={config.ALLOW_VACATION_EDITS}
 					/>
 				</TabPanel>
 				<TabPanel value="Jira">
@@ -76,6 +107,8 @@ function EditConfigPage() {
 						setDoneStaus={setDoneStaus}
 						customFields={customFields}
 						setCustomFields={setCustomFields}
+						editApiKey={editApiKey}
+						setEditApiKey={setEditApiKey}
 					/>
 				</TabPanel>
 				<TabPanel value="Git">
@@ -84,6 +117,8 @@ function EditConfigPage() {
 						setGitToken={setGitToken}
 						gitRepoPaths={gitRepoPaths}
 						setGitRepoPaths={setGitRepoPaths}
+						editToken={editToken}
+						setEditToken={setEditToken}
 					/>
 				</TabPanel>
 				<TabPanel value="Dashboards">

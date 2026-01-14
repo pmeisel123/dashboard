@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { GitRelease, GitReleaseSlice } from "../Types";
+import type { GitRelease, LoadedSlice } from "../Types";
 import { getReleases } from "./git";
 
-const initialState: { [key: string]: GitReleaseSlice } = {
+const initialState: { [key: string]: { releases: GitRelease[] } & LoadedSlice } = {
 	"": {
 		releases: [],
 		loaded: null,

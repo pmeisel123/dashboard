@@ -3,9 +3,6 @@ import { Box, Button, Grid, IconButton, InputAdornment, InputLabel, Link, TextFi
 import type { CustomFieldsObjectProps } from "@src/Api/Types";
 import { HtmlTooltip, JiraCustomFields } from "@src/Components";
 import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
-import { useState } from "react";
-
-declare const __API_KEY_DEFINED__: boolean;
 
 export const EditJiraConfigTab: FC<{
 	apiKey: string;
@@ -20,6 +17,8 @@ export const EditJiraConfigTab: FC<{
 	setDoneStaus: Dispatch<SetStateAction<string[]>>;
 	customFields: CustomFieldsObjectProps;
 	setCustomFields: Dispatch<SetStateAction<CustomFieldsObjectProps>>;
+	editApiKey: boolean;
+	setEditApiKey: Dispatch<SetStateAction<boolean>>;
 }> = ({
 	apiKey,
 	setApiKey,
@@ -33,8 +32,9 @@ export const EditJiraConfigTab: FC<{
 	setDoneStaus,
 	customFields,
 	setCustomFields,
+	editApiKey,
+	setEditApiKey,
 }) => {
-	const [editApiKey, setEditApiKey] = useState<boolean>(!__API_KEY_DEFINED__);
 	const handleEditDoneStatus = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
 		const newItems = doneStatus.map((item, i) => {
 			if (i === index) {

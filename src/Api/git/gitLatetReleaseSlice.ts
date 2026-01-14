@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { GitLatestReleaseSlice, LatestRelease } from "../Types";
 import { getLatestRelease } from "./git";
 
-const initialState: { [key: string]: GitLatestReleaseSlice } = {
+const initialState: Record<string, GitLatestReleaseSlice> = {
 	"": {
 		release: null,
 		loaded: null,

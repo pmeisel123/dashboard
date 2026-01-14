@@ -32,7 +32,6 @@ export interface TicketCache {
 export interface BranchesAndTicket {
 	branches: GitBranches;
 	tickets: TicketCache;
-	loaded: number | null; // ms since epoch
 }
 
 export interface ReposProps {

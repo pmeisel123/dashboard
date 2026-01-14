@@ -1,3 +1,6 @@
+import type { RepoNamePaths } from "./gittypes";
+import type { CustomFieldsObjectProps } from "./ticketstypes";
+
 export interface DashboardSinglePageProps {
 	name: string;
 	url: string;
@@ -56,4 +59,25 @@ export type VacationKeyType = "email" | "name";
 
 export interface EditableRow {
 	key: string;
+}
+
+export interface ConfigProps {
+	ALLOW_VACATION_EDITS: boolean;
+	API_CONFLUENCE_URL: string;
+	API_KEY_DEFINED: boolean;
+	API_URL: string;
+	CUSTOM_FIELDS: CustomFieldsObjectProps;
+	DASHBOARDS: DashboardsProps;
+	DASHBOARD_DUCKS: boolean;
+	DASHBOARD_SPEED_SECONDS: number;
+	DONE_STATUS: string[];
+	GITTOKEN_DEFINED: boolean;
+	HOST: string;
+	PORT: number;
+	VACATION_KEY: VacationKeyType;
+	GIT_REPOS_PATHS: { [key: string]: RepoNamePaths };
+}
+
+export interface LoadedSlice {
+	loaded: number | null; // ms since epoch
 }

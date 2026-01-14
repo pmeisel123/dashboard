@@ -1,15 +1,28 @@
-import { FormControlLabel, FormLabel, Grid, InputLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { Checkbox, FormControlLabel, FormLabel, Grid, InputLabel, Radio, RadioGroup, TextField } from "@mui/material";
 import type { VacationKeyType } from "@src/Api/Types";
 import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
 
 export const EditMiscellaneousConfigTab: FC<{
 	host: string;
 	setHost: Dispatch<SetStateAction<string>>;
-	port: string;
-	setPort: Dispatch<SetStateAction<string>>;
+	port: number;
+	setPort: Dispatch<SetStateAction<number>>;
 	vacationKey: VacationKeyType;
 	setVacationKey: Dispatch<SetStateAction<VacationKeyType>>;
-}> = ({ host, setHost, port, setPort, vacationKey, setVacationKey }) => {
+	allowVacationEdit: boolean;
+	setAllowVacationEdit: Dispatch<SetStateAction<boolean>>;
+	origVacationEdit: boolean;
+}> = ({
+	host,
+	setHost,
+	port,
+	setPort,
+	vacationKey,
+	setVacationKey,
+	allowVacationEdit,
+	setAllowVacationEdit,
+	origVacationEdit,
+}) => {
 	const handleVacationChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setVacationKey(event.target.value as VacationKeyType);
 	};
@@ -36,6 +49,7 @@ export const EditMiscellaneousConfigTab: FC<{
 						onChange={(event) => {
 							setHost(event.target.value);
 						}}
+						helperText=" "
 					/>
 				</Grid>
 				<Grid>
@@ -53,9 +67,10 @@ export const EditMiscellaneousConfigTab: FC<{
 					<InputLabel id="port">Port</InputLabel>
 					<TextField
 						id="Port"
-						value={port + ""}
+						value={port}
+						type="number"
 						onChange={(event) => {
-							setPort(event.target.value);
+							setPort(parseInt(event.target.value));
 						}}
 					/>
 				</Grid>
@@ -73,6 +88,19 @@ export const EditMiscellaneousConfigTab: FC<{
 				<FormControlLabel value="email" control={<Radio />} label="Email" />
 				<FormControlLabel value="name" control={<Radio />} label="Name" />
 			</RadioGroup>
+			<FormControlLabel
+				control={
+					<Checkbox
+						checked={allowVacationEdit}
+						onChange={(event) => {
+							setAllowVacationEdit(event.target.checked);
+						}}
+						inputProps={{ "aria-label": "controlled" }}
+						disabled={!origVacationEdit}
+					/>
+				}
+				label="Allow Vacation Edits (If turned off this can only be turned on by editting Config.json on the filesystem)"
+			/>
 		</>
 	);
 };

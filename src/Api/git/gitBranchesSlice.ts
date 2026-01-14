@@ -1,9 +1,8 @@
-import type { PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { BranchesAndTicket } from "../Types";
+import type { BranchesAndTicket, LoadedSlice } from "../Types";
 import { getBranches } from "./git";
 
-const initialState: BranchesAndTicket = {
+const initialState: BranchesAndTicket & LoadedSlice = {
 	branches: {},
 	tickets: {},
 	loaded: null,
@@ -19,7 +18,7 @@ export const gitBranchSlice = createSlice({
 	initialState,
 	reducers: {},
 	extraReducers: (builder) => {
-		builder.addCase(fetchBranches.fulfilled, (state, action: PayloadAction<BranchesAndTicket>) => {
+		builder.addCase(fetchBranches.fulfilled, (state, action) => {
 			state.branches = action.payload.branches;
 			state.tickets = action.payload.tickets;
 			state.loaded = Date.now();

@@ -1,14 +1,6 @@
 import { Link } from "@mui/material";
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import type {
-	AppDispatch,
-	BranchCommit,
-	BranchesAndTicket,
-	RepoNamePaths,
-	RootState,
-	TicketProps,
-	UsersGroupPropsSlice,
-} from "@src/Api";
+import type { AppDispatch, BranchCommit, BranchesAndTicket, RepoNamePaths, RootState, TicketProps } from "@src/Api";
 import { fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
 import { Ago, CustomDataGrid } from "@src/Components";
 import type { FC } from "react";
@@ -25,7 +17,7 @@ export const CommitsTable: FC<{
 	loading: boolean;
 	commits: BranchCommit[];
 }> = ({ repo, ticketsBranches, tickets, loading, commits }) => {
-	const allJiraUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const localStorageName = "CommitsTableColumns." + location.pathname;
 	const dispatch = useDispatch<AppDispatch>();
 

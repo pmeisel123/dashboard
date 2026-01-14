@@ -1,7 +1,6 @@
 import type {
 	AppDispatch,
 	BranchCommit,
-	BranchesAndTicket,
 	GitLatestReleaseSlice,
 	GitReleaseSlice,
 	RootState,
@@ -25,7 +24,7 @@ const BranchesComparePage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
-	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const releases: { [key: string]: GitReleaseSlice } = useSelector((state: RootState) => state.gitReleasesState);
 	const latestRelease: { [key: string]: GitLatestReleaseSlice } = useSelector(
 		(state: RootState) => state.gitLatestReleaseState,

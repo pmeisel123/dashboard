@@ -137,7 +137,6 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 	return {
 		tickets: ticketBranches,
 		branches: branches,
-		loaded: null,
 	};
 };
 

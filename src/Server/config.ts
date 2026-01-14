@@ -23,7 +23,48 @@ export const loadConfig = (): ConfigPropsFile => {
 			API_KEY: "",
 			API_URL: "",
 			CUSTOM_FIELDS: {},
-			DASHBOARDS: {},
+			DASHBOARDS: {
+				company: {
+					key: "company",
+					name: "Company Dashboard",
+					pages: [
+						{
+							name: "Front Page",
+							split: "fourways",
+							pages: [
+								{
+									name: "Date",
+									url: "/date",
+								},
+								{
+									name: "Time",
+									url: "/time",
+								},
+								{
+									name: "Company Dashboard Text",
+									url: "/text?text=Company%20Dashboard",
+								},
+								{
+									name: "Next Holiday",
+									url: "/nextholiday",
+								},
+							],
+						},
+						{
+							name: "Recent Tickets",
+							url: "/RecentTickets?days=30",
+						},
+						{
+							name: "Who is out",
+							url: "/whoisout",
+						},
+						{
+							name: "Holidays",
+							url: "/holidays",
+						},
+					],
+				},
+			},
 			DASHBOARD_DUCKS: true,
 			DASHBOARD_SPEED_SECONDS: 30,
 			DONE_STATUS: ["Done"],
@@ -39,40 +80,37 @@ export const loadConfig = (): ConfigPropsFile => {
 
 export const ConfigServer = (req: IncomingMessage, requestBody: string | null) => {
 	if (req.method === "GET") {
-		const content = readFileSync(filePath, "utf8");
-		if (content) {
-			const configFile = loadConfig();
-			const git_proxies_name_path: { [key: string]: RepoNamePaths } = {};
-			configFile.GITREPOS.forEach((repo, index: number) => {
-				const repo_path = "/git_" + index;
-				const repo_name = repo.name;
+		const configFile = loadConfig();
+		const git_proxies_name_path: { [key: string]: RepoNamePaths } = {};
+		configFile.GITREPOS.forEach((repo, index: number) => {
+			const repo_path = "/git_" + index;
+			const repo_name = repo.name;
 
-				git_proxies_name_path[repo_name] = {
-					path: repo_path,
-					url: repo.url,
-				};
-			});
-			const config: ConfigProps = {
-				ALLOW_VACATION_EDITS: configFile.ALLOW_VACATION_EDITS,
-				ALLOW_CONFIG_EDIT: configFile.ALLOW_CONFIG_EDIT,
-				ALLOW_DASHBOARD_EDIT: configFile.ALLOW_DASHBOARD_EDIT,
-				API_CONFLUENCE_URL: configFile.API_KEY ? configFile.API_CONFLUENCE_URL : "",
-				API_KEY_DEFINED: configFile.API_KEY ? true : false,
-				API_URL: configFile.API_KEY ? configFile.API_URL : "",
-				CUSTOM_FIELDS: configFile.CUSTOM_FIELDS || {},
-				DASHBOARDS: configFile.DASHBOARDS || {},
-				DASHBOARD_DUCKS: configFile.DASHBOARD_DUCKS,
-				DASHBOARD_SPEED_SECONDS: configFile.DASHBOARD_SPEED_SECONDS || 30,
-				DONE_STATUS: configFile.DONE_STATUS,
-				GITTOKEN_DEFINED: configFile.GITTOKEN ? true : false,
-				HOST: configFile.HOST,
-				PORT: configFile.PORT,
-				VACATION_KEY: configFile.VACATION_KEY,
-				GIT_REPOS_PATHS: git_proxies_name_path,
-				DUCKS: ducks,
+			git_proxies_name_path[repo_name] = {
+				path: repo_path,
+				url: repo.url,
 			};
-			return JSON.stringify(config, null, 2);
-		}
+		});
+		const config: ConfigProps = {
+			ALLOW_VACATION_EDITS: configFile.ALLOW_VACATION_EDITS,
+			ALLOW_CONFIG_EDIT: configFile.ALLOW_CONFIG_EDIT,
+			ALLOW_DASHBOARD_EDIT: configFile.ALLOW_DASHBOARD_EDIT,
+			API_CONFLUENCE_URL: configFile.API_KEY ? configFile.API_CONFLUENCE_URL : "",
+			API_KEY_DEFINED: configFile.API_KEY ? true : false,
+			API_URL: configFile.API_KEY ? configFile.API_URL : "",
+			CUSTOM_FIELDS: configFile.CUSTOM_FIELDS || {},
+			DASHBOARDS: configFile.DASHBOARDS || {},
+			DASHBOARD_DUCKS: configFile.DASHBOARD_DUCKS,
+			DASHBOARD_SPEED_SECONDS: configFile.DASHBOARD_SPEED_SECONDS || 30,
+			DONE_STATUS: configFile.DONE_STATUS,
+			GITTOKEN_DEFINED: configFile.GITTOKEN ? true : false,
+			HOST: configFile.HOST,
+			PORT: configFile.PORT,
+			VACATION_KEY: configFile.VACATION_KEY,
+			GIT_REPOS_PATHS: git_proxies_name_path,
+			DUCKS: ducks,
+		};
+		return JSON.stringify(config, null, 2);
 	}
 	if (req.method == "POST") {
 		const content = readFileSync(filePath, "utf8");

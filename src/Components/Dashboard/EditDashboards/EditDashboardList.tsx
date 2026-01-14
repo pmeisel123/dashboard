@@ -130,7 +130,6 @@ export const EditDashboardList: FC<{
 					</Box>
 				);
 			})}
-			<pre>dashboards={JSON.stringify(dashboards, null, 2)}</pre>
 		</>
 	);
 };

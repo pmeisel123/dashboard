@@ -31,7 +31,10 @@ export const EditPages: FC<{
 	};
 	const updateName = (index: number, newValue: string) => {
 		const newItems = [...pages];
-		newItems[index].name = newValue;
+		newItems[index] = {
+			...newItems[index],
+			name: newValue,
+		};
 		setPages(newItems);
 	};
 

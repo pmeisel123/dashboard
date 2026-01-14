@@ -45,7 +45,10 @@ export const EditGitConfigTab: FC<{
 	const updateUrl = (index: number, value: string) => {
 		const current_key = rows[index].key;
 		const newItems = { ...gitRepoPaths };
-		newItems[current_key].url = value;
+		newItems[current_key] = {
+			...newItems[current_key],
+			url: value,
+		};
 		setGitRepoPaths(newItems);
 	};
 	const addRow = () => {

@@ -86,7 +86,10 @@ export const JiraCustomFields: FC<{
 		const newItems = { ...customFields };
 		const key = rows[index].key;
 		if (newItems[key].Name != value) {
-			newItems[key].Name = value;
+			newItems[key] = {
+				...newItems[key],
+				Name: value,
+			};
 			setCustomFields(newItems);
 		}
 	};

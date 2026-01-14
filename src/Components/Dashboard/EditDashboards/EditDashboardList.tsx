@@ -24,8 +24,10 @@ export const EditDashboardList: FC<{
 			new_rows[index].key = newKey;
 			setRows(new_rows);
 			const newItems = { ...dashboards };
-			newItems[newKey] = newItems[current_key];
-			newItems[newKey].key = newKey;
+			newItems[newKey] = {
+				...newItems[current_key],
+				key: newKey,
+			};
 			delete newItems[current_key];
 			setDashboards(newItems);
 		}
@@ -62,7 +64,10 @@ export const EditDashboardList: FC<{
 	const updateName = (index: number, newValue: string) => {
 		const current_key = rows[index].key;
 		const newItems = { ...dashboards };
-		newItems[current_key].name = newValue;
+		newItems[current_key] = {
+			...newItems[current_key],
+			name: newValue,
+		};
 		setDashboards(newItems);
 	};
 
@@ -70,7 +75,10 @@ export const EditDashboardList: FC<{
 		return (pages: DashboardPageProps[]) => {
 			const current_key = rows[index].key;
 			const newItems = { ...dashboards };
-			newItems[current_key].pages = pages;
+			newItems[current_key] = {
+				...newItems[current_key],
+				pages: [...pages],
+			};
 			setDashboards(newItems);
 		};
 	};
@@ -105,6 +113,7 @@ export const EditDashboardList: FC<{
 									currentKey={key}
 									index={index}
 									disabled={false}
+									key={index}
 								/>
 							</Grid>
 							<Grid size={{ xs: 12, md: 8 }}>
@@ -121,6 +130,7 @@ export const EditDashboardList: FC<{
 					</Box>
 				);
 			})}
+			<pre>dashboards={JSON.stringify(dashboards, null, 2)}</pre>
 		</>
 	);
 };

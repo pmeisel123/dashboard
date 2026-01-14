@@ -13,22 +13,22 @@ export const JiraEditCustomFieldKey: FC<{
 	const [localKey, setLocalKey] = useState<string>(currentKey);
 	const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 	useEffect(() => {
-		if (localKey != currentKey) {
-			setLocalKey(currentKey);
+		if (localKey == currentKey) {
+			return;
 		}
-	}, [currentKey]);
-	useEffect(() => {
-		if (localKey != currentKey) {
-			if (customFields[localKey]) {
-				setIsDuplicate(true);
-			} else {
-				setIsDuplicate(false);
-				updateRow(index, localKey);
-			}
-		} else {
-			setIsDuplicate(false);
+		if (localKey in customFields) {
+			setIsDuplicate(true);
+			return;
 		}
+		setIsDuplicate(false);
+		const timeout = setTimeout(() => {
+			updateRow(index, localKey);
+		}, 500);
+		return () => {
+			clearTimeout(timeout);
+		};
 	}, [localKey]);
+
 	const getOptionString = (option: string | CustomFieldsFromJiraProps) => {
 		if (typeof option == "string") {
 			return option;

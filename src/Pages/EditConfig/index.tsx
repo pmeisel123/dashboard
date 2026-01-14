@@ -47,8 +47,6 @@ function EditConfigPage() {
 		}
 	}, [dispatch]);
 	useEffect(() => {
-		setLoading(false);
-		console.log(config);
 		setHost(config.HOST);
 		setPort(config.PORT);
 		setVacationKey(config.VACATION_KEY);

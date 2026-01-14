@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { BranchesAndTicket, LoadedSlice } from "../Types";
+import type { BranchesAndTicket, ConfigProps, LoadedSlice } from "../Types";
 import { getBranches } from "./git";
 
 const initialState: BranchesAndTicket & LoadedSlice = {
@@ -8,8 +8,8 @@ const initialState: BranchesAndTicket & LoadedSlice = {
 	loaded: null,
 };
 
-export const fetchBranches = createAsyncThunk("git/getBranches", async () => {
-	const data: BranchesAndTicket = await getBranches();
+export const fetchBranches = createAsyncThunk("git/getBranches", async (config: ConfigProps) => {
+	const data: BranchesAndTicket = await getBranches(config);
 	return data;
 });
 

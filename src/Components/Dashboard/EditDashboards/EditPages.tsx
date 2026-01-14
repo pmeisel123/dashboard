@@ -185,7 +185,7 @@ export const EditPages: FC<{
 							{"url" in page && (
 								<Grid size={{ xs: 12, md: 4 }} sx={{ backgroundColor: subPage ? "#EEF" : "" }}>
 									<TextField
-										label="Url"
+										label="URL"
 										value={page.url}
 										onChange={(event) => {
 											updateUrl(index, event.target.value);

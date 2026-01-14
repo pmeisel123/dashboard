@@ -13,14 +13,12 @@ import {
 	TextField,
 } from "@mui/material";
 import type { AppDispatch, RootState, UserEditVacation, UserProps } from "@src/Api";
-import { fetchUsersAndGroups, isSliceRecent, userHasGroup, vacationUpdateApi } from "@src/Api";
+import { fetchConfig, fetchUsersAndGroups, isSliceRecent, userHasGroup, vacationUpdateApi } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
 import type { ChangeEvent, FC, FocusEvent } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-
-declare const __VACATION_KEY__: string;
 
 const VacationPage: FC<{
 	searchParamsOveride?: URLSearchParams;
@@ -33,10 +31,10 @@ const VacationPage: FC<{
 	const dispatch = useDispatch<AppDispatch>();
 	const [errors, setErrors] = useState<{ [key: string]: string }>({});
 	const [loading, setLoading] = useState<boolean>(false);
-
+	const config = useSelector((state: RootState) => state.configState);
 	const getVacationKey = (user: UserProps) => {
 		let vacation_key: string = user.name || "";
-		if (__VACATION_KEY__ == "email") {
+		if (config.VACATION_KEY == "email") {
 			vacation_key = user.email || "";
 		}
 		return vacation_key;
@@ -77,8 +75,11 @@ const VacationPage: FC<{
 	}, [searchParams]);
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(allJiraUsersGroups)) {
-			dispatch(fetchUsersAndGroups());
+			dispatch(fetchUsersAndGroups(config));
 		}
 	}, [dispatch]);
 
@@ -137,7 +138,7 @@ const VacationPage: FC<{
 		if (valid) {
 			setLoading(true);
 			vacationUpdateApi(userVacations).then(() => {
-				dispatch(fetchUsersAndGroups()).then(() => {
+				dispatch(fetchUsersAndGroups(config)).then(() => {
 					setLoading(false);
 				});
 			});

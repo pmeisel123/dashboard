@@ -152,6 +152,11 @@ export const EditGitConfigTab: FC<{
 					</span>
 				</Tooltip>
 			</InputLabel>
+			<Grid container spacing={2} sx={{ width: "100%" }} key="headr">
+				<Grid sx={{ width: "30px", paddingTop: "7px", display: { xs: "none", md: "block" } }}></Grid>
+				<Grid size={{ xs: 12, md: 3 }}>Name</Grid>
+				<Grid size={{ xs: 12, md: 8 }}>URL</Grid>
+			</Grid>
 			{rows.map((item, index) => {
 				const key = item.key;
 				return (

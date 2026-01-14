@@ -1,7 +1,4 @@
-import type { CustomFieldsFromJiraProps, CustomFieldsProps, TicketProps } from "./Types";
-declare const __DONE_STATUS__: string[];
-
-declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
+import type { ConfigProps, CustomFieldsFromJiraProps, TicketProps } from "./Types";
 
 function getNameFromPerson(person: any): string | null {
 	if (person && person.displayName) {
@@ -24,7 +21,7 @@ function convertEstimateToDays(estimate: number | null): number | null {
 	return null;
 }
 
-function ticketFromIssue(issue: any): TicketProps | null {
+function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
 	if (issue.fields) {
 		let fields = issue.fields;
 		let id: number = issue.id;
@@ -45,7 +42,7 @@ function ticketFromIssue(issue: any): TicketProps | null {
 		let parentkey: string | null = null;
 		let parentname: string | null = null;
 		let labels: string[] | null = fields.labels;
-		let isdone: boolean = !!status && __DONE_STATUS__.includes(status);
+		let isdone: boolean = !!status && config.DONE_STATUS.includes(status);
 		if (isdone) {
 			timeestimate = 0;
 		}
@@ -54,9 +51,9 @@ function ticketFromIssue(issue: any): TicketProps | null {
 			parentname = fields.parent.fields.summary;
 		}
 		let custom_fields: { [key: string]: string | null } = {};
-		if (__CUSTOM_FIELDS__) {
-			Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-				if (__CUSTOM_FIELDS__[custom_field_key].Type == "User") {
+		if (config.CUSTOM_FIELDS) {
+			Object.keys(config.CUSTOM_FIELDS).forEach((custom_field_key) => {
+				if (config.CUSTOM_FIELDS[custom_field_key].Type == "User") {
 					if (fields[custom_field_key]) {
 						custom_fields[custom_field_key] = fields[custom_field_key].map((user: any) =>
 							getNameFromPerson(user),
@@ -94,8 +91,8 @@ function ticketFromIssue(issue: any): TicketProps | null {
 	return null;
 }
 
-export const getTicketsApi = async (search: string): Promise<TicketProps[]> => {
-	let extra_fields = Object.keys(__CUSTOM_FIELDS__).join(",");
+export const getTicketsApi = async (search: string, config: ConfigProps): Promise<TicketProps[]> => {
+	let extra_fields = Object.keys(config.CUSTOM_FIELDS).join(",");
 	if (extra_fields) {
 		extra_fields += ",";
 	}
@@ -118,7 +115,7 @@ export const getTicketsApi = async (search: string): Promise<TicketProps[]> => {
 		const ajax_result: any = await response.json();
 		if (ajax_result.issues) {
 			ajax_result.issues.forEach(function (issue: any) {
-				let ticket = ticketFromIssue(issue);
+				let ticket = ticketFromIssue(issue, config);
 				if (ticket != null) {
 					result.push(ticket);
 				}

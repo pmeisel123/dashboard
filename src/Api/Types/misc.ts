@@ -1,4 +1,4 @@
-import type { RepoNamePaths } from "./gittypes";
+import type { RepoNamePaths, ReposProps } from "./gittypes";
 import type { CustomFieldsObjectProps } from "./ticketstypes";
 
 export interface DashboardSinglePageProps {
@@ -76,6 +76,29 @@ export interface ConfigProps {
 	PORT: number;
 	VACATION_KEY: VacationKeyType;
 	GIT_REPOS_PATHS: { [key: string]: RepoNamePaths };
+	ALLOW_CONFIG_EDIT: boolean;
+	ALLOW_DASHBOARD_EDIT: boolean;
+	DUCKS: string[];
+}
+
+export interface ConfigPropsFile {
+	ALLOW_VACATION_EDITS: boolean;
+	ALLOW_CONFIG_EDIT: boolean;
+	ALLOW_DASHBOARD_EDIT: boolean;
+	API_CONFLUENCE_URL: string;
+	API_KEY: string;
+	API_URL: string;
+	API_USERNAME: string;
+	CUSTOM_FIELDS: CustomFieldsObjectProps;
+	DASHBOARDS: DashboardsProps;
+	DASHBOARD_DUCKS: boolean;
+	DASHBOARD_SPEED_SECONDS: number;
+	DONE_STATUS: string[];
+	GITTOKEN: string;
+	HOST: string;
+	PORT: number;
+	VACATION_KEY: VacationKeyType;
+	GITREPOS: ReposProps[];
 }
 
 export interface LoadedSlice {

@@ -1,12 +1,23 @@
 import { Box, Checkbox, FormControlLabel, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import type { AppDispatch, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent } from "@src/Api";
 import { SavePageList } from "@src/Components";
-import { pages } from "@src/Pages/pages";
+import { pages, pageTestRequires } from "@src/Pages/pages";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useSearchParams } from "react-router-dom";
 
 function HomePage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showHidden, setShowHidden] = useState<boolean>(searchParams.get("showHidden") == "true");
+	const config = useSelector((state: RootState) => state.configState);
+	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
 
 	useEffect(() => {
 		setShowHidden(searchParams.get("showHidden") == "true");
@@ -28,7 +39,11 @@ function HomePage() {
 	return (
 		<Box>
 			{pages.map((page) => {
-				if ("requires" in page && !page.requires) {
+				if (
+					"requires" in page &&
+					typeof page.requires === "string" &&
+					!pageTestRequires(page.requires, config)
+				) {
 					return;
 				}
 				return (
@@ -55,7 +70,11 @@ function HomePage() {
 			{showHidden && (
 				<>
 					{pages.map((page) => {
-						if ("requires" in page && !page.requires) {
+						if (
+							"requires" in page &&
+							typeof page.requires === "string" &&
+							!pageTestRequires(page.requires, config)
+						) {
 							return (
 								<ListItem disablePadding key={page.path} sx={{ backgroundColor: "#DDD" }}>
 									<ListItemButton title={page.name} component={Link} to={page.path}>

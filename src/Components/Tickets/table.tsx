@@ -8,16 +8,14 @@ import type {
 	GridSlotsComponentsProps,
 } from "@mui/x-data-grid";
 import { GridFooterContainer, GridPagination } from "@mui/x-data-grid";
-import type { BranchesAndTicket, CustomFieldsProps, TicketProps, UsersGroupProps } from "@src/Api";
-import { GetBranchCreator } from "@src/Api";
+import type { AppDispatch, BranchesAndTicket, RootState, TicketProps, UsersGroupProps } from "@src/Api";
+import { fetchConfig, GetBranchCreator, isSliceRecent } from "@src/Api";
 import type { tableSetingsProps } from "@src/Components";
 import { Ago, CustomDataGrid, defaultTableSettings } from "@src/Components";
 import type { FC } from "react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-
-declare const __API_URL__: string;
-declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
 
 declare module "@mui/x-data-grid" {
 	interface FooterPropsOverrides {
@@ -89,6 +87,13 @@ const TicketTable: FC<{
 	allJiraUsersGroups,
 	ticketsBranches,
 }) => {
+	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
 
@@ -99,7 +104,7 @@ const TicketTable: FC<{
 			headerName: "key",
 			renderCell: (params: GridRenderCellParams<TicketProps>) => (
 				<Link
-					href={(__API_URL__ + "/browse/" + params.value) as string}
+					href={(config.API_URL + "/browse/" + params.value) as string}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -122,7 +127,7 @@ const TicketTable: FC<{
 					return (
 						<>
 							<Link
-								href={(__API_URL__ + "/browse/" + params.row.parentkey) as string}
+								href={(config.API_URL + "/browse/" + params.row.parentkey) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -177,9 +182,9 @@ const TicketTable: FC<{
 		},
 		{ field: "timespent", headerName: "Spent" },
 	];
-	Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-		let custom_field_name = __CUSTOM_FIELDS__[custom_field_key].Name;
-		let custom_field_type = __CUSTOM_FIELDS__[custom_field_key].Type;
+	Object.keys(config.CUSTOM_FIELDS).forEach((custom_field_key) => {
+		let custom_field_name = config.CUSTOM_FIELDS[custom_field_key].Name;
+		let custom_field_type = config.CUSTOM_FIELDS[custom_field_key].Type;
 
 		if (custom_field_type == "Text") {
 			columns.push({
@@ -217,7 +222,7 @@ const TicketTable: FC<{
 				renderCell: (params: GridRenderCellParams<TicketProps>) => {
 					const value: string | null = params.row.customFields[custom_field_key];
 					if (value) {
-						const current_field_props = __CUSTOM_FIELDS__[custom_field_key];
+						const current_field_props = config.CUSTOM_FIELDS[custom_field_key];
 
 						const custom_field_link_icon =
 							"LinkIcon" in current_field_props ? current_field_props.LinkIcon : undefined;

@@ -18,6 +18,9 @@ const initialState: ConfigProps & LoadedSlice = {
 	PORT: 3000,
 	VACATION_KEY: "email",
 	GIT_REPOS_PATHS: {},
+	ALLOW_CONFIG_EDIT: true,
+	ALLOW_DASHBOARD_EDIT: true,
+	DUCKS: [],
 	loaded: null,
 };
 
@@ -46,6 +49,9 @@ export const configSlice = createSlice({
 			state.PORT = action.payload.PORT;
 			state.VACATION_KEY = action.payload.VACATION_KEY;
 			state.GIT_REPOS_PATHS = action.payload.GIT_REPOS_PATHS;
+			state.ALLOW_CONFIG_EDIT = action.payload.ALLOW_CONFIG_EDIT;
+			state.ALLOW_DASHBOARD_EDIT = action.payload.ALLOW_DASHBOARD_EDIT;
+			state.DUCKS = action.payload.DUCKS;
 			state.loaded = Date.now();
 		});
 	},

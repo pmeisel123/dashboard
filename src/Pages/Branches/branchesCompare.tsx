@@ -8,6 +8,7 @@ import type {
 } from "@src/Api";
 import {
 	fetchBranches,
+	fetchConfig,
 	fetchLatestRelease,
 	fetchReleases,
 	fetchTickets,
@@ -35,6 +36,7 @@ const BranchesComparePage: FC<{
 	const [commits, setCommits] = useState<BranchCommit[]>([]);
 	const [tickets, setTickets] = useState<{ [key: string]: TicketProps }>({});
 	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [useLatestRelease, setUseLatestRelease] = useState<boolean>(searchParams.get("useLatestRelease") == "true");
 
@@ -112,7 +114,7 @@ const BranchesComparePage: FC<{
 		if (repo && branch1 && branch2) {
 			setLoading(true);
 			const loadData = async () => {
-				const localcommits = await getBranchesCompare(repo, branch1, branch2);
+				const localcommits = await getBranchesCompare(repo, branch1, branch2, config);
 				if (isMounted) {
 					setCommits(localcommits);
 					setLoading(false);
@@ -138,7 +140,7 @@ const BranchesComparePage: FC<{
 			}
 		});
 		if (ticket_search) {
-			dispatch(fetchTickets(ticket_search)).then((data: any) => {
+			dispatch(fetchTickets([ticket_search, config])).then((data: any) => {
 				let local_tickets = { ...tickets };
 				if (data && data.payload && data.payload.length) {
 					data.payload.forEach((ticket: TicketProps) => {
@@ -151,18 +153,21 @@ const BranchesComparePage: FC<{
 	}, [commits]);
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
+			dispatch(fetchBranches(config));
 		}
 	}, [dispatch]);
 
 	useEffect(() => {
 		if (repo) {
 			if (!releases[repo] || !isSliceRecent(releases[repo])) {
-				dispatch(fetchReleases(repo));
+				dispatch(fetchReleases([repo, config]));
 			}
 			if (!latestRelease[repo] || !isSliceRecent(latestRelease[repo])) {
-				dispatch(fetchLatestRelease(repo));
+				dispatch(fetchLatestRelease([repo, config]));
 			}
 		}
 	}, [dispatch, repo]);

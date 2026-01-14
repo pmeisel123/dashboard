@@ -1,13 +1,11 @@
 import { Box } from "@mui/material";
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
+import { fetchBranches, fetchConfig, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { BranchesTable, UserSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-
-declare const __API_URL__: string;
 
 const BranchesPage: FC<{
 	searchParamsOveride?: URLSearchParams;
@@ -22,6 +20,7 @@ const BranchesPage: FC<{
 	const [group, setGroup] = useState<string>(searchParams.get("group") || "");
 	const [user, setUser] = useState<string>(searchParams.get("user") || "");
 	const [loaded, setLoaded] = useState<boolean>(false);
+	const config = useSelector((state: RootState) => state.configState);
 
 	const loadParams = () => {
 		setGroup(searchParams.get("group") || "");
@@ -52,11 +51,14 @@ const BranchesPage: FC<{
 	}, [group, user]);
 
 	useEffect(() => {
-		if (!isSliceRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
 		}
-		if (!isSliceRecent(allJiraUsersGroups) && __API_URL__) {
-			dispatch(fetchUsersAndGroups());
+		if (!isSliceRecent(ticketsBranches)) {
+			dispatch(fetchBranches(config));
+		}
+		if (!isSliceRecent(allJiraUsersGroups) && config.API_URL) {
+			dispatch(fetchUsersAndGroups(config));
 		}
 	}, [dispatch]);
 	useEffect(() => {
@@ -64,12 +66,12 @@ const BranchesPage: FC<{
 		if (ticketsBranches && ticketsBranches.tickets && Object.keys(ticketsBranches.tickets).length) {
 			jira_search = 'key IN ("' + Object.keys(ticketsBranches.tickets).join('", "') + '")';
 		}
-		if (!__API_URL__) {
+		if (!config.API_URL) {
 			setLoaded(true);
 		}
-		if (jira_search && __API_URL__) {
+		if (jira_search && config.API_URL) {
 			setJiraSearch(jira_search);
-			dispatch(fetchTickets(jira_search)).then((data) => {
+			dispatch(fetchTickets([jira_search, config])).then((data) => {
 				if (data && data.payload) {
 					const payload = data.payload as TicketProps[];
 					if (!payload.length) {
@@ -84,7 +86,7 @@ const BranchesPage: FC<{
 		}
 	}, [ticketsBranches]);
 	useEffect(() => {
-		if (__API_URL__) {
+		if (config.API_URL) {
 			if (tickets) {
 				tickets.forEach((ticket) => {
 					const key = ticket.key;
@@ -104,7 +106,7 @@ const BranchesPage: FC<{
 
 	return (
 		<Box sx={{ width: "100%" }}>
-			{!!__API_URL__ && (
+			{!!config.API_URL && (
 				<UserSelector
 					allJiraUsersGroups={allJiraUsersGroups}
 					group={group}

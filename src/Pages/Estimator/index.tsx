@@ -1,5 +1,5 @@
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
+import { fetchBranches, fetchConfig, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -34,6 +34,7 @@ const EstimatorPage: FC<{
 	const freezeParams = useRef(false);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
 	const [lastDay, setLastDay] = useState<string>("");
 
 	const loadParams = () => {
@@ -70,16 +71,19 @@ const EstimatorPage: FC<{
 		}
 		setJiraSearch(jira_search);
 		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
-		dispatch(fetchTickets(jira_search)).then(() => {
+		dispatch(fetchTickets([jira_search, config])).then(() => {
 			setLoading(false);
 		});
 	};
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(allJiraUsersGroups)) {
-			dispatch(fetchUsersAndGroups());
+			dispatch(fetchUsersAndGroups(config));
 		}
 		if (!isSliceRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
+			dispatch(fetchBranches(config));
 		}
 		getFunc();
 	}, [dispatch]);

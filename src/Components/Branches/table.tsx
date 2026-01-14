@@ -1,24 +1,14 @@
 import { Link } from "@mui/material";
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import type {
-	BranchesAndTicket,
-	CustomFieldsProps,
-	GitBranch,
-	RepoNamePaths,
-	TicketProps,
-	UsersGroupProps,
-} from "@src/Api";
-import { GetBranchCreator } from "@src/Api";
+import type { AppDispatch, BranchesAndTicket, GitBranch, RootState, TicketProps, UsersGroupProps } from "@src/Api";
+import { fetchConfig, GetBranchCreator, isSliceRecent } from "@src/Api";
 import type { tableSetingsProps } from "@src/Components";
 import { Ago, allGroups, CustomDataGrid, defaultTableSettings } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import type { rowProp } from "./const";
-
-declare const __API_URL__: string;
-declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
-declare const __GIT_REPOS_PATHS__: { [key: string]: RepoNamePaths };
 
 const BranchesTable: FC<{
 	ticketsBranches: BranchesAndTicket;
@@ -41,6 +31,13 @@ const BranchesTable: FC<{
 	user,
 	group,
 }) => {
+	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
 	const location = useLocation();
 	const localStorageName = "GitTableColumns22." + location.pathname;
 	const [rows, setRows] = useState<rowProp[]>([]);
@@ -53,7 +50,7 @@ const BranchesTable: FC<{
 			headerName: "Branch",
 			renderCell: (params: GridRenderCellParams<rowProp>) => {
 				const repo = params.row.repo;
-				const url = __GIT_REPOS_PATHS__[repo].url + "/tree/" + params.value;
+				const url = config.GIT_REPOS_PATHS[repo].url + "/tree/" + params.value;
 				return (
 					<Link href={url} target={"_blank"}>
 						{params.value}
@@ -79,7 +76,7 @@ const BranchesTable: FC<{
 			flex: 1,
 		},
 	];
-	if (__API_URL__) {
+	if (config.API_URL) {
 		columns = [
 			...columns,
 			{
@@ -87,7 +84,7 @@ const BranchesTable: FC<{
 				headerName: "Ticket Key",
 				renderCell: (params: GridRenderCellParams<rowProp>) => (
 					<Link
-						href={(__API_URL__ + "/browse/" + params.value) as string}
+						href={(config.API_URL + "/browse/" + params.value) as string}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
@@ -101,7 +98,7 @@ const BranchesTable: FC<{
 				headerName: "Ticket Summary",
 				renderCell: (params: GridRenderCellParams<rowProp>) => (
 					<Link
-						href={(__API_URL__ + "/browse/" + params.row.ticket_key) as string}
+						href={(config.API_URL + "/browse/" + params.row.ticket_key) as string}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
@@ -133,7 +130,7 @@ const BranchesTable: FC<{
 		}
 	}
 	if (
-		Object.keys(__GIT_REPOS_PATHS__).length == 1 && // Only 1 repo, don't need to show the repo column
+		Object.keys(config.GIT_REPOS_PATHS).length == 1 && // Only 1 repo, don't need to show the repo column
 		(!defaultColumnModel.GridColumnVisibilityModel ||
 			!Object.keys(defaultColumnModel.GridColumnVisibilityModel).length)
 	) {

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { GitRelease, LoadedSlice } from "../Types";
+import type { ConfigProps, GitRelease, LoadedSlice } from "../Types";
 import { getReleases } from "./git";
 
 const initialState: { [key: string]: { releases: GitRelease[] } & LoadedSlice } = {
@@ -9,8 +9,8 @@ const initialState: { [key: string]: { releases: GitRelease[] } & LoadedSlice } 
 	},
 };
 
-export const fetchReleases = createAsyncThunk("git/getReleases", async (repo: string) => {
-	const data: GitRelease[] = await getReleases(repo);
+export const fetchReleases = createAsyncThunk("git/getReleases", async ([repo, config]: [string, ConfigProps]) => {
+	const data: GitRelease[] = await getReleases(repo, config);
 	return data;
 });
 
@@ -21,7 +21,7 @@ export const gitReleasesSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchReleases.pending, (state, action) => {
-				const repo = action.meta.arg;
+				const repo = action.meta.arg[0];
 				if (!state[repo]) {
 					state[repo] = {
 						releases: [],
@@ -31,7 +31,7 @@ export const gitReleasesSlice = createSlice({
 			})
 			.addCase(fetchReleases.fulfilled, (state, action) => {
 				const data = action.payload;
-				const repo = action.meta.arg;
+				const repo = action.meta.arg[0];
 				state[repo] = {
 					releases: data,
 					loaded: Date.now(),

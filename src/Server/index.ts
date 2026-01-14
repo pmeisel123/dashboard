@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { ConfigServer } from "./config";
 import { VacationServer } from "./vacation";
+export { loadConfig } from "./config";
 
 export const ServerMap = (req: IncomingMessage, requestBody: string | null) => {
 	if (req.url === "/server/vacation") {

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { LoadedSlice, UsersGroupProps } from "./Types";
+import type { ConfigProps, LoadedSlice, UsersGroupProps } from "./Types";
 import { getUsersAndGroupsApi } from "./users";
 
 const initialState: UsersGroupProps & LoadedSlice = {
@@ -8,8 +8,8 @@ const initialState: UsersGroupProps & LoadedSlice = {
 	loaded: null,
 };
 
-export const fetchUsersAndGroups = createAsyncThunk("users/fetchUsersAndGroups", async () => {
-	const data: UsersGroupProps = await getUsersAndGroupsApi();
+export const fetchUsersAndGroups = createAsyncThunk("users/fetchUsersAndGroups", async (config: ConfigProps) => {
+	const data: UsersGroupProps = await getUsersAndGroupsApi(config);
 	return data;
 });
 

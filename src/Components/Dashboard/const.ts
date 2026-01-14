@@ -2,16 +2,16 @@ import { Box, LinearProgress, styled } from "@mui/material";
 import { pages } from "@src/Pages/pages";
 import { matchRoutes } from "react-router-dom";
 
-declare const __DASHBOARD_SPEED_SECONDS__: number;
-
-export const DashboardProgress = styled(LinearProgress)(() => ({
+export const DashboardProgress = styled(LinearProgress, {
+	shouldForwardProp: (prop) => prop !== "speed",
+})<{ speed: number }>(({ speed }) => ({
 	bottom: "0",
 	left: 0,
 	position: "fixed",
 	width: "100%",
 	zIndex: 99999,
 	"& .MuiLinearProgress-bar": {
-		animationDuration: __DASHBOARD_SPEED_SECONDS__ + "s",
+		animationDuration: speed + "s",
 	},
 }));
 

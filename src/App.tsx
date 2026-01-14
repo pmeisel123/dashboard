@@ -1,17 +1,15 @@
 import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
-import type { DashboardProps } from "@src/Api";
-import { store } from "@src/Api";
+import type { AppDispatch, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent, store } from "@src/Api";
 import { DashboardProgress, Duck, LeftNav, TopNav } from "@src/Components";
 import { pages } from "@src/Pages/pages";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
-import { Provider } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
 import { matchRoutes } from "react-router";
 import { createBrowserRouter, Outlet, RouterProvider, useLocation, useSearchParams } from "react-router-dom";
 import "./App.css";
 
-declare const __DASHBOARDS__: { [key: string]: DashboardProps };
-declare const __DASHBOARD_DUCKS__: boolean;
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -33,15 +31,30 @@ function Main() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [isDashboard, setIsDashboard] = useState<boolean>(searchParams.get("isDashboard") == "true");
 	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
+	const [configLoading, setConfigLoading] = useState<boolean>(true);
 	const location = useLocation();
+	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
+	useEffect(() => {
+		if (isSliceRecent(config)) {
+			setConfigLoading(false);
+		} else {
+			dispatch(fetchConfig()).then(() => {
+				setConfigLoading(false);
+			});
+		}
+	}, [dispatch]);
+
+	useEffect(() => {
+		if (dashboard && !config.DASHBOARDS[dashboard]) {
+			setDashboard("");
+		}
+	}, [config]);
+
 	const [windowSize, setWindowSize] = useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
 	});
-
-	if (dashboard && !__DASHBOARDS__[dashboard]) {
-		setDashboard("");
-	}
 
 	const toggleLeftNav = () => {
 		setLeftNavOpen(!leftNavOpen);
@@ -115,6 +128,9 @@ function Main() {
 		document.title = title;
 	}, [location]);
 
+	if (configLoading) {
+		return <></>;
+	}
 	return (
 		<>
 			{!isDashboard && !dashboard && (
@@ -150,7 +166,7 @@ function Main() {
 						</Typography>
 					</>
 				)}
-				{isDashboard && <DashboardProgress />}
+				{isDashboard && <DashboardProgress speed={config.DASHBOARD_SPEED_SECONDS} />}
 				<Stack spacing={2}>
 					<Outlet
 						context={{
@@ -159,7 +175,7 @@ function Main() {
 					/>
 				</Stack>
 			</Box>
-			{(!dashboard || __DASHBOARD_DUCKS__) && <Duck />}
+			{(!dashboard || config.DASHBOARD_DUCKS) && <Duck />}
 		</>
 	);
 }

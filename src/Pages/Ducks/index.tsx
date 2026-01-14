@@ -1,9 +1,20 @@
 import { Box } from "@mui/material";
-declare const __DUCKS__: string[];
+import type { AppDispatch, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent } from "@src/Api";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 function DuckPage() {
+	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
 	return (
 		<div>
-			{__DUCKS__.map((duck) => (
+			{config.DUCKS.map((duck) => (
 				<Box
 					key={duck}
 					sx={{

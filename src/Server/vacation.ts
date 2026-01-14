@@ -1,12 +1,13 @@
 import { writeFileSync } from "node:fs";
 import type { IncomingMessage } from "node:http";
 import { join } from "node:path";
-import { ALLOW_VACATION_EDITS } from "../../globals";
 import type { UserEditVacation } from "../Api/Types";
+import { loadConfig } from "./config";
 
 export const VacationServer = (req: IncomingMessage, requestBody: string | null) => {
 	if (req.method === "POST") {
-		if (requestBody && ALLOW_VACATION_EDITS) {
+		const config = loadConfig();
+		if (requestBody && config.ALLOW_VACATION_EDITS) {
 			try {
 				const vacations = JSON.parse(requestBody) as UserEditVacation;
 				let output = "";

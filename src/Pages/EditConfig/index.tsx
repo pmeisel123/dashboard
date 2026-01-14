@@ -1,8 +1,14 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Tab } from "@mui/material";
-import type { AppDispatch, RootState } from "@src/Api";
-import { fetchConfig, isSliceRecent } from "@src/Api";
-import type { CustomFieldsObjectProps, DashboardProps, RepoNamePaths, VacationKeyType } from "@src/Api/Types";
+import { Button, Tab } from "@mui/material";
+import type { AppDispatch, ReposProps, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent, postConfigApi } from "@src/Api";
+import type {
+	ConfigPropsFile,
+	CustomFieldsObjectProps,
+	DashboardProps,
+	RepoNamePaths,
+	VacationKeyType,
+} from "@src/Api/Types";
 import type { SyntheticEvent } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,12 +35,14 @@ function EditConfigPage() {
 	const [dashboards, setDashboards] = useState<{ [key: string]: DashboardProps }>({});
 	const [dashboardSpeed, setDashboardSpeed] = useState<number>(10);
 	const [dashboardDucks, setDashboardDucks] = useState<boolean>(true);
+	const [allowVacationEdit, setAllowVacationEdit] = useState<boolean>(true);
+	const [allowConfigEdit, setAllowConfigEdit] = useState<boolean>(true);
+	const [allowDashboardEdit, setAllowDashboardEdit] = useState<boolean>(true);
+	const [editApiKey, setEditApiKey] = useState<boolean>(true);
+	const [editToken, setEditToken] = useState<boolean>(true);
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(true);
-	const [allowVacationEdit, setAllowVacationEdit] = useState<boolean>(true);
-	const [editApiKey, setEditApiKey] = useState<boolean>(true);
-	const [editToken, setEditToken] = useState<boolean>(true);
 
 	useEffect(() => {
 		if (isSliceRecent(config)) {
@@ -61,9 +69,47 @@ function EditConfigPage() {
 		setDashboardSpeed(config.DASHBOARD_SPEED_SECONDS);
 		setDoneStaus(config.DONE_STATUS);
 		setGitRepoPaths(config.GIT_REPOS_PATHS);
+		setAllowConfigEdit(config.ALLOW_CONFIG_EDIT);
+		setAllowDashboardEdit(config.ALLOW_DASHBOARD_EDIT);
 	}, [config]);
+
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
+	};
+
+	const save = () => {
+		setLoading(true);
+		const repos: ReposProps[] = [];
+		Object.keys(gitRepoPaths).forEach((repo_name) => {
+			repos.push({
+				name: repo_name,
+				url: gitRepoPaths[repo_name].url,
+			});
+		});
+		const newConfig: ConfigPropsFile = {
+			ALLOW_CONFIG_EDIT: allowConfigEdit,
+			ALLOW_DASHBOARD_EDIT: allowDashboardEdit,
+			ALLOW_VACATION_EDITS: allowVacationEdit,
+			HOST: host,
+			PORT: port,
+			API_USERNAME: userName,
+			VACATION_KEY: vacationKey,
+			API_CONFLUENCE_URL: apiConfluenceUrl,
+			API_KEY: apiKey,
+			API_URL: apiUrl,
+			GITTOKEN: gitToken,
+			CUSTOM_FIELDS: customFields,
+			DASHBOARDS: dashboards,
+			DASHBOARD_DUCKS: dashboardDucks,
+			DASHBOARD_SPEED_SECONDS: dashboardSpeed,
+			DONE_STATUS: doneStatus,
+			GITREPOS: repos,
+		};
+		postConfigApi(newConfig).then(() => {
+			dispatch(fetchConfig()).then(() => {
+				setLoading(false);
+			});
+		});
 	};
 
 	if (loading) {
@@ -77,6 +123,9 @@ function EditConfigPage() {
 					<Tab label="Jira" value="Jira" />
 					<Tab label="Git" value="Git" />
 					<Tab label="Dashboards" value="Dashboards" />
+					<Button variant="contained" onClick={save} sx={{ marginLeft: "100px", width: "4em" }}>
+						Save
+					</Button>
 				</TabList>
 				<TabPanel value="Miscellaneous">
 					<EditMiscellaneousConfigTab
@@ -89,6 +138,12 @@ function EditConfigPage() {
 						allowVacationEdit={allowVacationEdit}
 						setAllowVacationEdit={setAllowVacationEdit}
 						origVacationEdit={config.ALLOW_VACATION_EDITS}
+						allowConfigEdit={allowConfigEdit}
+						setAllowConfigEdit={setAllowConfigEdit}
+						origAllowConfigEdit={config.ALLOW_CONFIG_EDIT}
+						allowDashboardEdit={allowDashboardEdit}
+						setAllowDashboardEdit={setAllowDashboardEdit}
+						origAllowDashboardEdit={config.ALLOW_DASHBOARD_EDIT}
 					/>
 				</TabPanel>
 				<TabPanel value="Jira">
@@ -120,16 +175,27 @@ function EditConfigPage() {
 					/>
 				</TabPanel>
 				<TabPanel value="Dashboards">
-					<EditDashboardConfigTab
-						dashboardSpeed={dashboardSpeed}
-						setDashboardSpeed={setDashboardSpeed}
-						dashboards={dashboards}
-						setDashboards={setDashboards}
-						dashboardDucks={dashboardDucks}
-						setDashboardDucks={setDashboardDucks}
-					/>
+					{config.ALLOW_DASHBOARD_EDIT && (
+						<EditDashboardConfigTab
+							dashboardSpeed={dashboardSpeed}
+							setDashboardSpeed={setDashboardSpeed}
+							dashboards={dashboards}
+							setDashboards={setDashboards}
+							dashboardDucks={dashboardDucks}
+							setDashboardDucks={setDashboardDucks}
+						/>
+					)}
+					{!config.ALLOW_DASHBOARD_EDIT && (
+						<>
+							Edit Dashboard has been turned off. Need to turn it back on from the server, by editting
+							Config.json by hand and changing ALLOW_DASHBOARD_EDIT: false to ALLOW_DASHBOARD_EDIT: true
+						</>
+					)}
 				</TabPanel>
 			</TabContext>
+			<Button variant="contained" onClick={save} sx={{ width: "4em" }}>
+				Save
+			</Button>
 			{Debug && (
 				<>
 					Fields: <br />

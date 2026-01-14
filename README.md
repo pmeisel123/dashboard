@@ -37,3 +37,9 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 ```bash
    npm run dev
 ```
+
+4. Load the site in a browser and go to https://127.0.0.1/EditConfig
+
+```bash
+   npm run dev
+```

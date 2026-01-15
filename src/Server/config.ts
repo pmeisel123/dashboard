@@ -8,74 +8,76 @@ const filePath = join(process.cwd(), "config.json");
 const ducks = fs.readdirSync("./src/assets/ducks/");
 
 export const loadConfig = (): ConfigPropsFile => {
-	const content = readFileSync(filePath, "utf8");
-	if (content) {
-		const configFile: ConfigPropsFile = JSON.parse(content);
+	if (fs.existsSync(filePath)) {
+		const content = readFileSync(filePath, "utf8");
+		if (content) {
+			const configFile: ConfigPropsFile = JSON.parse(content);
 
-		return configFile;
-	} else {
-		const config: ConfigPropsFile = {
-			ALLOW_VACATION_EDITS: true,
-			ALLOW_CONFIG_EDIT: true,
-			ALLOW_DASHBOARD_EDIT: true,
-			API_CONFLUENCE_URL: "",
-			API_USERNAME: "",
-			API_KEY: "",
-			API_URL: "",
-			CUSTOM_FIELDS: {},
-			DASHBOARDS: {
-				company: {
-					key: "company",
-					name: "Company Dashboard",
-					pages: [
-						{
-							name: "Front Page",
-							split: "fourways",
-							pages: [
-								{
-									name: "Date",
-									url: "/date",
-								},
-								{
-									name: "Time",
-									url: "/time",
-								},
-								{
-									name: "Company Dashboard Text",
-									url: "/text?text=Company%20Dashboard",
-								},
-								{
-									name: "Next Holiday",
-									url: "/nextholiday",
-								},
-							],
-						},
-						{
-							name: "Recent Tickets",
-							url: "/RecentTickets?days=30",
-						},
-						{
-							name: "Who is out",
-							url: "/whoisout",
-						},
-						{
-							name: "Holidays",
-							url: "/holidays",
-						},
-					],
-				},
-			},
-			DASHBOARD_DUCKS: true,
-			DASHBOARD_SPEED_SECONDS: 30,
-			DONE_STATUS: ["Done"],
-			GITTOKEN: "",
-			HOST: "",
-			PORT: 3000,
-			VACATION_KEY: "email",
-			GITREPOS: [],
-		};
-		return config;
+			return configFile;
+		}
 	}
+
+	const config: ConfigPropsFile = {
+		ALLOW_VACATION_EDITS: true,
+		ALLOW_CONFIG_EDIT: true,
+		ALLOW_DASHBOARD_EDIT: true,
+		API_CONFLUENCE_URL: "",
+		API_USERNAME: "",
+		API_KEY: "",
+		API_URL: "",
+		CUSTOM_FIELDS: {},
+		DASHBOARDS: {
+			company: {
+				key: "company",
+				name: "Company Dashboard",
+				pages: [
+					{
+						name: "Front Page",
+						split: "fourways",
+						pages: [
+							{
+								name: "Date",
+								url: "/date",
+							},
+							{
+								name: "Time",
+								url: "/time",
+							},
+							{
+								name: "Company Dashboard Text",
+								url: "/text?text=Company%20Dashboard",
+							},
+							{
+								name: "Next Holiday",
+								url: "/nextholiday",
+							},
+						],
+					},
+					{
+						name: "Recent Tickets",
+						url: "/RecentTickets?days=30",
+					},
+					{
+						name: "Who is out",
+						url: "/whoisout",
+					},
+					{
+						name: "Holidays",
+						url: "/holidays",
+					},
+				],
+			},
+		},
+		DASHBOARD_DUCKS: true,
+		DASHBOARD_SPEED_SECONDS: 30,
+		DONE_STATUS: ["Done"],
+		GITTOKEN: "",
+		HOST: "",
+		PORT: 3000,
+		VACATION_KEY: "email",
+		GITREPOS: [],
+	};
+	return config;
 };
 
 export const ConfigServer = (req: IncomingMessage, requestBody: string | null) => {

@@ -13,6 +13,7 @@ import type {
 import type { SyntheticEvent } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { EditDashboardConfigTab } from "./dashboard";
 import { EditGitConfigTab } from "./git";
 import { EditJiraConfigTab } from "./jira";
@@ -21,7 +22,8 @@ import { EditMiscellaneousConfigTab } from "./miscellaneous";
 const Debug = false;
 
 function EditConfigPage() {
-	const [tab, setTab] = useState<string>("Miscellaneous");
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [tab, setTab] = useState<string>(searchParams.get("tab") || "Miscellaneous");
 	const [host, setHost] = useState<string>("");
 	const [port, setPort] = useState<number>(3000);
 	const [vacationKey, setVacationKey] = useState<VacationKeyType>("email");
@@ -44,6 +46,25 @@ function EditConfigPage() {
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(true);
+
+	useEffect(() => {
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (tab) {
+			newSearchParams.set("tab", tab);
+		} else {
+			newSearchParams.delete(tab);
+		}
+		if (searchParams.toString() != newSearchParams.toString()) {
+			setSearchParams(newSearchParams);
+		}
+	}, [tab]);
+
+	useEffect(() => {
+		const tab = searchParams.get("tab");
+		if (tab) {
+			setTab(tab);
+		}
+	}, [searchParams]);
 
 	useEffect(() => {
 		if (isSliceRecent(config)) {

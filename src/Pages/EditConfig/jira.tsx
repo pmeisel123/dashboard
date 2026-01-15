@@ -150,6 +150,7 @@ export const EditJiraConfigTab: FC<{
 			<TextField
 				id="ApiUrl"
 				value={apiUrl}
+				placeholder="https://pmeisel.atlassian.net/"
 				fullWidth
 				disabled={!apiKey || !userName}
 				helperText={!apiKey || !userName ? "Enter Api Key and username to update" : " "}
@@ -182,6 +183,7 @@ export const EditJiraConfigTab: FC<{
 				id="ApiConfluenceUrl"
 				value={apiConfluenceUrl}
 				fullWidth
+				placeholder="https://pmeisel.atlassian.net/wiki/"
 				disabled={!apiKey || !userName}
 				helperText={!apiKey || !userName ? "Enter Api Key and username to update" : " "}
 				onChange={(event) => {

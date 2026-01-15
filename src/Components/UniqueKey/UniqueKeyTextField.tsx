@@ -7,8 +7,9 @@ export const UniqueTextFieldFieldKey: FC<{
 	updateRow: (index: number, newKey: string) => void;
 	currentKey: string;
 	disabled: boolean;
+	placeholder?: string;
 	index: number;
-}> = ({ object, updateRow, currentKey, disabled, index }) => {
+}> = ({ object, updateRow, currentKey, disabled, placeholder, index }) => {
 	const [localKey, setLocalKey] = useState<string>(currentKey);
 	const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
 	useEffect(() => {
@@ -40,6 +41,7 @@ export const UniqueTextFieldFieldKey: FC<{
 				fullWidth
 				disabled={disabled}
 				key={index}
+				placeholder={placeholder}
 			/>
 		</>
 	);

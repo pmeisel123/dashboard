@@ -89,9 +89,7 @@ export const EditMiscellaneousConfigTab: FC<{
 					/>
 				</Grid>
 			</Grid>
-			<FormLabel id="vacationKey">
-				Vacation key (How Jira Users and vacation api link user (by name or by email)
-			</FormLabel>
+			<FormLabel id="vacationKey">Vacation key: How Jira Users and vacation api link user</FormLabel>
 			<RadioGroup
 				row
 				aria-labelledby="vacationKey"
@@ -99,8 +97,8 @@ export const EditMiscellaneousConfigTab: FC<{
 				value={vacationKey}
 				onChange={handleVacationChange}
 			>
-				<FormControlLabel value="email" control={<Radio />} label="Email" />
-				<FormControlLabel value="name" control={<Radio />} label="Name" />
+				<FormControlLabel value="email" control={<Radio />} label="Person's Email" />
+				<FormControlLabel value="name" control={<Radio />} label="Person's Name" />
 			</RadioGroup>
 			<FormLabel>
 				If any of the below options are turned off, they can only be turned on by editting Config.json on the

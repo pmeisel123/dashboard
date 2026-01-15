@@ -173,6 +173,7 @@ export const EditGitConfigTab: FC<{
 								currentKey={key}
 								index={index}
 								disabled={!gitToken}
+								placeholder="Dashboard"
 							/>
 						</Grid>
 						<Grid size={{ xs: 12, md: 8 }}>
@@ -185,6 +186,7 @@ export const EditGitConfigTab: FC<{
 									updateUrl(index, event.target.value);
 								}}
 								disabled={!gitToken}
+								placeholder="https://github.com/pmeisel123/dashboard"
 							/>
 						</Grid>
 					</Grid>

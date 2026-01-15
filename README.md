@@ -29,13 +29,16 @@ This is a company Dashboard. It merges data from Jira, Git, and vacations. I bui
 2. Install dependencies
 
 ```bash
-   npm install
+   npm install --legacy-peer-deps
 ```
 
-3. Configure settings:
-   Update `globals.ts` (see instructions in the file).
+3. Run the application:
 
-4. Run the application:
+```bash
+   npm run dev
+```
+
+4. Load the site in a browser and go to https://127.0.0.1/EditConfig
 
 ```bash
    npm run dev

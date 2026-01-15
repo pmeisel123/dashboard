@@ -1,33 +1,19 @@
 import type { SelectChangeEvent } from "@mui/material";
 import { Checkbox, Grid, InputLabel, ListItemText, MenuItem, Select } from "@mui/material";
-import type { AppDispatch, CustomFieldsProps, ReportNamePaths, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
+import type { AppDispatch, RootState, TicketProps } from "@src/Api";
+import {
+	fetchBranches,
+	fetchConfig,
+	fetchTickets,
+	fetchUsersAndGroups,
+	GetBranchCreator,
+	isSliceRecent,
+} from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-
-declare const __DONE_STATUS__: string[];
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
-declare const __CUSTOM_FIELDS__: { [key: string]: CustomFieldsProps };
-const allUserFieldsMap: { [key: string]: string } = {
-	assignee: "Assignee",
-	creator: "Creator",
-	git: "Git Branches Owner",
-};
-const allUserFieldsDefault: { [key: string]: boolean } = {
-	assignee: true,
-	creator: false,
-	git: true,
-};
-Object.keys(__CUSTOM_FIELDS__).forEach((custom_field_key) => {
-	if (__CUSTOM_FIELDS__[custom_field_key].Type == "User") {
-		allUserFieldsMap[custom_field_key] = __CUSTOM_FIELDS__[custom_field_key].Name;
-		allUserFieldsDefault[custom_field_key] = true;
-	}
-});
-const allUserFieldsDefaultArray = Object.keys(allUserFieldsDefault).filter((key) => allUserFieldsDefault[key]);
 
 const MyTicketsPage: FC<{
 	searchParamsOveride?: URLSearchParams;
@@ -38,16 +24,14 @@ const MyTicketsPage: FC<{
 	const [group, setGroup] = useState<string>(searchParams.get("group") || window.localStorage.getItem("group") || "");
 	const [user, setUser] = useState<string>(searchParams.get("user") || window.localStorage.getItem("user") || "");
 	const [loading, setLoading] = useState<boolean>(true);
-	let user_fields_params = searchParams.get("user_fields") || window.localStorage.getItem("user_fields");
-	let user_field_load = allUserFieldsDefaultArray;
-	if (user_fields_params) {
-		user_field_load = user_fields_params.split(",");
-	}
-	const [userFields, setUserFields] = useState<string[]>(user_field_load);
+	const [allUserFieldsMap, setAllUserFieldsMap] = useState<{ [key: string]: string }>({});
+	const [allUserFieldsDefaultArray, setAllUserFieldsDefaultArray] = useState<string[]>([]);
+	const [userFields, setUserFields] = useState<string[]>([]);
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const hasFetchedTickets = useRef("");
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const loadParams = () => {
@@ -65,13 +49,45 @@ const MyTicketsPage: FC<{
 	}, [searchParams]);
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(allJiraUsersGroups)) {
-			dispatch(fetchUsersAndGroups());
+			dispatch(fetchUsersAndGroups(config));
 		}
 		if (!isSliceRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
+			dispatch(fetchBranches(config));
 		}
 	}, [dispatch]);
+	useEffect(() => {
+		const newAllUserFieldsMap: { [key: string]: string } = {
+			assignee: "Assignee",
+			creator: "Creator",
+			git: "Git Branches Owner",
+		};
+		const newAllUserFieldsDefault: { [key: string]: boolean } = {
+			assignee: true,
+			creator: false,
+			git: true,
+		};
+		const newAllUserFieldsDefaultArray = Object.keys(newAllUserFieldsDefault).filter(
+			(key) => newAllUserFieldsDefault[key],
+		);
+		Object.keys(config.CUSTOM_FIELDS).forEach((custom_field_key) => {
+			if (config.CUSTOM_FIELDS[custom_field_key].Type == "User") {
+				newAllUserFieldsMap[custom_field_key] = config.CUSTOM_FIELDS[custom_field_key].Name;
+				newAllUserFieldsDefault[custom_field_key] = true;
+			}
+		});
+		let user_fields_params = searchParams.get("user_fields") || window.localStorage.getItem("user_fields");
+		let user_field_load = newAllUserFieldsDefaultArray;
+		if (user_fields_params) {
+			user_field_load = user_fields_params.split(",");
+		}
+		setUserFields(user_field_load);
+		setAllUserFieldsMap(newAllUserFieldsMap);
+		setAllUserFieldsDefaultArray(newAllUserFieldsDefaultArray);
+	}, [config]);
 
 	var getFunc = function () {
 		if (!user) {
@@ -107,7 +123,7 @@ const MyTicketsPage: FC<{
 			setJiraSearch("");
 			return;
 		}
-		let jira_search = 'status NOT IN ("' + __DONE_STATUS__.join('","') + '")';
+		let jira_search = 'status NOT IN ("' + config.DONE_STATUS.join('","') + '")';
 		if (search) {
 			jira_search += " AND (" + search + ")";
 		}
@@ -116,7 +132,7 @@ const MyTicketsPage: FC<{
 		}
 		setJiraSearch(jira_search);
 		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
-		dispatch(fetchTickets(jira_search)).then(() => {
+		dispatch(fetchTickets([jira_search, config])).then(() => {
 			setLoading(false);
 		});
 	};

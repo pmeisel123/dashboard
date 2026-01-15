@@ -1,7 +1,6 @@
 import type {
 	AppDispatch,
 	BranchCommit,
-	BranchesAndTicket,
 	GitLatestReleaseSlice,
 	GitReleaseSlice,
 	RootState,
@@ -9,6 +8,7 @@ import type {
 } from "@src/Api";
 import {
 	fetchBranches,
+	fetchConfig,
 	fetchLatestRelease,
 	fetchReleases,
 	fetchTickets,
@@ -25,7 +25,7 @@ const BranchesComparePage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
-	const ticketsBranches: BranchesAndTicket = useSelector((state: RootState) => state.gitBranchState);
+	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const releases: { [key: string]: GitReleaseSlice } = useSelector((state: RootState) => state.gitReleasesState);
 	const latestRelease: { [key: string]: GitLatestReleaseSlice } = useSelector(
 		(state: RootState) => state.gitLatestReleaseState,
@@ -36,6 +36,7 @@ const BranchesComparePage: FC<{
 	const [commits, setCommits] = useState<BranchCommit[]>([]);
 	const [tickets, setTickets] = useState<{ [key: string]: TicketProps }>({});
 	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [useLatestRelease, setUseLatestRelease] = useState<boolean>(searchParams.get("useLatestRelease") == "true");
 
@@ -113,7 +114,7 @@ const BranchesComparePage: FC<{
 		if (repo && branch1 && branch2) {
 			setLoading(true);
 			const loadData = async () => {
-				const localcommits = await getBranchesCompare(repo, branch1, branch2);
+				const localcommits = await getBranchesCompare(repo, branch1, branch2, config);
 				if (isMounted) {
 					setCommits(localcommits);
 					setLoading(false);
@@ -139,7 +140,7 @@ const BranchesComparePage: FC<{
 			}
 		});
 		if (ticket_search) {
-			dispatch(fetchTickets(ticket_search)).then((data: any) => {
+			dispatch(fetchTickets([ticket_search, config])).then((data: any) => {
 				let local_tickets = { ...tickets };
 				if (data && data.payload && data.payload.length) {
 					data.payload.forEach((ticket: TicketProps) => {
@@ -152,18 +153,21 @@ const BranchesComparePage: FC<{
 	}, [commits]);
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
+			dispatch(fetchBranches(config));
 		}
 	}, [dispatch]);
 
 	useEffect(() => {
 		if (repo) {
 			if (!releases[repo] || !isSliceRecent(releases[repo])) {
-				dispatch(fetchReleases(repo));
+				dispatch(fetchReleases([repo, config]));
 			}
 			if (!latestRelease[repo] || !isSliceRecent(latestRelease[repo])) {
-				dispatch(fetchLatestRelease(repo));
+				dispatch(fetchLatestRelease([repo, config]));
 			}
 		}
 	}, [dispatch, repo]);

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import type { AppDispatch, RootState } from "@src/Api";
 import {
+	fetchConfig,
 	fetchUsersAndGroups,
 	getAllUsHolidays,
 	getDateString,
@@ -42,6 +43,7 @@ const WhoIsOutPage: FC<{
 	let param_groups = searchParams.get("groups");
 	const [groups, setGroups] = useState<string[]>(param_groups ? param_groups.split(/,/g) : []);
 	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
 
 	const loadParams = () => {
 		param_groups = searchParams.get("groups");
@@ -53,8 +55,11 @@ const WhoIsOutPage: FC<{
 	}, [searchParams]);
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(allJiraUsersGroups)) {
-			dispatch(fetchUsersAndGroups());
+			dispatch(fetchUsersAndGroups(config));
 		}
 	}, [dispatch]);
 	const today = new Date();

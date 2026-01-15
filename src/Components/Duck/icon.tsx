@@ -1,24 +1,38 @@
 import { Box } from "@mui/material";
-import { getHolidayDayString } from "@src/Api";
+import type { AppDispatch, RootState } from "@src/Api";
+import { fetchConfig, getHolidayDayString, isSliceRecent } from "@src/Api";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { getHolidayDuck } from "./const";
-declare const __DUCKS__: string[];
-const max_silly = __DUCKS__.length * 4;
 
 export const Duck = () => {
 	let default_duck = "ducky.png";
 	let default_duck_title = "ducky.png";
+	const [max_silly, setMaxSilly] = useState<number>(30);
 	const [searchParams] = useSearchParams();
 	const [duck, setDuck] = useState<string>(default_duck);
-	const [silly, setSilly] = useState<number>(parseInt(searchParams.get("silly") || max_silly + ""));
+	const [silly, setSilly] = useState<number>(parseInt(searchParams.get("silly") || "0"));
 	const [orderSilly] = useState<boolean>(searchParams.get("orderSilly") == "true");
 	const [duckTitle, setDuckTitle] = useState<string>("");
+
+	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
+
+	useEffect(() => {
+		setMaxSilly(config.DUCKS.length * 4);
+	}, [config]);
+
 	let today = getHolidayDayString(new Date());
 	const randomSilly = () => {
 		if (orderSilly) {
 			setSilly((silly) => {
-				if (silly >= __DUCKS__.length - 1) {
+				if (silly >= config.DUCKS.length - 1) {
 					return 0;
 				} else {
 					return silly + 1;
@@ -50,8 +64,8 @@ export const Duck = () => {
 			default_duck_title = duck_title;
 			default_duck = holiday_duck;
 		}
-		if (__DUCKS__.length > silly && __DUCKS__[silly]) {
-			setDuck(__DUCKS__[silly]);
+		if (config.DUCKS.length > silly && config.DUCKS[silly]) {
+			setDuck(config.DUCKS[silly]);
 			setDuckTitle("silly " + silly);
 		} else {
 			setDuck(default_duck);

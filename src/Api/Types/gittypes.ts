@@ -14,7 +14,7 @@ export interface GitBranches {
 	[key: string]: GitBranch[];
 }
 
-export interface ReportNamePaths {
+export interface RepoNamePaths {
 	path: string;
 	url: string;
 }
@@ -24,7 +24,7 @@ export interface TicketCache {
 		[key: string]: {
 			name: string;
 			branch: GitBranch;
-			repo: ReportNamePaths;
+			repo: RepoNamePaths;
 		};
 	};
 }
@@ -32,7 +32,6 @@ export interface TicketCache {
 export interface BranchesAndTicket {
 	branches: GitBranches;
 	tickets: TicketCache;
-	loaded: number | null; // ms since epoch
 }
 
 export interface ReposProps {

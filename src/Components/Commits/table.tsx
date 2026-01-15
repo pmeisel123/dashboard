@@ -1,22 +1,11 @@
 import { Link } from "@mui/material";
 import type { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import type {
-	AppDispatch,
-	BranchCommit,
-	BranchesAndTicket,
-	ReportNamePaths,
-	RootState,
-	TicketProps,
-	UsersGroupPropsSlice,
-} from "@src/Api";
-import { fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
+import type { AppDispatch, BranchCommit, BranchesAndTicket, RootState, TicketProps } from "@src/Api";
+import { fetchConfig, fetchUsersAndGroups, GetBranchCreator, isSliceRecent } from "@src/Api";
 import { Ago, CustomDataGrid } from "@src/Components";
 import type { FC } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
-declare const __API_URL__: string;
 
 export const CommitsTable: FC<{
 	repo: string;
@@ -25,9 +14,10 @@ export const CommitsTable: FC<{
 	loading: boolean;
 	commits: BranchCommit[];
 }> = ({ repo, ticketsBranches, tickets, loading, commits }) => {
-	const allJiraUsersGroups: UsersGroupPropsSlice = useSelector((state: RootState) => state.usersAndGroupsState);
+	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const localStorageName = "CommitsTableColumns." + location.pathname;
 	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
 
 	let columns: GridColDef<BranchCommit>[] = [
 		{
@@ -35,7 +25,7 @@ export const CommitsTable: FC<{
 			headerName: "Commit Mesage",
 			flex: 6,
 			renderCell: (params: GridRenderCellParams<BranchCommit>) => {
-				const url = __GIT_REPOS_PATHS__[repo].url + "/commit/" + params.row.sha;
+				const url = config.GIT_REPOS_PATHS[repo].url + "/commit/" + params.row.sha;
 				return (
 					<Link href={url} target="_blank" rel="noopener noreferrer">
 						{params.row.message}
@@ -75,7 +65,7 @@ export const CommitsTable: FC<{
 			flex: 2,
 		},
 	];
-	if (__API_URL__) {
+	if (config.API_URL) {
 		columns = [
 			...columns,
 			{
@@ -83,7 +73,7 @@ export const CommitsTable: FC<{
 				headerName: "Ticket Key",
 				renderCell: (params: GridRenderCellParams<BranchCommit>) => (
 					<Link
-						href={(__API_URL__ + "/browse/" + params.row.ticket) as string}
+						href={(config.API_URL + "/browse/" + params.row.ticket) as string}
 						target="_blank"
 						rel="noopener noreferrer"
 					>
@@ -98,7 +88,7 @@ export const CommitsTable: FC<{
 					if (params.row.ticket && params.row.ticket in tickets) {
 						return (
 							<Link
-								href={(__API_URL__ + "/browse/" + params.row.ticket) as string}
+								href={(config.API_URL + "/browse/" + params.row.ticket) as string}
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -123,8 +113,11 @@ export const CommitsTable: FC<{
 	}
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(allJiraUsersGroups)) {
-			dispatch(fetchUsersAndGroups());
+			dispatch(fetchUsersAndGroups(config));
 		}
 	}, [dispatch]);
 

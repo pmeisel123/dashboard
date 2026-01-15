@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import configReducer from "./configSlice";
 import gitBranchReducer from "./git/gitBranchesSlice";
 import gitLatestReleaseReducer from "./git/gitLatetReleaseSlice";
 import gitReleasesReducer from "./git/gitReleasesSlice";
@@ -10,6 +11,7 @@ import wikiSpacesReducer from "./wiki/wikiSpacesSlice";
 
 export const store = configureStore({
 	reducer: {
+		configState: configReducer,
 		usersAndGroupsState: usersGroupReducer,
 		ticketsState: ticketsReducer,
 		gitBranchState: gitBranchReducer,

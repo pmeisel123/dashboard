@@ -1,13 +1,11 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
 import type { AppDispatch, RootState, WikiPageProps, WikiPagesProps, WikiSpaceProps } from "@src/Api";
-import { fetchWiki, fetchWikiPages, fetchWikiSpaces } from "@src/Api";
+import { fetchConfig, fetchWiki, fetchWikiPages, fetchWikiSpaces, isSliceRecent } from "@src/Api";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import "./wiki.css";
-
-declare const __API_CONFLUENCE_URL__: string;
 
 const WikiPage: FC<{
 	searchParamsOveride?: URLSearchParams;
@@ -20,6 +18,7 @@ const WikiPage: FC<{
 	const wikiSpaces: WikiSpaceProps[] = useSelector((state: RootState) => state.wikiSpacesState);
 	const wikiPages: WikiPagesProps[] = useSelector((state: RootState) => state.wikiPagesState[spaceKey]);
 	const wiki: WikiPageProps = useSelector((state: RootState) => state.wikiState[pageId]);
+	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const loadPage = () => {
 		if (pageId) {
@@ -29,6 +28,11 @@ const WikiPage: FC<{
 	useEffect(() => {
 		loadPage();
 	}, [dispatch, pageId]);
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	});
 	useEffect(() => {
 		dispatch(fetchWikiSpaces());
 		loadPage();
@@ -66,7 +70,7 @@ const WikiPage: FC<{
 		}
 	}, [pageId, spaceKey]);
 
-	const wiki_directory = __API_CONFLUENCE_URL__.replace(/https?:\/\/[^/]*/, "");
+	const wiki_directory = config.API_CONFLUENCE_URL.replace(/https?:\/\/[^/]*/, "");
 	const wiki_regex1 = new RegExp('"' + wiki_directory, "g");
 	const wiki_regex2 = new RegExp("'" + wiki_directory, "g");
 
@@ -132,7 +136,7 @@ const WikiPage: FC<{
 						{!!pageId && (
 							<a
 								href={
-									__API_CONFLUENCE_URL__.replace(/\/$/, "") +
+									config.API_CONFLUENCE_URL.replace(/\/$/, "") +
 									"/spaces/" +
 									spaceKey +
 									"/pages/" +

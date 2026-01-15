@@ -1,7 +1,8 @@
-import type { ReportNamePaths } from "@src/Api";
+import type { ConfigProps } from "@src/Api";
 import { BranchesComparePage, BranchesPage } from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import DucksPage from "@src/Pages/Ducks";
+import EditConfig from "@src/Pages/EditConfig";
 import EstimatorPage from "@src/Pages/Estimator";
 import HolidayPage from "@src/Pages/Holiday";
 import HomePage from "@src/Pages/Home";
@@ -11,11 +12,29 @@ import RecentTicketsPage from "@src/Pages/RecentTickets";
 import VacationsPage from "@src/Pages/Vacations";
 import WhoIsOutPage from "@src/Pages/WhoIsOut";
 import WikiPage from "@src/Pages/Wiki";
+import { Link } from "react-router-dom";
 
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
-declare const __ALLOW_VACATION_EDITS__: boolean;
-declare let __API_URL__: string;
-declare const __API_CONFLUENCE_URL__: string;
+export const pageTestRequires = (test: string, config: ConfigProps) => {
+	if (!test) {
+		return true;
+	}
+	if (test == "false") {
+		return false;
+	}
+	if (test == "APIURL") {
+		return !!config.API_URL;
+	}
+	if (test == "ALLOW_VACATION_EDITS") {
+		return config.ALLOW_VACATION_EDITS && !!config.API_URL;
+	}
+	if (test == "API_CONFLUENCE_URL") {
+		return !!config.API_CONFLUENCE_URL;
+	}
+	if (test == "GIT_REPOS_PATHS") {
+		return !!Object.keys(config.GIT_REPOS_PATHS).length;
+	}
+};
+
 export const pages = [
 	{
 		path: "/",
@@ -33,7 +52,7 @@ export const pages = [
 				vacations, and holidays. Useful for project planning.
 			</>
 		),
-		requires: !!__API_URL__,
+		requires: "APIURL",
 	},
 	{
 		path: "/MyTickets",
@@ -42,28 +61,28 @@ export const pages = [
 		description: (
 			<>View tickets assigned to a specific user. The selected user is saved to local storage for convenience.</>
 		),
-		requires: !!__API_URL__,
+		requires: "APIURL",
 	},
 	{
 		path: "/RecentTickets",
 		name: "Recent Tickets",
 		element: <RecentTicketsPage />,
 		description: <>Find tickets that were recently filed.</>,
-		requires: !!__API_URL__,
+		requires: "APIURL",
 	},
 	{
 		path: "/branches",
 		name: "Branches",
 		element: <BranchesPage />,
 		description: <>List all the git repositories and their respective branches.</>,
-		requires: !!Object.keys(__GIT_REPOS_PATHS__).length,
+		requires: "GIT_REPOS_PATHS",
 	},
 	{
 		path: "/branchesCompare",
 		name: "Compare Branches",
 		element: <BranchesComparePage />,
 		description: <>Find all commits in one branch and not the other</>,
-		requires: !!Object.keys(__GIT_REPOS_PATHS__).length,
+		requires: "GIT_REPOS_PATHS",
 	},
 	{
 		path: "/holidays",
@@ -89,21 +108,21 @@ export const pages = [
 				vacations api to automaticlly pull/format the vacation data
 			</>
 		),
-		requires: !!__API_URL__,
+		requires: "APIURL",
 	},
 	{
 		path: "/vacations",
 		name: "Edit Vacations",
 		element: <VacationsPage />,
 		description: <>Edit Vacations and save it to src/assets/vacation.csv</>,
-		requires: __ALLOW_VACATION_EDITS__,
+		requires: "ALLOW_VACATION_EDITS",
 	},
 	{
 		path: "/wiki",
 		name: "Wiki Page",
 		element: <WikiPage />,
 		description: <>Wiki Page</>,
-		requires: !!__API_CONFLUENCE_URL__,
+		requires: "API_CONFLUENCE_URL",
 	},
 	{
 		path: "/dashboard",
@@ -111,53 +130,59 @@ export const pages = [
 		element: <Dashboard />,
 		description: (
 			<>
-				Dashboards are configured within the globals.ts file. When a dashboard is loaded, the page will
-				automatically switch between different pages.
+				Dashboards are configured within the <Link to="/EditConfig">Edit Config</Link>. When a dashboard is
+				loaded, the page will automatically switch between different pages.
 				<br />
 				This is useful for displaying information on internal office screens.
 			</>
 		),
 	},
 	{
+		path: "/EditConfig",
+		name: "Edit Config",
+		element: <EditConfig />,
+		description: <>Allow Editting of the config for this site</>,
+	},
+	{
 		path: "/ducks",
 		name: "Ducks",
 		element: <DucksPage />,
 		description: <>DUCKS! (for fun)</>,
-		requires: false,
+		requires: "false",
 	},
 	{
 		path: "/blank",
 		name: "Blank",
 		element: <></>,
 		description: <>A blank Page</>,
-		requires: false,
+		requires: "false",
 	},
 	{
 		path: "/time",
 		name: "Time",
 		element: <Misc.TimePage />,
 		description: <>Time (for dashboards)</>,
-		requires: false,
+		requires: "false",
 	},
 	{
 		path: "/date",
 		name: "Date",
 		element: <Misc.DatePage />,
 		description: <>Date (for dashboards)</>,
-		requires: false,
+		requires: "false",
 	},
 	{
 		path: "/nextholiday",
 		name: "Next Holiday",
 		element: <Misc.NextHolidayPage />,
 		description: <>Next holiday coming up (for dashboards)</>,
-		requires: false,
+		requires: "false",
 	},
 	{
 		path: "/text",
 		name: "Text",
 		element: <Misc.TextPage />,
 		description: <>Show some text on the page (for dashboards)</>,
-		requires: false,
+		requires: "false",
 	},
 ];

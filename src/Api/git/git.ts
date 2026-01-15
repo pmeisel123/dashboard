@@ -1,15 +1,14 @@
 import type {
 	BranchCommit,
 	BranchesAndTicket,
+	ConfigProps,
 	GitBranch,
 	GitRelease,
 	GitTag,
 	LatestRelease,
-	ReportNamePaths,
+	RepoNamePaths,
 	TicketCache,
 } from "../Types";
-
-declare const __GIT_REPOS_PATHS__: { [key: string]: ReportNamePaths };
 
 const paramaters = {
 	method: "GET",
@@ -67,8 +66,8 @@ const getTicketFromLastCommit = (commits: any) => {
 	return "";
 };
 
-const getCommits = async (repo_name: string, branch_name: string): Promise<any> => {
-	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+const getCommits = async (repo_name: string, branch_name: string, config: ConfigProps): Promise<any> => {
+	const repo: RepoNamePaths = config.GIT_REPOS_PATHS[repo_name];
 	const path = repo.path;
 	const url = path + "/commits?sha=" + encodeURI(branch_name);
 	let response = await fetch(url, paramaters);
@@ -95,10 +94,10 @@ const getLastCommit = (commits: any) => {
 	return null;
 };
 
-export const getBranches = async (): Promise<BranchesAndTicket> => {
+export const getBranches = async (config: ConfigProps): Promise<BranchesAndTicket> => {
 	const branches: { [key: string]: GitBranch[] } = {};
 	const ticketBranches: TicketCache = {};
-	for (const [repo_name, repo] of Object.entries(__GIT_REPOS_PATHS__)) {
+	for (const [repo_name, repo] of Object.entries(config.GIT_REPOS_PATHS)) {
 		const path = repo.path;
 		const url = path + "/branches";
 		let response = await fetch(url, paramaters);
@@ -106,7 +105,7 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 		branches[repo_name] = ajax_result as GitBranch[];
 		for (const branch of branches[repo_name]) {
 			const branch_name: string = branch.name;
-			const commits: any = await getCommits(repo_name, branch_name);
+			const commits: any = await getCommits(repo_name, branch_name, config);
 			const last_commit = getLastCommit(commits);
 			if (last_commit) {
 				branch.lastCommitDate = last_commit;
@@ -137,7 +136,6 @@ export const getBranches = async (): Promise<BranchesAndTicket> => {
 	return {
 		tickets: ticketBranches,
 		branches: branches,
-		loaded: null,
 	};
 };
 
@@ -157,8 +155,8 @@ export const getTags = async (repo_url: string): Promise<{ [key: string]: GitTag
 	return results;
 };
 
-export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
-	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+export const getReleases = async (repo_name: string, config: ConfigProps): Promise<GitRelease[]> => {
+	const repo: RepoNamePaths = config.GIT_REPOS_PATHS[repo_name];
 	const repo_url = repo.path;
 	const tags = await getTags(repo_url);
 	const url = repo_url + "/releases";
@@ -187,11 +185,11 @@ export const getReleases = async (repo_name: string): Promise<GitRelease[]> => {
 	return results;
 };
 
-export const getLatestRelease = async (repo_name: string): Promise<LatestRelease | null> => {
+export const getLatestRelease = async (repo_name: string, config: ConfigProps): Promise<LatestRelease | null> => {
 	if (!repo_name) {
 		return null;
 	}
-	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+	const repo: RepoNamePaths = config.GIT_REPOS_PATHS[repo_name];
 	if (!repo) {
 		return null;
 	}
@@ -212,12 +210,13 @@ export const getBranchesCompare = async (
 	repo_name: string,
 	branch1: string,
 	branch2: string,
+	config: ConfigProps,
 ): Promise<BranchCommit[]> => {
 	const results: BranchCommit[] = [];
 	if (branch1 == branch2 || !branch1 || !branch2 || !repo_name) {
 		return results;
 	}
-	const repo: ReportNamePaths = __GIT_REPOS_PATHS__[repo_name];
+	const repo: RepoNamePaths = config.GIT_REPOS_PATHS[repo_name];
 	const path = repo.path;
 	const url = path + "/compare/" + branch2 + "..." + branch1;
 	let response = await fetch(url, paramaters);

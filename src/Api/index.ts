@@ -9,3 +9,6 @@ export * from "./users";
 export * from "./usersSlice";
 export * from "./vacations";
 export * from "./wiki";
+
+export * from "./config";
+export * from "./configSlice";

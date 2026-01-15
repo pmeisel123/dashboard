@@ -12,10 +12,6 @@ export interface UsersGroupProps {
 	users: { [key: string]: UserProps };
 }
 
-export interface UsersGroupPropsSlice extends UsersGroupProps {
-	loaded: number | null; // ms since epoch
-}
-
 export interface UserEditVacation {
 	[key: string]: string;
 }

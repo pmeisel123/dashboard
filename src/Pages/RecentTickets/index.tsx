@@ -1,6 +1,6 @@
 import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchTickets, getJiraDayString, isSliceRecent } from "@src/Api";
+import { fetchBranches, fetchConfig, fetchTickets, getJiraDayString, isSliceRecent } from "@src/Api";
 import { TicketTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -30,10 +30,14 @@ const RecentTicketsPage: FC<{
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
 
 	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
 		if (!isSliceRecent(ticketsBranches)) {
-			dispatch(fetchBranches());
+			dispatch(fetchBranches(config));
 		}
 	}, [dispatch, ticketsBranches]);
 
@@ -48,7 +52,7 @@ const RecentTicketsPage: FC<{
 		jira_search += getJiraDayString(past_date) + '"';
 		setJiraSearch(jira_search);
 		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
-		dispatch(fetchTickets(jira_search)).then(() => {
+		dispatch(fetchTickets([jira_search, config])).then(() => {
 			setLoading(false);
 		});
 	};

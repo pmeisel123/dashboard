@@ -1,7 +1,5 @@
-import type { UserProps, UsersGroupProps } from "./Types";
+import type { ConfigProps, UserProps, UsersGroupProps } from "./Types";
 import { getVacationApi } from "./vacations";
-
-declare const __VACATION_KEY__: string;
 
 export const getUserGroupApi = async (userId: string) => {
 	const url = "/jira/rest/api/2/user?expand=groups&accountId=" + userId;
@@ -40,7 +38,7 @@ const getUserDataFromAjaxResponse = (user: any) => {
 	return return_obj;
 };
 
-export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
+export const getUsersAndGroupsApi = async (config: ConfigProps): Promise<UsersGroupProps> => {
 	const max_results = 1000;
 	const main_url =
 		"/jira/rest/api/2/user/search?query=.&maxResults=" + max_results + "&expand=groups,applicationRoles";
@@ -77,7 +75,7 @@ export const getUsersAndGroupsApi = async (): Promise<UsersGroupProps> => {
 						});
 
 						let vacation_key: string | null = formatted.name;
-						if (__VACATION_KEY__ == "email") {
+						if (config.VACATION_KEY == "email") {
 							vacation_key = formatted.email;
 						}
 						if (vacation_key && vacations[vacation_key]) {

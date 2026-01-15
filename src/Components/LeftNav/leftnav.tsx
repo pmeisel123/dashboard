@@ -1,7 +1,11 @@
 import { Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMediaQuery, useTheme } from "@mui/material";
+import type { AppDispatch, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent } from "@src/Api";
 import { SavePageList } from "@src/Components";
-import { pages } from "@src/Pages/pages";
+import { pages, pageTestRequires } from "@src/Pages/pages";
 import type { FC } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
 interface LeftNavProps {
@@ -14,6 +18,14 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 	const location = useLocation();
 	const theme = useTheme();
 	const isSmallOrLarger = useMediaQuery(theme.breakpoints.up("sm"));
+	const config = useSelector((state: RootState) => state.configState);
+	const dispatch = useDispatch<AppDispatch>();
+
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
 	const handleClick = () => {
 		if (!isSmallOrLarger) {
 			setLeftNavOpen(false);
@@ -24,7 +36,11 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 			<Toolbar />
 			<List sx={{ width: width }}>
 				{pages.map((page) => {
-					if ("requires" in page && !page.requires) {
+					if (
+						"requires" in page &&
+						typeof page.requires === "string" &&
+						!pageTestRequires(page.requires, config)
+					) {
 						return;
 					}
 					return (

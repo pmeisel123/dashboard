@@ -55,23 +55,24 @@ const getHolidays = (year?: string) => {
 			*/
 			return hol;
 		}
-		hol[holiday.date] = clean_name;
-		if (hol[holiday.date] == "Thanksgiving") {
-			const week = new Date(holiday.date);
+		const date = getHolidayDayString(new Date(holiday.date));
+		hol[date] = clean_name;
+		if (hol[date] == "Thanksgiving") {
+			const week = new Date(date);
 			week.setDate(week.getDate() - 4);
-			while (getHolidayDayString(week) != holiday.date) {
+			while (getHolidayDayString(week) != date) {
 				hol[getHolidayDayString(week)] = "Thanksgiving";
 				week.setDate(week.getDate() + 1);
 			}
-			let cyberMonday = new Date(holiday.date);
+			let cyberMonday = new Date(date);
 			cyberMonday.setDate(cyberMonday.getDate() + 4);
 			hol[getHolidayDayString(cyberMonday)] = "Cyber Monday";
 		}
-		if (hol[holiday.date] == "Day after Thanksgiving") {
+		if (hol[date] == "Day after Thanksgiving") {
 			hol[holiday.date] = "Black Friday";
 		}
-		if (hol[holiday.date] == "Pesach") {
-			hol[holiday.date] = "Passover";
+		if (hol[date] == "Pesach") {
+			hol[date] = "Passover";
 		}
 		return hol;
 	}, {});

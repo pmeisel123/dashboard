@@ -36,7 +36,7 @@ interface CustomFieldsPropsUser extends BaseCustomFieldProps {
 type LinkDetails =
 	| { LinkIcon: keyof typeof MuiIcons; LinkText?: never } // Must have Icon, cannot have Text
 	| { LinkText: string; LinkIcon?: never } // Must have Text, cannot have Icon (using the XOR pattern from the previous answer for strictness)
-	| { LinkText?: undefined; LinkIcon?: undefined }; // Or allow neither if the user wants just a bare link?
+	| { LinkText?: undefined; LinkIcon?: undefined }; // Or allow neither if the user wants just a bare link
 
 type CustomFieldsPropsLink = BaseCustomFieldProps &
 	LinkDetails & {
@@ -47,4 +47,9 @@ export type CustomFieldsProps = CustomFieldsPropsText | CustomFieldsPropsUser | 
 
 export interface CustomFieldsObjectProps {
 	[key: string]: CustomFieldsProps;
+}
+
+export interface CustomFieldsFromJiraProps {
+	Key: string;
+	Name: string;
 }

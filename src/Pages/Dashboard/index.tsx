@@ -1,13 +1,12 @@
 import { Box, Button } from "@mui/material";
-import type { DashboardPageProps, DashboardProps } from "@src/Api";
+import type { AppDispatch, DashboardPageProps, RootState } from "@src/Api";
+import { fetchConfig, isSliceRecent } from "@src/Api";
 import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress, ListDashboard } from "@src/Components";
 import { pages } from "@src/Pages/pages";
 import type { FC } from "react";
 import { cloneElement, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, matchRoutes, useSearchParams } from "react-router-dom";
-
-declare const __DASHBOARDS__: { [key: string]: DashboardProps };
-declare const __DASHBOARD_SPEED_SECONDS__: number;
 
 const LoadPage: FC<{
 	url: string;
@@ -55,6 +54,14 @@ function DashboardPage() {
 	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
 	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "0"));
 	const [page, setPage] = useState<DashboardPageProps | null>(null);
+
+	const dispatch = useDispatch<AppDispatch>();
+	const config = useSelector((state: RootState) => state.configState);
+	useEffect(() => {
+		if (!isSliceRecent(config)) {
+			dispatch(fetchConfig());
+		}
+	}, [dispatch]);
 	const [windowSize, setWindowSize] = useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
@@ -90,11 +97,11 @@ function DashboardPage() {
 		}
 	}, [dashboard]);
 	let pages_count = 0;
-	if (dashboard && __DASHBOARDS__[dashboard]) {
-		pages_count = __DASHBOARDS__[dashboard].pages.length;
+	if (dashboard && config.DASHBOARDS[dashboard]) {
+		pages_count = config.DASHBOARDS[dashboard].pages.length;
 	}
 	const changePageNumber = () => {
-		if (dashboard && __DASHBOARDS__[dashboard]) {
+		if (dashboard && config.DASHBOARDS[dashboard]) {
 			setPageNumber((pageNumber) => {
 				if (pageNumber + 1 >= pages_count) {
 					return 0;
@@ -105,14 +112,14 @@ function DashboardPage() {
 		}
 	};
 	useEffect(() => {
-		if (dashboard && __DASHBOARDS__[dashboard]) {
+		if (dashboard && config.DASHBOARDS[dashboard]) {
 			ChangePageFromPageNumber();
 		}
 		const changePageNumberInterval = setInterval(() => {
-			if (dashboard && __DASHBOARDS__[dashboard]) {
+			if (dashboard && config.DASHBOARDS[dashboard]) {
 				changePageNumber();
 			}
-		}, __DASHBOARD_SPEED_SECONDS__ * 1000);
+		}, config.DASHBOARD_SPEED_SECONDS * 1000);
 		return () => {
 			clearInterval(changePageNumberInterval);
 		};
@@ -133,14 +140,14 @@ function DashboardPage() {
 	};
 	const ChangePageFromPageNumber = () => {
 		if (dashboard) {
-			setPage(__DASHBOARDS__[dashboard].pages[pageNumber]);
+			setPage(config.DASHBOARDS[dashboard].pages[pageNumber]);
 		}
 	};
 
 	useEffect(() => {
 		ChangePageFromPageNumber();
 	}, [pageNumber]);
-	if (dashboard && __DASHBOARDS__[dashboard]) {
+	if (dashboard && config.DASHBOARDS[dashboard]) {
 		return (
 			<>
 				<Box>
@@ -154,15 +161,15 @@ function DashboardPage() {
 					>
 						Exit Dashboard
 					</Button>
-					Dashboard &gt; {__DASHBOARDS__[dashboard].name} &gt;{" "}
-					{__DASHBOARDS__[dashboard].pages[pageNumber].name}
+					Dashboard &gt; {config.DASHBOARDS[dashboard].name} &gt;{" "}
+					{config.DASHBOARDS[dashboard].pages[pageNumber].name}
 					<>
 						{" "}
-						(Page {pageNumber + 1} of {__DASHBOARDS__[dashboard].pages.length})
+						(Page {pageNumber + 1} of {config.DASHBOARDS[dashboard].pages.length})
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>
-				<DashboardProgress />
+				<DashboardProgress speed={config.DASHBOARD_SPEED_SECONDS} />
 				{page && "url" in page && <LoadUrl url={getPageUrl(page)} height={windowSize.height} />}
 				{page && "split" in page && (
 					<Box sx={{ marginTop: "5px" }}>

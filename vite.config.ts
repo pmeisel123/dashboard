@@ -1,34 +1,17 @@
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
-import * as fs from "fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "path";
 import type { ProxyOptions } from "vite";
 import { defineConfig } from "vite";
-import { Server } from "./src/Server/";
+import ViteRestart from "vite-plugin-restart";
+import type { ConfigPropsFile, RepoNamePaths } from "./src/Api/Types";
+import { Server, loadConfig } from "./src/Server/";
 
-import {
-	ALLOW_VACATION_EDITS,
-	API_CONFLUENCE_URL,
-	API_KEY,
-	API_URL,
-	API_USERNAME,
-	CUSTOM_FIELDS,
-	DASHBOARDS,
-	DASHBOARD_DUCKS,
-	DASHBOARD_SPEED_SECONDS,
-	DONE_STATUS,
-	GITREPOS,
-	GITTOKEN,
-	HOST,
-	PORT,
-	VACATION_KEY,
-} from "./globals";
-import type { ReportNamePaths } from "./src/Api/Types";
-
+const config: ConfigPropsFile = loadConfig();
 const proxies: { [key: string]: ProxyOptions } = {};
-const git_proxies_name_path: { [key: string]: ReportNamePaths } = {};
-GITREPOS.forEach((repo, index: number) => {
+const git_proxies_name_path: { [key: string]: RepoNamePaths } = {};
+config.GITREPOS.forEach((repo, index: number) => {
 	const repo_path = "/git_" + index;
 	const repo_name = repo.name;
 	const repo_target = repo.url.replace("https://github.com/", "https://api.github.com/repos/");
@@ -44,7 +27,7 @@ GITREPOS.forEach((repo, index: number) => {
 		secure: false,
 		headers: {
 			Accept: "application/vnd.github+json",
-			Authorization: "Bearer " + GITTOKEN,
+			Authorization: "Bearer " + config.GITTOKEN,
 			"X-GitHub-Api-Version": "2022-11-28",
 			"User-Agent": "validator",
 		},
@@ -56,28 +39,28 @@ GITREPOS.forEach((repo, index: number) => {
 		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
 	};
 });
-if (API_CONFLUENCE_URL && API_KEY) {
+if (config.API_CONFLUENCE_URL && config.API_KEY) {
 	proxies["/jirawiki"] = {
-		target: API_CONFLUENCE_URL,
+		target: config.API_CONFLUENCE_URL,
 		changeOrigin: true,
 		headers: {
-			Authorization: "Basic " + btoa(API_USERNAME + ":" + (API_KEY as string)),
+			Authorization: "Basic " + btoa(config.API_USERNAME + ":" + config.API_KEY),
 		},
 		rewrite: (path) => path.replace(/^\/jirawiki\//, ""),
 		configure: (proxy) => {
 			proxy.on("proxyRes", (_proxyRes, req) => {
-				console.log("Received Response from Target:", API_CONFLUENCE_URL + req.url);
+				console.log("Received Response from Target:", config.API_CONFLUENCE_URL + req.url);
 			});
 		},
 	};
 }
 
-if (API_URL && API_KEY) {
+if (config.API_URL && config.API_KEY) {
 	proxies["/jira/"] = {
-		target: API_URL,
+		target: config.API_URL,
 		changeOrigin: true,
 		headers: {
-			Authorization: "Basic " + btoa(API_USERNAME + ":" + (API_KEY as string)),
+			Authorization: "Basic " + btoa(config.API_USERNAME + ":" + config.API_KEY),
 		},
 		rewrite: (path) => path.replace(/^\/jira\//, ""),
 		configure: (proxy) => {
@@ -89,7 +72,7 @@ if (API_URL && API_KEY) {
 }
 
 proxies["/server"] = {
-	target: "http://127.0.0.1:" + PORT,
+	target: "http://127.0.0.1:" + config.PORT,
 	changeOrigin: true,
 	bypass: async (req: IncomingMessage, res: ServerResponse | undefined) => {
 		if (!res) return;
@@ -103,26 +86,12 @@ proxies["/server"] = {
 	},
 };
 
-const ducks = fs.readdirSync("./src/assets/ducks/");
 // https://vite.dev/config/
 export default defineConfig({
-	define: {
-		__API_URL__: JSON.stringify(API_KEY ? API_URL : ""),
-		__API_CONFLUENCE_URL__: JSON.stringify(API_KEY ? API_CONFLUENCE_URL : ""),
-		__VACATION_KEY__: JSON.stringify(VACATION_KEY),
-		__DONE_STATUS__: JSON.stringify(DONE_STATUS),
-		__CUSTOM_FIELDS__: JSON.stringify(CUSTOM_FIELDS || {}),
-		__DASHBOARDS__: JSON.stringify(DASHBOARDS || {}),
-		__DASHBOARD_SPEED_SECONDS__: JSON.stringify(DASHBOARD_SPEED_SECONDS || {}),
-		__DUCKS__: JSON.stringify(ducks),
-		__DASHBOARD_DUCKS__: JSON.stringify(DASHBOARD_DUCKS),
-		__GIT_REPOS_PATHS__: JSON.stringify(git_proxies_name_path),
-		__ALLOW_VACATION_EDITS__: JSON.stringify(ALLOW_VACATION_EDITS),
-	},
 	server: {
 		host: "0.0.0.0",
-		port: PORT,
-		allowedHosts: [HOST],
+		port: config.PORT,
+		allowedHosts: [config.HOST],
 		proxy: proxies,
 		fs: {
 			allow: ["src", "node_modules", "index.html"],
@@ -134,7 +103,13 @@ export default defineConfig({
 			"@src": path.resolve(__dirname, "./src"),
 		},
 	},
-	plugins: [react(), basicSsl()],
+	plugins: [
+		react(),
+		basicSsl(),
+		ViteRestart({
+			restart: ["./config.json"],
+		}),
+	],
 	optimizeDeps: {
 		include: ["@mui/x-data-grid"],
 	},

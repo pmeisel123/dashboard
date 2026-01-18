@@ -184,44 +184,66 @@ const TicketTable: FC<{
 		{
 			field: "blocks",
 			headerName: "Blocks",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
-				<div>
-					{
-						params.value.map((ticket: string) => (
-							<div>
-								<Link
-									href={(config.API_URL + "/browse/" + ticket) as string}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ticket}
-								</Link>
-							</div>
-						))
-					}
-				</div>
-			)
+			valueGetter: (_params, row) => {
+				if (row.blocks) {
+					return [...row.blocks].sort().join(", ");
+				}
+			},
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				if (params.value) {
+					return (
+						<div>
+							{
+								[...params.row.blocks].sort().map((ticket: string) => (
+									<div key={ticket}>
+										<Link
+											href={(config.API_URL + "/browse/" + ticket) as string}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{ticket}
+										</Link>
+									</div>
+								))
+							}
+						</div>
+					)
+				} else {
+					return null;
+				}
+			}
 		},
 		{
 			field: "blocked_by",
 			headerName: "Blocked by",
-			renderCell: (params: GridRenderCellParams<TicketProps>) => (
-				<div>
-					{
-						params.value.map((ticket: string) => (
-							<div>
-								<Link
-									href={(config.API_URL + "/browse/" + ticket) as string}
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ticket}
-								</Link>
-							</div>
-						))
-					}
-				</div>
-			)
+			valueGetter: (_params, row) => {
+				if (row.blocked_by) {
+					return [...row.blocked_by].sort().join(", ");
+				}
+			},
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				if (params.value) {
+					return (
+						<div>
+							{
+								[...params.row.blocked_by].sort().map((ticket: string) => (
+									<div key={ticket}>
+										<Link
+											href={(config.API_URL + "/browse/" + ticket) as string}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{ticket}
+										</Link>
+									</div>
+								))
+							}
+						</div>
+					)
+				} else {
+					return null;
+				}
+			}
 		},
 	];
 	Object.keys(config.CUSTOM_FIELDS).forEach((custom_field_key) => {

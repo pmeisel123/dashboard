@@ -181,6 +181,48 @@ const TicketTable: FC<{
 			),
 		},
 		{ field: "timespent", headerName: "Spent" },
+		{
+			field: "blocks",
+			headerName: "Blocks",
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+				<div>
+					{
+						params.value.map((ticket: string) => (
+							<div>
+								<Link
+									href={(config.API_URL + "/browse/" + ticket) as string}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{ticket}
+								</Link>
+							</div>
+						))
+					}
+				</div>
+			)
+		},
+		{
+			field: "blocked_by",
+			headerName: "Blocked by",
+			renderCell: (params: GridRenderCellParams<TicketProps>) => (
+				<div>
+					{
+						params.value.map((ticket: string) => (
+							<div>
+								<Link
+									href={(config.API_URL + "/browse/" + ticket) as string}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{ticket}
+								</Link>
+							</div>
+						))
+					}
+				</div>
+			)
+		},
 	];
 	Object.keys(config.CUSTOM_FIELDS).forEach((custom_field_key) => {
 		let custom_field_name = config.CUSTOM_FIELDS[custom_field_key].Name;

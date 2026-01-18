@@ -38,6 +38,21 @@ function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
 		let updated: Date | null = fields.updated;
 		let timeestimate: number | null = fields.timeestimate;
 		let timeoriginalestimate: number | null = fields.timeoriginalestimate;
+		let blocks: string[] = [];
+		let blocked_by: string[] = [];
+
+		if (fields.issuelinks && fields.issuelinks.length) {
+			fields.issuelinks.forEach((link: any) => {
+				if (link.type.name == 'Blocks') {
+					if ('inwardIssue' in link) {
+						blocked_by.push(link.inwardIssue.key);
+					}
+					if ('outwardIssue' in link) {
+						blocks.push(link.outwardIssue.key);
+					}
+				}
+			});
+		}
 		let timespent: number | null = fields.timespent;
 		let parentkey: string | null = null;
 		let parentname: string | null = null;
@@ -86,6 +101,8 @@ function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
 			isdone: isdone,
 			labels: labels,
 			customFields: custom_fields,
+			blocks: blocks,
+			blocked_by: blocked_by
 		};
 	}
 	return null;

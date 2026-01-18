@@ -65,7 +65,7 @@ if (config.API_URL && config.API_KEY) {
 		rewrite: (path) => path.replace(/^\/jira\//, ""),
 		configure: (proxy) => {
 			proxy.on("proxyRes", (_proxyRes, req) => {
-				console.log("Received Response from Target:", req.url);
+				console.log("Received Response from Target:", config.API_URL + req.url);
 			});
 		},
 	};

@@ -99,7 +99,7 @@ export const getTicketsApi = async (search: string, config: ConfigProps): Promis
 	const main_url =
 		"/jira/rest/api/3/search/jql?maxResults=5000&validateQuery=1&fields=" +
 		extra_fields +
-		"key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent,labels&jql=" +
+		"key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent,labels,issuelinks&jql=" +
 		encodeURI(search);
 	let last = false;
 	let result: TicketProps[] = [];

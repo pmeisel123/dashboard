@@ -19,8 +19,8 @@ export interface TicketProps {
 	isdone: boolean;
 	customFields: { [key: string]: string | null };
 	labels: string[] | null;
-	blocks: string[],
-	blocked_by: string[]
+	blocks: string[];
+	blocked_by: string[];
 }
 
 interface BaseCustomFieldProps {

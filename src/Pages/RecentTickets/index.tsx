@@ -151,6 +151,7 @@ const RecentTicketsPage: FC<{
 					defaultSortDirection={"desc"}
 					allJiraUsersGroups={allJiraUsersGroups}
 					ticketsBranches={ticketsBranches}
+					searchParamsOveride={searchParamsOveride}
 				/>
 			}
 		</>

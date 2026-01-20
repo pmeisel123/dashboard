@@ -2,8 +2,11 @@ import { LayoutControls, LayoutProvider } from "@jalez/react-flow-automated-layo
 import { Link } from "@mui/material";
 import type { ConfigProps, TicketProps } from "@src/Api";
 import type { Edge, Node } from "@xyflow/react";
+
+import type { Theme } from "@mui/material/styles";
 import {
 	ConnectionLineType,
+	Controls,
 	MarkerType,
 	ReactFlow,
 	ReactFlowProvider,
@@ -19,7 +22,8 @@ export const TicketFlow: FC<{
 	tickets: TicketProps[];
 	defaultEstimate: number | null;
 	config: ConfigProps;
-}> = ({ tickets, defaultEstimate, config }) => {
+	theme: Theme;
+}> = ({ tickets, defaultEstimate, config, theme }) => {
 	let initialNodes: Node[] = [];
 	let groups: { [key: string]: boolean } = {};
 	let initialEdges: Edge[] = [];
@@ -29,7 +33,9 @@ export const TicketFlow: FC<{
 		if (ticket.summary) {
 			const matches = ticket.summary.match(/(.*?):/g);
 			if (matches) {
+				let level = 0;
 				matches.forEach((match: string) => {
+					level += 5;
 					const parent = group;
 					group += match;
 					if (!(group in groups)) {
@@ -38,6 +44,7 @@ export const TicketFlow: FC<{
 							id: group,
 							data: { label: match },
 							position: { x: 0, y: 0 },
+							style: { backgroundColor: "rgba(50, 0, 50, " + level / 100 + ")" },
 						};
 						if (parent) {
 							groupnode.parentId = parent;
@@ -66,9 +73,12 @@ export const TicketFlow: FC<{
 						<RenderEstimate value={ticket.timeestimate} defaultEstimate={defaultEstimate}></RenderEstimate>
 						<br />
 						Assignee: {ticket.assignee}
+						<br />
+						Status: {ticket.status}
 					</>
 				),
 			},
+			style: { backgroundColor: ticket.isdone ? theme.palette.grey.A400 : "" },
 			position: { x: 0, y: 0 },
 		};
 		if (group) {
@@ -112,30 +122,41 @@ export const TicketFlow: FC<{
 	return (
 		<ReactFlowProvider>
 			<LayoutProvider
-				initialDirection="RIGHT"
+				initialDirection="DOWN"
 				initialAutoLayout={true}
 				initialPadding={50}
+				initialSpacing={{ node: 80, layer: 80 }}
 				nodeIdWithNode={nodeIdWithNode}
 				updateNodes={updateNodesHandler}
 				updateEdges={updateEdgesHandler}
 			>
-				<div style={{ width: "100%", height: "100vh", overflow: "auto", position: "relative" }}>
-					<div style={{ position: "absolute", right: 0, zIndex: 99999999 }}>
-						<LayoutControls
-							showDirectionControls={true}
-							showAutoLayoutToggle={true}
-							showSpacingControls={true}
-							showApplyLayoutButton={true}
-						/>
-					</div>
+				<div style={{ width: "100%", height: "50vh" }}>
 					<ReactFlow
 						nodes={nodes}
 						edges={edges}
+						nodeOrigin={[0, 0]}
 						fitView
+						fitViewOptions={{
+							padding: {
+								top: 0,
+								left: 0,
+								right: "95%",
+								bottom: "95%",
+							},
+						}}
 						onNodesChange={onNodesChange}
 						onEdgesChange={onEdgesChange}
 						connectionLineType={ConnectionLineType.SmoothStep}
-					/>
+					>
+						<Controls position="top-right" showFitView={false}>
+							<LayoutControls
+								showDirectionControls={true}
+								showAutoLayoutToggle={true}
+								showSpacingControls={true}
+								showApplyLayoutButton={true}
+							/>
+						</Controls>
+					</ReactFlow>
 				</div>
 			</LayoutProvider>
 		</ReactFlowProvider>

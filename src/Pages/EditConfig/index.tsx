@@ -52,7 +52,7 @@ function EditConfigPage() {
 		if (tab) {
 			newSearchParams.set("tab", tab);
 		} else {
-			newSearchParams.delete(tab);
+			newSearchParams.delete("tab");
 		}
 		if (searchParams.toString() != newSearchParams.toString()) {
 			setSearchParams(newSearchParams);

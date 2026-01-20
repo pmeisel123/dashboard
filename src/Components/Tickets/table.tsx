@@ -1,5 +1,6 @@
 import * as icons from "@mui/icons-material";
-import { Box, Link, Typography, useTheme } from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import { Box, Link, Tab, Typography, useTheme } from "@mui/material";
 import type {
 	GridColDef,
 	GridColumnVisibilityModel,
@@ -12,11 +13,12 @@ import type { AppDispatch, BranchesAndTicket, RootState, TicketProps, UsersGroup
 import { fetchConfig, GetBranchCreator, isSliceRecent } from "@src/Api";
 import type { tableSetingsProps } from "@src/Components";
 import { Ago, CustomDataGrid, defaultTableSettings } from "@src/Components";
-import type { FC } from "react";
-import { Fragment, useEffect } from "react";
+import type { FC, SyntheticEvent } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
-
+import { useLocation, useSearchParams } from "react-router-dom";
+import { RenderEstimate } from "./const";
+import { TicketFlow } from "./flow";
 declare module "@mui/x-data-grid" {
 	interface FooterPropsOverrides {
 		// this interface is used by const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps['footer']>,) => {
@@ -25,19 +27,6 @@ declare module "@mui/x-data-grid" {
 		totalTimeSpent: number | null;
 	}
 }
-
-const RenderEstimate: FC<{
-	value: number | null;
-	defaultEstimate: number | null;
-}> = ({ value, defaultEstimate }) => {
-	if (value != null) {
-		return <>{value}</>;
-	}
-	if (defaultEstimate == null) {
-		return <span style={{ color: "red" }}>-</span>;
-	}
-	return <span style={{ color: "red" }}>{defaultEstimate}</span>;
-};
 
 const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps["footer"]>) => {
 	const { totalTimEstimate, totalTimeOriginalEstimate, totalTimeSpent } = props;
@@ -73,6 +62,7 @@ const TicketTable: FC<{
 	user?: string;
 	allJiraUsersGroups: UsersGroupProps;
 	ticketsBranches: BranchesAndTicket;
+	searchParamsOveride?: URLSearchParams;
 }> = ({
 	tickets,
 	defaultEstimate,
@@ -86,7 +76,10 @@ const TicketTable: FC<{
 	user,
 	allJiraUsersGroups,
 	ticketsBranches,
+	searchParamsOveride,
 }) => {
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [tab, setTab] = useState<string>(searchParams.get("tickettab") || "table");
 	const dispatch = useDispatch<AppDispatch>();
 	const config = useSelector((state: RootState) => state.configState);
 	useEffect(() => {
@@ -94,6 +87,30 @@ const TicketTable: FC<{
 			dispatch(fetchConfig());
 		}
 	}, [dispatch]);
+
+	const handleChange = (_event: SyntheticEvent, newValue: string) => {
+		setTab(newValue);
+	};
+
+	useEffect(() => {
+		const tab = searchParams.get("tickettab");
+		if (tab) {
+			setTab(tab);
+		}
+	}, [searchParams]);
+
+	useEffect(() => {
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (tab && tab != "table") {
+			newSearchParams.set("tickettab", tab);
+		} else {
+			newSearchParams.delete("tickettab");
+		}
+		if (searchParams.toString() != newSearchParams.toString()) {
+			setSearchParams(newSearchParams);
+		}
+	}, [tab]);
+
 	const location = useLocation();
 	const localStorageName = "TicketTableColumns." + location.pathname;
 
@@ -193,25 +210,23 @@ const TicketTable: FC<{
 				if (params.value) {
 					return (
 						<div>
-							{
-								[...params.row.blocks].sort().map((ticket: string) => (
-									<div key={ticket}>
-										<Link
-											href={(config.API_URL + "/browse/" + ticket) as string}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{ticket}
-										</Link>
-									</div>
-								))
-							}
+							{[...params.row.blocks].sort().map((ticket: string) => (
+								<div key={ticket}>
+									<Link
+										href={(config.API_URL + "/browse/" + ticket) as string}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{ticket}
+									</Link>
+								</div>
+							))}
 						</div>
-					)
+					);
 				} else {
 					return null;
 				}
-			}
+			},
 		},
 		{
 			field: "blocked_by",
@@ -225,25 +240,23 @@ const TicketTable: FC<{
 				if (params.value) {
 					return (
 						<div>
-							{
-								[...params.row.blocked_by].sort().map((ticket: string) => (
-									<div key={ticket}>
-										<Link
-											href={(config.API_URL + "/browse/" + ticket) as string}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											{ticket}
-										</Link>
-									</div>
-								))
-							}
+							{[...params.row.blocked_by].sort().map((ticket: string) => (
+								<div key={ticket}>
+									<Link
+										href={(config.API_URL + "/browse/" + ticket) as string}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{ticket}
+									</Link>
+								</div>
+							))}
 						</div>
-					)
+					);
 				} else {
 					return null;
 				}
-			}
+			},
 		},
 	];
 	Object.keys(config.CUSTOM_FIELDS).forEach((custom_field_key) => {
@@ -444,39 +457,50 @@ const TicketTable: FC<{
 	};
 	return (
 		<Box sx={{ width: "100%" }}>
-			<CustomDataGrid
-				sx={{
-					"& .MuiDataGrid-row-notowner": {
-						backgroundColor: theme.palette.grey.A200,
-					},
-					"& .MuiDataGrid-row-done": {
-						backgroundColor: theme.palette.grey.A400,
-					},
-				}}
-				loading={loading}
-				rows={tickets}
-				columns={columns}
-				getRowClassName={getRowClassName}
-				defaultColumnModel={defaultColumnModel}
-				slots={{
-					footer: CustomFooterStatusComponent,
-				}}
-				slotProps={{
-					footer: {
-						totalTimEstimate,
-						totalTimeOriginalEstimate,
-						totalTimeSpent,
-					},
-					loadingOverlay: {
-						variant: "linear-progress",
-						noRowsVariant: "skeleton",
-					},
-				}}
-				checkboxSelection={false}
-				disableRowSelectionOnClick
-				getVisibility={getVisibility}
-				localStorageName={localStorageName}
-			/>
+			<TabContext value={tab}>
+				<TabList onChange={handleChange}>
+					<Tab label="Table" value="table" />
+					<Tab label="Flow Chart" value="flow" />
+				</TabList>
+				<TabPanel value="table">
+					<CustomDataGrid
+						sx={{
+							"& .MuiDataGrid-row-notowner": {
+								backgroundColor: theme.palette.grey.A200,
+							},
+							"& .MuiDataGrid-row-done": {
+								backgroundColor: theme.palette.grey.A400,
+							},
+						}}
+						loading={loading}
+						rows={tickets}
+						columns={columns}
+						getRowClassName={getRowClassName}
+						defaultColumnModel={defaultColumnModel}
+						slots={{
+							footer: CustomFooterStatusComponent,
+						}}
+						slotProps={{
+							footer: {
+								totalTimEstimate,
+								totalTimeOriginalEstimate,
+								totalTimeSpent,
+							},
+							loadingOverlay: {
+								variant: "linear-progress",
+								noRowsVariant: "skeleton",
+							},
+						}}
+						checkboxSelection={false}
+						disableRowSelectionOnClick
+						getVisibility={getVisibility}
+						localStorageName={localStorageName}
+					/>
+				</TabPanel>
+				<TabPanel value="flow">
+					<TicketFlow tickets={tickets} defaultEstimate={defaultEstimate} config={config} theme={theme} />
+				</TabPanel>
+			</TabContext>
 		</Box>
 	);
 };

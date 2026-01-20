@@ -43,11 +43,11 @@ function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
 
 		if (fields.issuelinks && fields.issuelinks.length) {
 			fields.issuelinks.forEach((link: any) => {
-				if (link.type.name == 'Blocks') {
-					if ('inwardIssue' in link) {
+				if (link.type.name == "Blocks") {
+					if ("inwardIssue" in link) {
 						blocked_by.push(link.inwardIssue.key);
 					}
-					if ('outwardIssue' in link) {
+					if ("outwardIssue" in link) {
 						blocks.push(link.outwardIssue.key);
 					}
 				}
@@ -102,7 +102,7 @@ function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
 			labels: labels,
 			customFields: custom_fields,
 			blocks: blocks,
-			blocked_by: blocked_by
+			blocked_by: blocked_by,
 		};
 	}
 	return null;

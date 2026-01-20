@@ -25,35 +25,47 @@ export const TicketFlow: FC<{
 	theme: Theme;
 }> = ({ tickets, defaultEstimate, config, theme }) => {
 	let initialNodes: Node[] = [];
-	let groups: { [key: string]: boolean } = {};
+	let groups: { [key: string]: { estimate: number; node: Node } } = {};
 	let initialEdges: Edge[] = [];
 	tickets.forEach((ticket: TicketProps) => {
 		const id = ticket.key;
 		let group = "";
 		if (ticket.summary) {
-			const matches = ticket.summary.match(/(.*?):/g);
-			if (matches) {
+			const matches = ticket.summary.match(/(.*?):/g) || [];
+			if (matches.length) {
 				let level = 0;
 				matches.forEach((match: string) => {
 					level += 5;
 					const parent = group;
 					group += match;
+					const estimate =
+						ticket.timeestimate != null ? ticket.timeestimate : defaultEstimate ? defaultEstimate : 0;
 					if (!(group in groups)) {
-						groups[group] = true;
 						let groupnode: Node = {
 							id: group,
-							data: { label: match },
+							data: { label: <></> },
 							position: { x: 0, y: 0 },
 							style: { backgroundColor: "rgba(50, 0, 50, " + level / 100 + ")" },
 						};
 						if (parent) {
 							groupnode.parentId = parent;
 						}
+						groups[group] = { node: groupnode, estimate: estimate };
 						initialNodes.push(groupnode);
+					} else {
+						groups[group]["estimate"] += estimate;
 					}
+					groups[group]["node"].data.label = (
+						<>
+							{match}
+							<br />
+							Estimate: {groups[group]["estimate"]}
+						</>
+					);
 				});
 			}
 		}
+
 		let node: Node = {
 			id: id,
 			data: {
@@ -96,6 +108,7 @@ export const TicketFlow: FC<{
 		}
 		initialNodes.push(node);
 	});
+	console.log(initialNodes);
 	if (!initialNodes.length) {
 		return null;
 	}
@@ -136,6 +149,7 @@ export const TicketFlow: FC<{
 						edges={edges}
 						nodeOrigin={[0, 0]}
 						fitView
+						minZoom={0.002}
 						fitViewOptions={{
 							padding: {
 								top: 0,

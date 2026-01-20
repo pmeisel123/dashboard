@@ -80,6 +80,7 @@ const TicketTable: FC<{
 }) => {
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [tab, setTab] = useState<string>(searchParams.get("tickettab") || "table");
+	const [changeCount, setChangeCount] = useState<number>(0);
 	const dispatch = useDispatch<AppDispatch>();
 	const config = useSelector((state: RootState) => state.configState);
 	useEffect(() => {
@@ -87,6 +88,9 @@ const TicketTable: FC<{
 			dispatch(fetchConfig());
 		}
 	}, [dispatch]);
+	useEffect(() => {
+		setChangeCount((prev) => prev + 1);
+	}, [defaultEstimate, tickets, config]);
 
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
@@ -498,7 +502,13 @@ const TicketTable: FC<{
 					/>
 				</TabPanel>
 				<TabPanel value="flow">
-					<TicketFlow tickets={tickets} defaultEstimate={defaultEstimate} config={config} theme={theme} />
+					<TicketFlow
+						tickets={tickets}
+						defaultEstimate={defaultEstimate}
+						config={config}
+						theme={theme}
+						key={changeCount}
+					/>
 				</TabPanel>
 			</TabContext>
 		</Box>

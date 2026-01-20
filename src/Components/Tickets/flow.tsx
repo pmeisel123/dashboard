@@ -148,9 +148,11 @@ export const TicketFlow: FC<{
 						nodes={nodes}
 						edges={edges}
 						nodeOrigin={[0, 0]}
+						minZoom={0.001}
 						fitView
-						minZoom={0.002}
 						fitViewOptions={{
+							minZoom: 0.5,
+							maxZoom: 5,
 							padding: {
 								top: 0,
 								left: 0,

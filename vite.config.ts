@@ -30,8 +30,8 @@ const logTime = () => {
 const pendingResolvers = new Map<string, (data: CachedResponse) => void>();
 const pendingPromises = new Map<string, Promise<CachedResponse>>();
 
-const serveFromCache = (res: ServerResponse, cached: CachedResponse, logKey: string) => {
-	console.log(logTime() + "isCached (Bypassed): " + logKey);
+const serveFromCache = (res: ServerResponse, cached: CachedResponse, _logKey: string) => {
+	// console.log(logTime() + "isCached (Bypassed): " + logKey);
 	Object.entries(cached.headers).forEach(([key, val]) => {
 		if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
 			res.setHeader(key, val);
@@ -53,7 +53,7 @@ const bypassFunction = async (req: IncomingMessage, res: ServerResponse | undefi
 	}
 
 	if (pendingPromises.has(cacheKey)) {
-		console.log(logTime() + "Collapsing Duplicate Request: " + cacheKey);
+		// console.log(logTime() + "Collapsing Duplicate Request: " + cacheKey);
 		const result = await Promise.race([
 			pendingPromises.get(cacheKey)!,
 			new Promise<null>((r) => setTimeout(() => r(null), 30000)),

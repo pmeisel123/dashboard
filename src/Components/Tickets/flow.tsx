@@ -17,7 +17,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { FC } from "react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RenderEstimate } from "./const";
 
 export const FlowInternal: FC<{
@@ -28,6 +28,7 @@ export const FlowInternal: FC<{
 }> = ({ tickets, defaultEstimate, config, theme }) => {
 	const { fitView } = useReactFlow();
 	const [ref, size] = useResizeObserver<HTMLDivElement>();
+	const [loading, setLoading] = useState<boolean>(true);
 
 	let initialNodes: Node[] = [];
 	let groups: { [key: string]: { estimate: number; node: Node } } = {};
@@ -49,11 +50,11 @@ export const FlowInternal: FC<{
 		const estimate = ticket.timeestimate != null ? ticket.timeestimate : defaultEstimate ? defaultEstimate : 0;
 		groups[group]["estimate"] += estimate;
 		groups[group]["node"].data.label = (
-			<>
+			<h2>
 				{match}
 				<br />
 				Total Estimate: {groups[group]["estimate"]}
-			</>
+			</h2>
 		);
 	};
 	tickets.forEach((ticket: TicketProps) => {
@@ -91,7 +92,7 @@ export const FlowInternal: FC<{
 						Estimate:{" "}
 						<RenderEstimate value={ticket.timeestimate} defaultEstimate={defaultEstimate}></RenderEstimate>
 						<br />
-						Assignee: {ticket.assignee}
+						Assignee: {ticket.assignee ? ticket.assignee : <span style={{ color: "red" }}>Unassigned</span>}
 						<br />
 						Status: {ticket.status}
 					</>
@@ -114,7 +115,6 @@ export const FlowInternal: FC<{
 						type: MarkerType.ArrowClosed,
 						width: 50,
 					},
-					
 				});
 			});
 		}
@@ -128,6 +128,7 @@ export const FlowInternal: FC<{
 			fitView({
 				duration: 100,
 			});
+			setLoading(false);
 		}, 300);
 
 		return () => clearTimeout(timeout);
@@ -158,7 +159,7 @@ export const FlowInternal: FC<{
 			initialDirection="RIGHT"
 			initialAutoLayout={true}
 			initialPadding={50}
-			initialSpacing={{ node: 80, layer: 80 }}
+			initialSpacing={{ node: 75, layer: 50 }}
 			nodeIdWithNode={nodeIdWithNode}
 			updateNodes={updateNodesHandler}
 			updateEdges={updateEdgesHandler}
@@ -166,10 +167,12 @@ export const FlowInternal: FC<{
 			<div
 				style={{
 					width: "100%",
-					height: "75vh",
+					height: "calc(100vh - 200px)",
 					resize: "vertical",
 					border: "1px solid black",
 					overflow: "auto",
+					opacity: loading ? 0 : 1,
+					transition: loading ? "" : "opacity 0.5s ease-in",
 				}}
 				ref={ref}
 			>
@@ -186,6 +189,7 @@ export const FlowInternal: FC<{
 					onNodesChange={onNodesChange}
 					onEdgesChange={onEdgesChange}
 					connectionLineType={ConnectionLineType.SmoothStep}
+					proOptions={{ hideAttribution: true }}
 				>
 					<Controls position="top-right">
 						<LayoutControls

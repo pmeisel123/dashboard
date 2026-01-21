@@ -35,7 +35,7 @@ export const CommitsTable: FC<{
 		},
 		{
 			field: "date",
-			headerName: "Commit Date",
+			headerName: "Committed",
 			flex: 1,
 			valueGetter: (_params, row) => {
 				if (row.date) {

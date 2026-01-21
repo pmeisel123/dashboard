@@ -176,7 +176,7 @@ const BranchesComparePage: FC<{
 		if (ticketsBranches.branches && Object.keys(ticketsBranches.branches).length == 1) {
 			setRepo(Object.keys(ticketsBranches.branches)[0]);
 		}
-	}, [ticketsBranches]);
+	}, [ticketsBranches, searchParams]);
 	if (!Object.keys(ticketsBranches.branches).length) {
 		return;
 	}

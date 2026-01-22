@@ -30,7 +30,7 @@ const logTime = () => {
 const pendingResolvers = new Map<string, (data: CachedResponse) => void>();
 const pendingPromises = new Map<string, Promise<CachedResponse>>();
 
-const serveFromCache = (res: ServerResponse, cached: CachedResponse, _logKey: string) => {
+const serveFromCache = (res: ServerResponse, cached: CachedResponse) => {
 	// console.log(logTime() + "isCached (Bypassed): " + logKey);
 	Object.entries(cached.headers).forEach(([key, val]) => {
 		if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
@@ -47,8 +47,10 @@ const bypassFunction = async (req: IncomingMessage, res: ServerResponse | undefi
 	const cacheKey = req.url ?? "";
 
 	const cached = apiCache.get(cacheKey);
+	// This is mostly to prevent duplicate calls
+	// The browser will cache for 10 minutes
 	if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-		serveFromCache(res, cached, cacheKey);
+		serveFromCache(res, cached);
 		return req.url;
 	}
 
@@ -59,7 +61,7 @@ const bypassFunction = async (req: IncomingMessage, res: ServerResponse | undefi
 			new Promise<null>((r) => setTimeout(() => r(null), 30000)),
 		]);
 		if (result) {
-			serveFromCache(res, result, cacheKey);
+			serveFromCache(res, result);
 			return req.url;
 		}
 		pendingPromises.delete(cacheKey);

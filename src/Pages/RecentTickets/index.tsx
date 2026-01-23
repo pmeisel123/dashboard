@@ -12,7 +12,7 @@ const default_days = 5;
 const RecentTicketsPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const getParamDays = () => {
 		return parseInt(searchParams.get("days") || default_days + "");

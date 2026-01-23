@@ -18,7 +18,7 @@ import { useSearchParams } from "react-router-dom";
 const MyTicketsPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get("group") || window.localStorage.getItem("group") || "");

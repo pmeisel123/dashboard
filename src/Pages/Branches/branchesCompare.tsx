@@ -24,7 +24,7 @@ import { useSearchParams } from "react-router-dom";
 const BranchesComparePage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const releases: { [key: string]: GitReleaseSlice } = useSelector((state: RootState) => state.gitReleasesState);
 	const latestRelease: { [key: string]: GitLatestReleaseSlice } = useSelector(

@@ -23,7 +23,7 @@ import { useSearchParams } from "react-router-dom";
 const VacationPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [userVacations, setUserVacations] = useState<UserEditVacation>({});
 	let param_groups = searchParams.get("groups");

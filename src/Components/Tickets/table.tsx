@@ -78,7 +78,7 @@ const TicketTable: FC<{
 	ticketsBranches,
 	searchParamsOveride,
 }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const [tab, setTab] = useState<string>(searchParams.get("tickettab") || "table");
 	const [changeCount, setChangeCount] = useState<number>(0);
 	const dispatch = useDispatch<AppDispatch>();
@@ -466,10 +466,12 @@ const TicketTable: FC<{
 	return (
 		<Box sx={{ width: "100%" }}>
 			<TabContext value={tab}>
-				<TabList onChange={handleChange}>
-					<Tab label="Table" value="table" />
-					<Tab label="Flow Chart" value="flow" />
-				</TabList>
+				{!isDashboard && (
+					<TabList onChange={handleChange}>
+						<Tab label="Table" value="table" />
+						<Tab label="Flow Chart" value="flow" />
+					</TabList>
+				)}
 				<TabPanel value="table">
 					<CustomDataGrid
 						sx={{

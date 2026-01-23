@@ -37,7 +37,7 @@ interface cellData {
 const WhoIsOutPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	let param_groups = searchParams.get("groups");

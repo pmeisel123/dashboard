@@ -100,18 +100,20 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 		const cacheKey = path + url;
 		const encoding = proxyRes.headers["content-encoding"];
 		let decodedBuffer: Buffer = buffer;
-		try {
-			if (encoding === "gzip") {
-				decodedBuffer = zlib.gunzipSync(buffer);
-			} else if (encoding === "deflate") {
-				decodedBuffer = zlib.inflateSync(buffer);
-			} else if (encoding === "br") {
-				decodedBuffer = zlib.brotliDecompressSync(buffer);
-			} else {
-				console.log("unknown encoding", encoding);
+		if (encoding) {
+			try {
+				if (encoding === "gzip") {
+					decodedBuffer = zlib.gunzipSync(buffer);
+				} else if (encoding === "deflate") {
+					decodedBuffer = zlib.inflateSync(buffer);
+				} else if (encoding === "br") {
+					decodedBuffer = zlib.brotliDecompressSync(buffer);
+				} else {
+					console.log("unknown encoding", encoding);
+				}
+			} catch (e) {
+				console.error("Decompression failed", e);
 			}
-		} catch (e) {
-			console.error("Decompression failed", e);
 		}
 		const newCacheEntry: CachedResponse = {
 			body: decodedBuffer,

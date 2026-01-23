@@ -10,7 +10,7 @@ import { useSearchParams } from "react-router-dom";
 const BranchesPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const dispatch = useDispatch<AppDispatch>();

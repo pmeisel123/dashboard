@@ -11,7 +11,7 @@ const WikiPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const [pageId, setPageId] = useState<string>(searchParams.get("PageId") || "");
 	const [spaceKey, setSpaceKey] = useState<string>(searchParams.get("SpaceKey") || "");
 	const [loading, setLoading] = useState<boolean>(true);

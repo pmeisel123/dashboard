@@ -8,7 +8,7 @@ export const TextPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const [text, setText] = useState<string>(searchParams.get("text") || "");
 	const [localText, setLocalText] = useState<string>(searchParams.get("text") || "");
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);

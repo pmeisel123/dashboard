@@ -64,7 +64,7 @@ const HolidayPage: FC<{
 }> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const this_year = new Date().getFullYear() + "";
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const [year, setYear] = useState<string>(searchParams.get("year") || this_year);
 	const [holidayCategory, setHolidayCategory] = useState<"Bank" | "Extended" | "Jewish and Extended">(
 		getHolidayCategory(searchParams.get("holidayCategory")),

@@ -17,7 +17,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { FC } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { RenderEstimate } from "./const";
 
 export const FlowInternal: FC<{
@@ -30,113 +30,124 @@ export const FlowInternal: FC<{
 	const [ref, size] = useResizeObserver<HTMLDivElement>();
 	const [loading, setLoading] = useState<boolean>(true);
 
-	let initialNodes: Node[] = [];
-	let groups: { [key: string]: { estimate: number; node: Node } } = {};
-	let initialEdges: Edge[] = [];
-	const createGroupNode = (group: string, match: string, ticket: TicketProps, parent: string) => {
-		if (!(group in groups)) {
-			let groupnode: Node = {
-				id: group,
-				data: { label: <></> },
-				position: { x: 0, y: 0 },
-				style: { backgroundColor: "rgba(75, 25, 75, 0.1" },
-			};
-			if (parent) {
-				groupnode.parentId = parent;
-			}
-			groups[group] = { node: groupnode, estimate: 0 };
-			initialNodes.push(groupnode);
-		}
-		const estimate = ticket.timeestimate != null ? ticket.timeestimate : defaultEstimate ? defaultEstimate : 0;
-		groups[group]["estimate"] += estimate;
-		groups[group]["node"].data.label = (
-			<h2>
-				{match}
-				<br />
-				Total Estimate: {groups[group]["estimate"]}
-			</h2>
-		);
-	};
-	tickets.forEach((ticket: TicketProps) => {
-		const id = ticket.key;
-		let group = "";
-		if (ticket.summary) {
-			const matches = ticket.summary.match(/(.*?):/g) || [];
-			if (matches.length) {
-				matches.forEach((match: string) => {
-					const parent = group;
-					group += match;
-					createGroupNode(group, match, ticket, parent);
-				});
-			} else {
-				group = "Uncategorized (Names without a ':')";
-				createGroupNode(group, group, ticket, "");
-			}
-		}
+	const { initialNodes, initialEdges } = useMemo(() => {
+		let nodes: Node[] = [];
+		let groups: { [key: string]: { estimate: number; node: Node } } = {};
+		let edges: Edge[] = [];
 
-		let node: Node = {
-			id: id,
-			data: {
-				label: (
-					<>
-						<Link
-							href={(config.API_URL + "/browse/" + id) as string}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{id}
-							<br />
-							{ticket.summary}
-							<br />
-						</Link>
-						Estimate:{" "}
-						<RenderEstimate value={ticket.timeestimate} defaultEstimate={defaultEstimate}></RenderEstimate>
-						<br />
-						Assignee: {ticket.assignee ? ticket.assignee : <span style={{ color: "red" }}>Unassigned</span>}
-						<br />
-						Status: {ticket.status}
-					</>
-				),
-			},
-			style: { backgroundColor: ticket.isdone ? theme.palette.grey.A400 : "" },
-			position: { x: 0, y: 0 },
+		const createGroupNode = (group: string, match: string, ticket: TicketProps, parent: string) => {
+			if (!(group in groups)) {
+				let groupnode: Node = {
+					id: group,
+					data: { label: <></> },
+					position: { x: 0, y: 0 },
+					style: { backgroundColor: "rgba(75, 25, 75, 0.1)" },
+				};
+				if (parent) {
+					groupnode.parentId = parent;
+				}
+				groups[group] = { node: groupnode, estimate: 0 };
+				nodes.push(groupnode);
+			}
+			const estimate = ticket.timeestimate != null ? ticket.timeestimate : defaultEstimate ? defaultEstimate : 0;
+			groups[group]["estimate"] += estimate;
+			groups[group]["node"].data.label = (
+				<h2>
+					{match}
+					<br />
+					Total Estimate: {groups[group]["estimate"]}
+				</h2>
+			);
 		};
-		if (group) {
-			node.parentId = group;
-		}
-		if (ticket.blocked_by.length) {
-			ticket.blocked_by.forEach((parent: string) => {
-				initialEdges.push({
-					id: id + "-" + parent,
-					source: parent,
-					target: id,
-					markerEnd: {
-						height: 50,
-						type: MarkerType.ArrowClosed,
-						width: 50,
-					},
+
+		tickets.forEach((ticket: TicketProps) => {
+			const id = ticket.key;
+			let group = "";
+			if (ticket.summary) {
+				const matches = ticket.summary.match(/(.*?):/g) || [];
+				if (matches.length) {
+					matches.forEach((match: string) => {
+						const parent = group;
+						group += match;
+						createGroupNode(group, match, ticket, parent);
+					});
+				} else {
+					group = "Uncategorized (Names without a ':')";
+					createGroupNode(group, group, ticket, "");
+				}
+			}
+
+			let node: Node = {
+				id: id,
+				data: {
+					label: (
+						<>
+							<Link
+								href={(config.API_URL + "/browse/" + id) as string}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{id}
+								<br />
+								{ticket.summary}
+								<br />
+							</Link>
+							Estimate:{" "}
+							<RenderEstimate
+								value={ticket.timeestimate}
+								defaultEstimate={defaultEstimate}
+							></RenderEstimate>
+							<br />
+							Assignee:{" "}
+							{ticket.assignee ? ticket.assignee : <span style={{ color: "red" }}>Unassigned</span>}
+							<br />
+							Status: {ticket.status}
+						</>
+					),
+				},
+				style: { backgroundColor: ticket.isdone ? theme.palette.grey.A400 : undefined },
+				position: { x: 0, y: 0 },
+			};
+			if (group) {
+				node.parentId = group;
+			}
+			if (ticket.blocked_by.length) {
+				ticket.blocked_by.forEach((parent: string) => {
+					edges.push({
+						id: id + "-" + parent,
+						source: parent,
+						target: id,
+						markerEnd: {
+							height: 50,
+							type: MarkerType.ArrowClosed,
+							width: 50,
+						},
+					});
 				});
-			});
-		}
-		initialNodes.push(node);
-	});
+			}
+			nodes.push(node);
+		});
+
+		return { initialNodes: nodes, initialEdges: edges };
+	}, [tickets, defaultEstimate, config.API_URL, theme]);
+
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
 	useEffect(() => {
 		const timeout = setTimeout(() => {
-			fitView({
-				duration: 100,
-			});
+			fitView({ duration: 100 });
 			setLoading(false);
 		}, 300);
 
 		return () => clearTimeout(timeout);
 	}, [fitView, nodes.length, size]);
+
 	const nodeIdWithNode = new Map<string, Node>();
 	nodes.forEach((node) => {
 		nodeIdWithNode.set(node.id, node);
 	});
+
 	const updateNodesHandler = useCallback(
 		(newNodes: Node[]) => {
 			setNodes(newNodes);

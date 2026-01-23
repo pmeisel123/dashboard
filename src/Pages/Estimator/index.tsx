@@ -2,7 +2,7 @@ import type { AppDispatch, RootState, TicketProps } from "@src/Api";
 import { fetchBranches, fetchConfig, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import type { FC } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 
@@ -12,24 +12,32 @@ const EstimatorPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
-	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
-	let defaultDefaultEstimate: number = parseInt(
-		searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "",
+	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
+
+	const initialDefaultEstimate = useMemo(
+		() => parseInt(searchParams.get("defaultEstimate") || `${defaultDefaultDefaultEstimate}`, 10),
+		[searchParams],
 	);
+
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [search, setSearch] = useState<string>(searchParams.get("search") || "");
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch] ?? []);
 	const [loading, setLoading] = useState<boolean>(true);
-	const [defaultEstimate, setDefaultEstimate] = useState<number>(defaultDefaultEstimate);
+	const [defaultEstimate, setDefaultEstimate] = useState<number>(initialDefaultEstimate);
 	const [parent, setParent] = useState<string>(searchParams.get("parent") || "");
 	const [estimatePadding, setEstimatePadding] = useState<number>(
 		parseFloat(searchParams.get("estimatePadding") || "0"),
 	);
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const [group, setGroup] = useState<string>(searchParams.get("group") || allGroups);
-	let user_param = searchParams.get("users") || "";
-	const [users, setUsers] = useState<Set<string>>(new Set(user_param.split(",")));
+
+	const initialUsers = useMemo(() => {
+		const up = searchParams.get("users") || "";
+		return new Set((up ? up.split(",") : []).filter(Boolean));
+	}, [searchParams]);
+
+	const [users, setUsers] = useState<Set<string>>(initialUsers);
 	const [visibleUsers, setVisibleUsers] = useState<Set<string>>(new Set());
 	const freezeParams = useRef(false);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
@@ -38,43 +46,45 @@ const EstimatorPage: FC<{
 	const [lastDay, setLastDay] = useState<string>("");
 
 	const loadParams = () => {
-		defaultDefaultEstimate = parseInt(searchParams.get("defaultEstimate") || defaultDefaultDefaultEstimate + "");
-		setDefaultEstimate(defaultDefaultEstimate);
+		setDefaultEstimate(parseInt(searchParams.get("defaultEstimate") || `${defaultDefaultDefaultEstimate}`, 10));
 		setSearch(searchParams.get("search") || "");
 		setParent(searchParams.get("parent") || "");
 		setEstimatePadding(parseFloat(searchParams.get("estimatePadding") || "0"));
 		setGroup(searchParams.get("group") || allGroups);
-		user_param = searchParams.get("users") || "";
-		setUsers(new Set(user_param.split(",")));
+		setUsers(new Set((searchParams.get("users") || "").split(",").filter(Boolean)));
 	};
 
 	useEffect(() => {
 		freezeParams.current = true;
 		loadParams();
-		setTimeout(function () {
+		const id = setTimeout(() => {
 			freezeParams.current = false;
 		});
+		return () => clearTimeout(id);
 	}, [searchParams]);
 
-	var getFunc = function () {
-		var jira_search = "";
-		if (search && parent) {
-			jira_search = search + " AND parent=" + parent;
-		} else if (!search && parent) {
-			jira_search = "parent = " + parent;
-		} else {
-			jira_search = search;
-		}
+	const buildJiraQuery = (search: string, parent: string) => {
+		const ss = (search || "").trim();
+		const pp = (parent || "").trim();
+		if (ss && pp) return `${ss} AND parent=${pp}`;
+		if (!ss && pp) return `parent = ${pp}`;
+		return ss;
+	};
+
+	const getFunc = function () {
+		const jira_search = buildJiraQuery(search, parent);
 		if (!jira_search) {
 			setJiraSearch("");
 			return;
 		}
 		setJiraSearch(jira_search);
+		// use ticketsSelector to decide if we need to set loading
 		setLoading(!ticketsSelector[jira_search] || !ticketsSelector[jira_search].length);
-		dispatch(fetchTickets([jira_search, config])).then(() => {
+		dispatch(fetchTickets([jira_search, config])).finally(() => {
 			setLoading(false);
 		});
 	};
+
 	useEffect(() => {
 		if (!isSliceRecent(config)) {
 			dispatch(fetchConfig());
@@ -85,13 +95,16 @@ const EstimatorPage: FC<{
 		if (!isSliceRecent(ticketsBranches)) {
 			dispatch(fetchBranches(config));
 		}
+		// run a search on mount
 		getFunc();
 	}, [dispatch]);
+
 	useEffect(() => {
 		if (search || parent) {
 			getFunc();
 		}
 	}, [search, parent]);
+
 	useEffect(() => {
 		if (freezeParams.current) {
 			return;
@@ -135,11 +148,16 @@ const EstimatorPage: FC<{
 		}
 	}, [search, defaultEstimate, parent, estimatePadding, group, users]);
 
-	let totalTimEstimate =
-		tickets.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding;
-	let totalTimeOriginalEstimate =
-		tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding;
-	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	const totalTimEstimate = useMemo(
+		() => tickets.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding,
+		[tickets, defaultEstimate, estimatePadding],
+	);
+	const totalTimeOriginalEstimate = useMemo(
+		() => tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding,
+		[tickets, defaultEstimate, estimatePadding],
+	);
+	const totalTimeSpent = useMemo(() => tickets.reduce((sum, row) => sum + (row.timespent || 0), 0), [tickets]);
+
 	return (
 		<>
 			{!isDashboard && (

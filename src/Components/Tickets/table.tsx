@@ -92,6 +92,10 @@ const TicketTable: FC<{
 		setChangeCount((prev) => prev + 1);
 	}, [defaultEstimate, tickets, config]);
 
+	useEffect(() => {
+		setTab(searchParams.get("tickettab") || "table");
+	}, [searchParams]);
+
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
 		setTab(newValue);
 	};

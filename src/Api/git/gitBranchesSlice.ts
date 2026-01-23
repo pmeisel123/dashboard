@@ -19,8 +19,7 @@ export const gitBranchSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder.addCase(fetchBranches.fulfilled, (state, action) => {
-			state.branches = action.payload.branches;
-			state.tickets = action.payload.tickets;
+			Object.assign(state, action.payload);
 			state.loaded = Date.now();
 		});
 	},

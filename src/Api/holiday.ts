@@ -21,10 +21,6 @@ const JewishHolidaysList = (year: string) => {
 	events.forEach((event) => {
 		const secular = getHolidayDayString(event.greg());
 		const name = renameHoliday(event.desc);
-		/*if (name.match(/Rosh Chodesh/)) {
-			return;
-		}
-		*/
 		if (!event.getCategories().includes("major")) {
 			return;
 		}
@@ -137,7 +133,7 @@ export const getDateDistance = (data_string: string) => {
 	return returnValue;
 };
 
-export const getHolidayDayString = (dateObj: Date) => {
+const getMonthDayYearFromDate = (dateObj: Date) => {
 	let month: string | number = dateObj.getUTCMonth() + 1; // months from 1-12
 	let day: string | number = dateObj.getUTCDate();
 	const year = dateObj.getUTCFullYear();
@@ -148,33 +144,21 @@ export const getHolidayDayString = (dateObj: Date) => {
 	if (month < 10) {
 		month = "0" + month;
 	}
+	return [year, month, day];
+};
+
+export const getHolidayDayString = (dateObj: Date) => {
+	const [year, month, day] = getMonthDayYearFromDate(dateObj);
 	return year + "-" + month + "-" + day + " 00:00:00";
 };
 
 export const getDayString = (dateObj: Date) => {
-	let month: string | number = dateObj.getUTCMonth() + 1; // months from 1-12
-	let day: string | number = dateObj.getUTCDate();
-	const year = dateObj.getUTCFullYear();
-
-	if (day < 10) {
-		day = "0" + day;
-	}
-	if (month < 10) {
-		month = "0" + month;
-	}
+	const [year, month, day] = getMonthDayYearFromDate(dateObj);
 	return year + "/" + month + "/" + day;
 };
-export const getJiraDayString = (dateObj: Date) => {
-	let month: string | number = dateObj.getUTCMonth() + 1; // months from 1-12
-	let day: string | number = dateObj.getUTCDate();
-	const year = dateObj.getUTCFullYear();
 
-	if (day < 10) {
-		day = "0" + day;
-	}
-	if (month < 10) {
-		month = "0" + month;
-	}
+export const getJiraDayString = (dateObj: Date) => {
+	const [year, month, day] = getMonthDayYearFromDate(dateObj);
 	return year + "-" + month + "-" + day;
 };
 

@@ -19,8 +19,7 @@ export const usersGroupSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder.addCase(fetchUsersAndGroups.fulfilled, (state, action) => {
-			state.users = action.payload.users;
-			state.groups = action.payload.groups;
+			Object.assign(state, action.payload);
 			state.loaded = Date.now();
 		});
 	},

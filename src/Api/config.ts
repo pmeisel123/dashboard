@@ -1,5 +1,6 @@
 import type { ConfigProps, ConfigPropsFile } from "./Types";
 
+//  Create a function to get the config from the server
 export const getConfigApi = async () => {
 	const url = "/server/config";
 	const paramaters = {
@@ -13,6 +14,7 @@ export const getConfigApi = async () => {
 	return ajax_result;
 };
 
+// Create a function to post the config to the server
 export const postConfigApi = async (config: ConfigPropsFile) => {
 	const url = "/server/config";
 	const requestOptions = {

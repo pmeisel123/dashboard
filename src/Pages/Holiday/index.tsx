@@ -51,6 +51,14 @@ const HolidayDuck: FC<{ day: string; name: string }> = ({ day, name }) => {
 	);
 };
 
+// Ensure category is valid
+const getHolidayCategory = (category: string | null) => {
+	if (category == "Bank" || category == "Extended" || category == "Jewish and Extended") {
+		return category;
+	}
+	return "Bank";
+};
+
 const HolidayPage: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
@@ -58,7 +66,9 @@ const HolidayPage: FC<{
 	const this_year = new Date().getFullYear() + "";
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride ? searchParamsOveride.toString() : {});
 	const [year, setYear] = useState<string>(searchParams.get("year") || this_year);
-	const [holidayCategory, setHolidayCategory] = useState<"Bank" | "Extended" | "Jewish and Extended">("Bank");
+	const [holidayCategory, setHolidayCategory] = useState<"Bank" | "Extended" | "Jewish and Extended">(
+		getHolidayCategory(searchParams.get("holidayCategory")),
+	);
 	const [withDucks, setwithDucks] = useState<boolean>(searchParams.get("withDucks") == "true");
 	const year_as_int = parseInt(this_year);
 

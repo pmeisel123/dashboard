@@ -27,6 +27,21 @@ const logTime = () => {
 	return new Date().toISOString() + " ";
 };
 
+const log = (type: string, req: IncomingMessage, url_start: string | null, message: string) => {
+	console.log(
+		logTime() +
+			"[" +
+			type +
+			"] " +
+			message +
+			" request: " +
+			(url_start || "") +
+			(req.url || "") +
+			" from IP:" +
+			(req.socket.remoteAddress || "unknown"),
+	);
+};
+
 const pendingResolvers = new Map<string, (data: CachedResponse) => void>();
 const pendingPromises = new Map<string, Promise<CachedResponse>>();
 
@@ -90,7 +105,7 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 		return;
 	}
 
-	console.log(logTime() + "Received Response from Target (Cache Miss): " + path + req.url);
+	log("PROXY", req, path, "(Cache Miss):");
 	const chunks: Buffer[] = [];
 	proxyRes.on("data", (chunk: Buffer) => chunks.push(chunk));
 
@@ -177,6 +192,7 @@ config.GITREPOS.forEach((repo, index: number) => {
 		},
 	};
 });
+
 if (config.API_CONFLUENCE_URL && config.API_KEY) {
 	proxies["/jirawiki/"] = {
 		target: config.API_CONFLUENCE_URL,
@@ -220,14 +236,39 @@ if (config.API_URL && config.API_KEY) {
 proxies["/server/"] = {
 	target: "http://127.0.0.1:" + config.PORT,
 	changeOrigin: true,
-	bypass: async (req: IncomingMessage, res: ServerResponse | undefined) => {
-		if (!res) return;
-		await new Promise<void>((resolve) => {
+	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+		if (res) {
 			Server(req, res);
-			req.on("end", () => {
-				resolve();
-			});
-		});
+		}
+		return false;
+	},
+};
+
+proxies["^/.*\\.(git|env|crt|pem)"] = {
+	target: "http://127.0.0.1:" + config.PORT,
+	changeOrigin: true,
+	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+		const match = req.url?.match(/\.(git|env|crt|pem)/i);
+		const targetFile = match ? match[0] : "sensitive files";
+
+		log("Blocked", req, "", "access attempt");
+		if (res) {
+			res.writeHead(404, { "Content-Type": "text/plain" });
+			res.end(`You think you can access ${targetFile}? Think again.`);
+		}
+		return false;
+	},
+};
+
+proxies["/src/Server"] = {
+	// technicall there is nothing secure under /src/Server but block it anyway
+	target: "http://127.0.0.1:" + config.PORT,
+	changeOrigin: true,
+	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+		log("Blocked", req, "", "access attempt");
+		if (res) {
+			res.writeHead(404, { "Content-Type": "text/plain" });
+		}
 		return false;
 	},
 };

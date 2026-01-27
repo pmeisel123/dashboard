@@ -2,7 +2,7 @@ import { Box, Checkbox, FormControlLabel, ListItem, ListItemButton, ListItemText
 import type { AppDispatch, RootState } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { SavePageList } from "@src/Components";
-import { pages, pageTestRequires } from "@src/Pages/pages";
+import { GetPages, pageTestRequires } from "@src/Pages/pages";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useSearchParams } from "react-router-dom";
@@ -12,7 +12,7 @@ function HomePage() {
 	const [showHidden, setShowHidden] = useState<boolean>(searchParams.get("showHidden") == "true");
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
-
+	const pages = GetPages();
 	useEffect(() => {
 		if (!isSliceRecent(config)) {
 			dispatch(fetchConfig());

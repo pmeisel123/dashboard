@@ -2,11 +2,13 @@ import { Box, Button } from "@mui/material";
 import type { AppDispatch, DashboardPageProps, RootState } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress, ListDashboard } from "@src/Components";
-import { pages } from "@src/Pages/pages";
+import { GetPages } from "@src/Pages/pages";
 import type { FC } from "react";
 import { cloneElement, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, matchRoutes, useSearchParams } from "react-router-dom";
+
+const pages = GetPages();
 
 const LoadPage: FC<{
 	url: string;

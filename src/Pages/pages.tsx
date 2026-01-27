@@ -1,5 +1,5 @@
 import type { ConfigProps } from "@src/Api";
-import { BranchesComparePage, BranchesPage } from "@src/Pages/Branches";
+import { GetPages as BranchPages } from "@src/Pages/Branches";
 import Dashboard from "@src/Pages/Dashboard";
 import DucksPage from "@src/Pages/Ducks";
 import EditConfig from "@src/Pages/EditConfig";
@@ -14,7 +14,7 @@ import WhoIsOutPage from "@src/Pages/WhoIsOut";
 import WikiPage from "@src/Pages/Wiki";
 import { Link } from "react-router-dom";
 
-export const pageTestRequires = (test: string, config: ConfigProps) => {
+export const pageTestRequires = (test: string, config: ConfigProps): boolean => {
 	if (!test) {
 		return true;
 	}
@@ -33,9 +33,11 @@ export const pageTestRequires = (test: string, config: ConfigProps) => {
 	if (test == "GIT_REPOS_PATHS") {
 		return !!Object.keys(config.GIT_REPOS_PATHS).length;
 	}
+	return true;
 };
 
-export const pages = [
+const pages = [
+	...BranchPages(),
 	{
 		path: "/",
 		name: "Home",
@@ -69,20 +71,6 @@ export const pages = [
 		element: <RecentTicketsPage />,
 		description: <>Find tickets that were recently filed.</>,
 		requires: "APIURL",
-	},
-	{
-		path: "/branches",
-		name: "Branches",
-		element: <BranchesPage />,
-		description: <>List all the git repositories and their respective branches.</>,
-		requires: "GIT_REPOS_PATHS",
-	},
-	{
-		path: "/branchesCompare",
-		name: "Compare Branches",
-		element: <BranchesComparePage />,
-		description: <>Find all commits in one branch and not the other</>,
-		requires: "GIT_REPOS_PATHS",
 	},
 	{
 		path: "/holidays",
@@ -186,3 +174,7 @@ export const pages = [
 		requires: "false",
 	},
 ];
+
+export const GetPages = () => {
+	return pages;
+}

@@ -157,15 +157,15 @@ function EditConfigPage() {
 					<Tab label="Jira" value="Jira" />
 					<Tab label="Git" value="Git" />
 					<Tab label="Dashboards" value="Dashboards" />
-					<Button
-						variant="contained"
-						onClick={save}
-						sx={{ marginLeft: "100px", width: "4em" }}
-						disabled={!config.ALLOW_CONFIG_EDIT}
-					>
-						Save
-					</Button>
 				</TabList>
+				<Button
+					variant="contained"
+					onClick={save}
+					sx={{ marginLeft: "100px", width: "4em" }}
+					disabled={!config.ALLOW_CONFIG_EDIT}
+				>
+					Save
+				</Button>
 				<TabPanel value="Miscellaneous">
 					<EditMiscellaneousConfigTab
 						host={host}
@@ -272,3 +272,12 @@ function EditConfigPage() {
 }
 
 export default EditConfigPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/EditConfig",
+		name: "Edit Config",
+		element: <EditConfigPage />,
+		description: <>Allow Editting of the config for this site</>,
+	},
+];

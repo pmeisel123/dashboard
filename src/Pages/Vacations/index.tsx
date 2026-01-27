@@ -230,3 +230,13 @@ const VacationPage: FC<{
 };
 
 export default VacationPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/vacations",
+		name: "Edit Vacations",
+		element: <VacationPage />,
+		description: <>Edit Vacations and save it to src/assets/vacation.csv</>,
+		requires: "ALLOW_VACATION_EDITS",
+	},
+];

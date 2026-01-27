@@ -1,8 +1,6 @@
 import { Box, LinearProgress, styled } from "@mui/material";
-import { GetPages } from "@src/Pages/pages";
+import { pages } from "@src/Pages/pages";
 import { matchRoutes } from "react-router-dom";
-
-const pages = GetPages();
 
 export const DashboardProgress = styled(LinearProgress, {
 	shouldForwardProp: (prop) => prop !== "speed",

@@ -40,3 +40,13 @@ function DuckPage() {
 	);
 }
 export default DuckPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/ducks",
+		name: "Ducks",
+		element: <DuckPage />,
+		description: <>DUCKS! (for fun)</>,
+		requires: "false",
+	},
+];

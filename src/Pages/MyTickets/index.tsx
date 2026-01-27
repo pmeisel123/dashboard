@@ -236,3 +236,15 @@ const MyTicketsPage: FC<{
 };
 
 export default MyTicketsPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/MyTickets",
+		name: "My Tickets",
+		element: <MyTicketsPage />,
+		description: (
+			<>View tickets assigned to a specific user. The selected user is saved to local storage for convenience.</>
+		),
+		requires: "APIURL",
+	},
+];

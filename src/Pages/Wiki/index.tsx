@@ -165,3 +165,13 @@ const WikiPage: FC<{
 	);
 };
 export default WikiPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/wiki",
+		name: "Wiki Page",
+		element: <WikiPage />,
+		description: <>Wiki Page</>,
+		requires: "API_CONFLUENCE_URL",
+	},
+];

@@ -2,7 +2,7 @@ import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import type { AppDispatch, RootState } from "@src/Api";
 import { fetchConfig, isSliceRecent, store } from "@src/Api";
 import { DashboardProgress, Duck, LeftNav, TopNav } from "@src/Components";
-import { GetPages } from "@src/Pages/pages";
+import { pages } from "@src/Pages/pages";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
@@ -10,7 +10,6 @@ import { matchRoutes } from "react-router";
 import { createBrowserRouter, Outlet, RouterProvider, useLocation, useSearchParams } from "react-router-dom";
 import "./App.css";
 
-const pages = GetPages();
 const router = createBrowserRouter([
 	{
 		path: "/",

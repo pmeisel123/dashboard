@@ -253,3 +253,20 @@ const WhoIsOutPage: FC<{
 };
 
 export default WhoIsOutPage;
+export const GetModulePages = () => [
+	{
+		path: "/whoisout",
+		name: "Who is out",
+		element: <WhoIsOutPage />,
+		description: (
+			<>
+				Show upcoming vacations. Users are pulled from Jira, and vacation times are sourced from
+				src/assets/vacation.csv via src/API/vacations.tsx
+				<br />
+				Need to pull vacations from your HR site. Either via a cron job updating the csv file or by updating to
+				vacations api to automaticlly pull/format the vacation data
+			</>
+		),
+		requires: "APIURL",
+	},
+];

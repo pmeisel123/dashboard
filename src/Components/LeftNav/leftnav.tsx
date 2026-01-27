@@ -2,13 +2,13 @@ import { Drawer, List, ListItem, ListItemButton, ListItemText, Toolbar, useMedia
 import type { AppDispatch, RootState } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { SavePageList } from "@src/Components";
-import { GetPages, pageTestRequires } from "@src/Pages/pages";
+import { pageTestRequires } from "@src/Pages/pageRegistry";
+import { pages } from "@src/Pages/pages";
 import type { FC } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 
-const pages = GetPages();
 interface LeftNavProps {
 	open: boolean;
 	setLeftNavOpen: Function;

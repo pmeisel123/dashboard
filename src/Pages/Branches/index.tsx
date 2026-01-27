@@ -1,9 +1,7 @@
-
-
 import { default as BranchesComparePage } from "./branchesCompare";
 import { default as BranchesPage } from "./branchPage";
 
-export const GetPages = () => [
+export const GetModulePages = () => [
 	{
 		path: "/branches",
 		name: "Branches",

@@ -2,13 +2,11 @@ import { Box, Button } from "@mui/material";
 import type { AppDispatch, DashboardPageProps, RootState } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress, ListDashboard } from "@src/Components";
-import { GetPages } from "@src/Pages/pages";
+import { pages } from "@src/Pages/pages";
 import type { FC } from "react";
 import { cloneElement, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, matchRoutes, useSearchParams } from "react-router-dom";
-
-const pages = GetPages();
 
 const LoadPage: FC<{
 	url: string;
@@ -206,5 +204,21 @@ function DashboardPage() {
 	}
 	return <ListDashboard setDashboard={setDashboard}></ListDashboard>;
 }
+
+export const GetModulePages = () => [
+	{
+		path: "/dashboard",
+		name: "Dashboards",
+		element: <DashboardPage />,
+		description: (
+			<>
+				Dashboards are configured within the <Link to="/EditConfig">Edit Config</Link>. When a dashboard is
+				loaded, the page will automatically switch between different pages.
+				<br />
+				This is useful for displaying information on internal office screens.
+			</>
+		),
+	},
+];
 
 export default DashboardPage;

@@ -2,7 +2,8 @@ import { Box, Checkbox, FormControlLabel, ListItem, ListItemButton, ListItemText
 import type { AppDispatch, RootState } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { SavePageList } from "@src/Components";
-import { GetPages, pageTestRequires } from "@src/Pages/pages";
+import { pageTestRequires } from "@src/Pages/pageRegistry";
+import { pages } from "@src/Pages/pages";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useSearchParams } from "react-router-dom";
@@ -12,7 +13,6 @@ function HomePage() {
 	const [showHidden, setShowHidden] = useState<boolean>(searchParams.get("showHidden") == "true");
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
-	const pages = GetPages();
 	useEffect(() => {
 		if (!isSliceRecent(config)) {
 			dispatch(fetchConfig());
@@ -38,6 +38,7 @@ function HomePage() {
 	}, [showHidden]);
 	return (
 		<Box>
+			{pages.length}
 			{pages.map((page) => {
 				if (
 					"requires" in page &&
@@ -48,8 +49,22 @@ function HomePage() {
 				}
 				return (
 					<ListItem disablePadding key={page.path}>
-						<ListItemButton title={page.name} component={Link} to={page.path}>
-							<ListItemText primary={page.name} secondary={page.description} />
+						<ListItemButton component="div" sx={{ cursor: "default" }}>
+							<ListItemText
+								primary={
+									<Link
+										to={page.path}
+										style={{ fontWeight: "bold", textDecoration: "none", color: "inherit" }}
+									>
+										<div>{page.name}</div>
+									</Link>
+								}
+								secondary={
+									<Box component="span" sx={{ display: "block" }}>
+										{page.description}
+									</Box>
+								}
+							/>
 						</ListItemButton>
 					</ListItem>
 				);
@@ -77,8 +92,26 @@ function HomePage() {
 						) {
 							return (
 								<ListItem disablePadding key={page.path} sx={{ backgroundColor: "#DDD" }}>
-									<ListItemButton title={page.name} component={Link} to={page.path}>
-										<ListItemText primary={page.name} secondary={page.description} />
+									<ListItemButton component="div" sx={{ cursor: "default" }}>
+										<ListItemText
+											primary={
+												<Link
+													to={page.path}
+													style={{
+														fontWeight: "bold",
+														textDecoration: "none",
+														color: "inherit",
+													}}
+												>
+													<div>{page.name}</div>
+												</Link>
+											}
+											secondary={
+												<Box component="span" sx={{ display: "block" }}>
+													{page.description}
+												</Box>
+											}
+										/>
 									</ListItemButton>
 								</ListItem>
 							);
@@ -91,3 +124,12 @@ function HomePage() {
 	);
 }
 export default HomePage;
+
+export const GetModulePages = () => [
+	{
+		path: "/",
+		name: "Home",
+		element: <HomePage />,
+		description: <>Landing Page for the application.</>,
+	},
+];

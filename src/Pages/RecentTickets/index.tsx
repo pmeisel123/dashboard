@@ -159,3 +159,13 @@ const RecentTicketsPage: FC<{
 };
 
 export default RecentTicketsPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/RecentTickets",
+		name: "Recent Tickets",
+		element: <RecentTicketsPage />,
+		description: <>Find tickets that were recently filed.</>,
+		requires: "APIURL",
+	},
+];

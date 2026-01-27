@@ -216,3 +216,18 @@ const EstimatorPage: FC<{
 	);
 };
 export default EstimatorPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/Estimator",
+		name: "Estimator",
+		element: <EstimatorPage />,
+		description: (
+			<>
+				Calculate approximate project completion dates based on Jira ticket estimates, user selection, upcoming
+				vacations, and holidays. Useful for project planning.
+			</>
+		),
+		requires: "APIURL",
+	},
+];

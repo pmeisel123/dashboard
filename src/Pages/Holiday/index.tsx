@@ -211,3 +211,17 @@ const HolidayPage: FC<{
 	);
 };
 export default HolidayPage;
+
+export const GetModulePages = () => [
+	{
+		path: "/holidays",
+		element: <HolidayPage />,
+		name: "Holidays",
+		description: (
+			<>
+				Display US bank holidays by year. To change the default filters, edit src/API/holiday.ts &gt;
+				getHolidays.
+			</>
+		),
+	},
+];

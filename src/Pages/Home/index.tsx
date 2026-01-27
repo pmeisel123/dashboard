@@ -38,7 +38,6 @@ function HomePage() {
 	}, [showHidden]);
 	return (
 		<Box>
-			{pages.length}
 			{pages.map((page) => {
 				if (
 					"requires" in page &&

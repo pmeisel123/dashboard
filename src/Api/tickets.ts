@@ -53,7 +53,6 @@ function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
 		parentname = fields.parent.fields?.summary ?? null;
 	}
 
-	// Keep custom fields as a flexible map — values can be strings, arrays, or null
 	const custom_fields: { [key: string]: any } = {};
 	if (config.CUSTOM_FIELDS) {
 		for (const custom_field_key of Object.keys(config.CUSTOM_FIELDS)) {

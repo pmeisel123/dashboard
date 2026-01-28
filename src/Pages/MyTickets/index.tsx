@@ -1,6 +1,6 @@
 import type { SelectChangeEvent } from "@mui/material";
 import { Checkbox, Grid, InputLabel, ListItemText, MenuItem, Select } from "@mui/material";
-import type { AppDispatch, RootState, TicketProps } from "@src/Api";
+import type { AppDispatch, RootState, RoutePageProps, TicketProps } from "@src/Api";
 import {
 	fetchBranches,
 	fetchConfig,
@@ -235,9 +235,7 @@ const MyTicketsPage: FC<{
 	);
 };
 
-export default MyTicketsPage;
-
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/MyTickets",
 		name: "My Tickets",

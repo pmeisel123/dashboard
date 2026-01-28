@@ -1,7 +1,8 @@
+import type { RoutePageProps } from "@src/Api";
 import { default as BranchesComparePage } from "./branchesCompare";
 import { default as BranchesPage } from "./branchPage";
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/branches",
 		name: "Branches",

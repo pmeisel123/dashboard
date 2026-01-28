@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { RepoNamePaths, ReposProps } from "./gittypes";
 import type { CustomFieldsObjectProps } from "./ticketstypes";
 
@@ -103,4 +104,12 @@ export interface ConfigPropsFile {
 
 export interface LoadedSlice {
 	loaded: number | null; // ms since epoch
+}
+
+export interface RoutePageProps {
+	path: string;
+	name: string;
+	element: ReactNode;
+	description: ReactNode;
+	requires?: "false" | "APIURL" | "ALLOW_VACATION_EDITS" | "API_CONFLUENCE_URL" | "GIT_REPOS_PATHS";
 }

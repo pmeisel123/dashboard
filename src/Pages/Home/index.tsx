@@ -1,5 +1,5 @@
-import { Box, Checkbox, FormControlLabel, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import type { AppDispatch, RootState } from "@src/Api";
+import { Box, Checkbox, FormControlLabel, ListItem, ListItemButton, ListItemText, Typography } from "@mui/material";
+import type { AppDispatch, RootState, RoutePageProps } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { SavePageList } from "@src/Components";
 import { pageTestRequires } from "@src/Pages/pageRegistry";
@@ -8,7 +8,56 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useSearchParams } from "react-router-dom";
 
-function HomePage() {
+const HomePageItem = (page: RoutePageProps) => {
+	return (
+		<ListItem disablePadding key={page.path}>
+			<ListItemButton
+				component="div"
+				sx={{ position: "relative", p: 0 }} // Ensure relative for absolute link
+			>
+				{/* LINK: Handles status bar & navigation for everything except zIndex: 2 */}
+				<Link
+					to={page.path}
+					style={{
+						position: "absolute",
+						inset: 0,
+						zIndex: 1,
+					}}
+					aria-label={page.name}
+				/>
+
+				<ListItemText
+					sx={{ px: 2, py: 1 }}
+					primary={
+						<Typography variant="body1" sx={{ fontWeight: "bold", position: "relative", zIndex: 0 }}>
+							{page.name}
+						</Typography>
+					}
+					secondary={
+						<Box
+							component="span"
+							sx={{
+								display: "block",
+								mt: 0.5,
+								position: "relative",
+								zIndex: 2, // Sits ABOVE the link overlay to be clickable
+								pointerEvents: "none",
+								/* Re-enable clicks ONLY for anchors inside the description */
+								"& a": {
+									pointerEvents: "auto",
+								},
+							}}
+						>
+							{page.description}
+						</Box>
+					}
+				/>
+			</ListItemButton>
+		</ListItem>
+	);
+};
+
+const HomePage = () => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [showHidden, setShowHidden] = useState<boolean>(searchParams.get("showHidden") == "true");
 	const config = useSelector((state: RootState) => state.configState);
@@ -46,27 +95,7 @@ function HomePage() {
 				) {
 					return;
 				}
-				return (
-					<ListItem disablePadding key={page.path}>
-						<ListItemButton component="div" sx={{ cursor: "default" }}>
-							<ListItemText
-								primary={
-									<Link
-										to={page.path}
-										style={{ fontWeight: "bold", textDecoration: "none", color: "inherit" }}
-									>
-										<div>{page.name}</div>
-									</Link>
-								}
-								secondary={
-									<Box component="span" sx={{ display: "block" }}>
-										{page.description}
-									</Box>
-								}
-							/>
-						</ListItemButton>
-					</ListItem>
-				);
+				return <HomePageItem key={page.path} {...page} />;
 			})}
 			<FormControlLabel
 				control={
@@ -89,31 +118,7 @@ function HomePage() {
 							typeof page.requires === "string" &&
 							!pageTestRequires(page.requires, config)
 						) {
-							return (
-								<ListItem disablePadding key={page.path} sx={{ backgroundColor: "#DDD" }}>
-									<ListItemButton component="div" sx={{ cursor: "default" }}>
-										<ListItemText
-											primary={
-												<Link
-													to={page.path}
-													style={{
-														fontWeight: "bold",
-														textDecoration: "none",
-														color: "inherit",
-													}}
-												>
-													<div>{page.name}</div>
-												</Link>
-											}
-											secondary={
-												<Box component="span" sx={{ display: "block" }}>
-													{page.description}
-												</Box>
-											}
-										/>
-									</ListItemButton>
-								</ListItem>
-							);
+							return <HomePageItem key={page.path} {...page} />;
 						}
 					})}
 				</>
@@ -121,10 +126,9 @@ function HomePage() {
 			<SavePageList />
 		</Box>
 	);
-}
-export default HomePage;
+};
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/",
 		name: "Home",

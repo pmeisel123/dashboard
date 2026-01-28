@@ -10,7 +10,7 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import type { AppDispatch, RootState } from "@src/Api";
+import type { AppDispatch, RootState, RoutePageProps } from "@src/Api";
 import {
 	fetchConfig,
 	fetchUsersAndGroups,
@@ -252,8 +252,7 @@ const WhoIsOutPage: FC<{
 	);
 };
 
-export default WhoIsOutPage;
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/whoisout",
 		name: "Who is out",

@@ -158,8 +158,6 @@ const RecentTicketsPage: FC<{
 	);
 };
 
-export default RecentTicketsPage;
-
 export const GetModulePages = () => [
 	{
 		path: "/RecentTickets",

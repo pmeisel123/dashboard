@@ -1,6 +1,6 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Alert, Button, Tab } from "@mui/material";
-import type { AppDispatch, ReposProps, RootState } from "@src/Api";
+import type { AppDispatch, ReposProps, RootState, RoutePageProps } from "@src/Api";
 import { fetchConfig, fetchUsersAndGroups, isSliceRecent, postConfigApi } from "@src/Api";
 import type {
 	ConfigProps,
@@ -271,9 +271,7 @@ function EditConfigPage() {
 	);
 }
 
-export default EditConfigPage;
-
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/EditConfig",
 		name: "Edit Config",

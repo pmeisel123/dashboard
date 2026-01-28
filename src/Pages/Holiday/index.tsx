@@ -13,7 +13,7 @@ import {
 	TableHead,
 	TableRow,
 } from "@mui/material";
-import type { HolidayProps } from "@src/Api";
+import type { HolidayProps, RoutePageProps } from "@src/Api";
 import {
 	getAllHolidays,
 	getAllUsHolidays,
@@ -210,9 +210,7 @@ const HolidayPage: FC<{
 		</>
 	);
 };
-export default HolidayPage;
-
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/holidays",
 		element: <HolidayPage />,

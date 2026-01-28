@@ -12,7 +12,7 @@ import {
 	TableRow,
 	TextField,
 } from "@mui/material";
-import type { AppDispatch, RootState, UserEditVacation, UserProps } from "@src/Api";
+import type { AppDispatch, RootState, RoutePageProps, UserEditVacation, UserProps } from "@src/Api";
 import { fetchConfig, fetchUsersAndGroups, isSliceRecent, userHasGroup, vacationUpdateApi } from "@src/Api";
 import { EstimatorCell } from "@src/Components";
 import type { ChangeEvent, FC, FocusEvent } from "react";
@@ -229,9 +229,7 @@ const VacationPage: FC<{
 	);
 };
 
-export default VacationPage;
-
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/vacations",
 		name: "Edit Vacations",

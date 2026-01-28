@@ -9,4 +9,4 @@ export const pages = [
 		description: <>A blank Page</>,
 		requires: "false",
 	},
-];
+].sort((a, b) => a.name.localeCompare(b.name));

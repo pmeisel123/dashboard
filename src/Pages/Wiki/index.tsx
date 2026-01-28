@@ -1,5 +1,5 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
-import type { AppDispatch, RootState, WikiPageProps, WikiPagesProps, WikiSpaceProps } from "@src/Api";
+import type { AppDispatch, RootState, RoutePageProps, WikiPageProps, WikiPagesProps, WikiSpaceProps } from "@src/Api";
 import { fetchConfig, fetchWiki, fetchWikiPages, fetchWikiSpaces, isSliceRecent } from "@src/Api";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -164,9 +164,8 @@ const WikiPage: FC<{
 		</>
 	);
 };
-export default WikiPage;
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/wiki",
 		name: "Wiki Page",

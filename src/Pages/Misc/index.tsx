@@ -1,9 +1,10 @@
+import type { RoutePageProps } from "@src/Api";
 import { DatePage } from "./date";
 import { NextHolidayPage } from "./next_holiday";
 import { TextPage } from "./text";
 import { TimePage } from "./time";
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/time",
 		name: "Time",

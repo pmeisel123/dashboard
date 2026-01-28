@@ -1,5 +1,5 @@
 import { Box, Button } from "@mui/material";
-import type { AppDispatch, DashboardPageProps, RootState } from "@src/Api";
+import type { AppDispatch, DashboardPageProps, RootState, RoutePageProps } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress, ListDashboard } from "@src/Components";
 import { pages } from "@src/Pages/pages";
@@ -205,7 +205,7 @@ function DashboardPage() {
 	return <ListDashboard setDashboard={setDashboard}></ListDashboard>;
 }
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/dashboard",
 		name: "Dashboards",
@@ -220,5 +220,3 @@ export const GetModulePages = () => [
 		),
 	},
 ];
-
-export default DashboardPage;

@@ -1,4 +1,4 @@
-import type { AppDispatch, RootState, TicketProps } from "@src/Api";
+import type { AppDispatch, RootState, RoutePageProps, TicketProps } from "@src/Api";
 import { fetchBranches, fetchConfig, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
 import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import type { FC } from "react";
@@ -215,9 +215,8 @@ const EstimatorPage: FC<{
 		</>
 	);
 };
-export default EstimatorPage;
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/Estimator",
 		name: "Estimator",

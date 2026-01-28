@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import type { AppDispatch, RootState } from "@src/Api";
+import type { AppDispatch, RootState, RoutePageProps } from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,9 +39,8 @@ function DuckPage() {
 		</div>
 	);
 }
-export default DuckPage;
 
-export const GetModulePages = () => [
+export const GetModulePages = (): RoutePageProps[] => [
 	{
 		path: "/ducks",
 		name: "Ducks",

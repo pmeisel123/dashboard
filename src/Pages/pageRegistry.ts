@@ -7,9 +7,12 @@ interface PageModule {
 const modules = import.meta.glob<PageModule>("./*/index.tsx", { eager: true });
 
 export const getDynamicPages = (): any[] => {
-	return Object.values(modules).flatMap((mod) => {
+	return Object.entries(modules).flatMap(([path, mod]) => {
 		if (typeof mod?.GetModulePages === "function") {
 			return mod.GetModulePages();
+		} else {
+			const moduleName = path.split("/")[1];
+			console.warn("No GetModulePages found in module: " + moduleName);
 		}
 		return [];
 	});

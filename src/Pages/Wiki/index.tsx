@@ -167,10 +167,10 @@ const WikiPage: FC<{
 
 export const GetModulePages = (): RoutePageProps[] => [
 	{
-		path: "/wiki",
+		path: "/Wiki",
 		name: "Wiki Page",
 		element: <WikiPage />,
-		description: <>Wiki Page</>,
+		description: <>Wiki Page (useful to use with Dashboards)</>,
 		requires: "API_CONFLUENCE_URL",
 	},
 ];

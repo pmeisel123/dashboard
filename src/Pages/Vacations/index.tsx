@@ -231,7 +231,7 @@ const VacationPage: FC<{
 
 export const GetModulePages = (): RoutePageProps[] => [
 	{
-		path: "/vacations",
+		path: "/Vacations",
 		name: "Edit Vacations",
 		element: <VacationPage />,
 		description: <>Edit Vacations and save it to src/assets/vacation.csv</>,

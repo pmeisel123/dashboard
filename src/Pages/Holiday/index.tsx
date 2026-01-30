@@ -212,7 +212,7 @@ const HolidayPage: FC<{
 };
 export const GetModulePages = (): RoutePageProps[] => [
 	{
-		path: "/holidays",
+		path: "/Holidays",
 		element: <HolidayPage />,
 		name: "Holidays",
 		description: (

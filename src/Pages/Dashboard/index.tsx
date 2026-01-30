@@ -207,7 +207,7 @@ function DashboardPage() {
 
 export const GetModulePages = (): RoutePageProps[] => [
 	{
-		path: "/dashboard",
+		path: "/Dashboard",
 		name: "Dashboards",
 		element: <DashboardPage />,
 		description: (

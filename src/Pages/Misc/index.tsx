@@ -6,28 +6,28 @@ import { TimePage } from "./time";
 
 export const GetModulePages = (): RoutePageProps[] => [
 	{
-		path: "/time",
+		path: "/Time",
 		name: "Time",
 		element: <TimePage />,
 		description: <>Time (for dashboards)</>,
 		requires: "false",
 	},
 	{
-		path: "/date",
+		path: "/Date",
 		name: "Date",
 		element: <DatePage />,
 		description: <>Date (for dashboards)</>,
 		requires: "false",
 	},
 	{
-		path: "/nextholiday",
+		path: "/NextHoliday",
 		name: "Next Holiday",
 		element: <NextHolidayPage />,
 		description: <>Next holiday coming up (for dashboards)</>,
 		requires: "false",
 	},
 	{
-		path: "/text",
+		path: "/Text",
 		name: "Text",
 		element: <TextPage />,
 		description: <>Show some text on the page (for dashboards)</>,

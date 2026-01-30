@@ -254,7 +254,7 @@ const WhoIsOutPage: FC<{
 
 export const GetModulePages = (): RoutePageProps[] => [
 	{
-		path: "/whoisout",
+		path: "/WhoIsOut",
 		name: "Who is out",
 		element: <WhoIsOutPage />,
 		description: (

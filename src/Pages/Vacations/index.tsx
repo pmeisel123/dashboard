@@ -155,9 +155,9 @@ const VacationPage: FC<{
 						minHeight: "3em",
 					}}
 				>
-					{allJiraUsersGroups.groups.map((option, index) => (
+					{allJiraUsersGroups.groups.map((option) => (
 						<FormControlLabel
-							key={index}
+							key={option}
 							control={
 								<Checkbox
 									checked={groups.includes(option)}

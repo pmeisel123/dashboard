@@ -23,13 +23,10 @@ const apiCache = new Map<string, CachedResponse>();
 const CACHE_TTL = 60 * 1000; // 1 minute
 const FORBIDDEN_HTTP2_HEADERS = ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade", "te"];
 
-const logTime = () => {
-	return new Date().toISOString() + " ";
-};
-
 const log = (type: string, req: IncomingMessage, url_start: string | null, message: string) => {
 	console.log(
-		logTime() +
+		new Date().toISOString() +
+			" " +
 			"[" +
 			type +
 			"] " +
@@ -46,7 +43,6 @@ const pendingResolvers = new Map<string, (data: CachedResponse) => void>();
 const pendingPromises = new Map<string, Promise<CachedResponse>>();
 
 const serveFromCache = (res: ServerResponse, cached: CachedResponse) => {
-	// console.log(logTime() + "isCached (Bypassed): " + logKey);
 	Object.entries(cached.headers).forEach(([key, val]) => {
 		if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
 			res.setHeader(key, val);
@@ -64,13 +60,21 @@ const bypassFunction = async (req: IncomingMessage, res: ServerResponse | undefi
 	const cached = apiCache.get(cacheKey);
 	// This is mostly to prevent duplicate calls
 	// The browser will cache for 10 minutes
-	if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-		serveFromCache(res, cached);
-		return req.url;
+	// But will rerequest if the user reloads the page
+	if (cached) {
+		if (Date.now() - cached.timestamp < CACHE_TTL) {
+			serveFromCache(res, cached);
+			return req.url;
+		} else {
+			apiCache.delete(cacheKey);
+			if (pendingPromises.has(cacheKey)) {
+				pendingPromises.delete(cacheKey);
+				pendingResolvers.delete(cacheKey);
+			}
+		}
 	}
 
 	if (pendingPromises.has(cacheKey)) {
-		// console.log(logTime() + "Collapsing Duplicate Request: " + cacheKey);
 		const result = await Promise.race([
 			pendingPromises.get(cacheKey)!,
 			new Promise<null>((r) => setTimeout(() => r(null), 30000)),
@@ -144,6 +148,12 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 			pendingResolvers.delete(cacheKey);
 			pendingPromises.delete(cacheKey);
 		}
+		setTimeout(() => {
+			log("CACHE", req, path, "Clearing cached response:");
+			apiCache.delete(cacheKey);
+			pendingResolvers.delete(cacheKey);
+			pendingPromises.delete(cacheKey);
+		}, CACHE_TTL * 2);
 
 		Object.entries(proxyRes.headers).forEach(([key, val]) => {
 			if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
@@ -186,51 +196,34 @@ config.GITREPOS.forEach((repo, index: number) => {
 		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
 		bypass: bypassFunction,
 		configure: (proxy) => {
-			proxy.on("proxyRes", (proxyRes, req, res) => {
-				return proxyResFunction(repo_path, proxyRes, req, res);
-			});
+			proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(repo_path, proxyRes, req, res));
 		},
 	};
 });
 
-if (config.API_CONFLUENCE_URL && config.API_KEY) {
-	proxies["/jirawiki/"] = {
-		target: config.API_CONFLUENCE_URL,
-		changeOrigin: true,
-		selfHandleResponse: true,
-		agent: false,
-		headers: {
-			Connection: "close",
-			Authorization: "Basic " + btoa(config.API_USERNAME + ":" + config.API_KEY),
-		},
-		rewrite: (path) => path.replace(/^\/jirawiki\//, ""),
-		bypass: bypassFunction,
-		configure: (proxy) => {
-			proxy.on("proxyRes", (proxyRes, req, res) => {
-				return proxyResFunction("/jirawiki/", proxyRes, req, res);
-			});
-		},
-	};
-}
+const jira_proxies = {
+	"/jirawiki/": config.API_CONFLUENCE_URL,
+	"/jira/": config.API_URL,
+};
 
-if (config.API_URL && config.API_KEY) {
-	proxies["/jira/"] = {
-		target: config.API_URL,
-		changeOrigin: true,
-		selfHandleResponse: true,
-		agent: false,
-		headers: {
-			Connection: "close",
-			Authorization: "Basic " + btoa(config.API_USERNAME + ":" + config.API_KEY),
-		},
-		rewrite: (path) => path.replace(/^\/jira\//, ""),
-		bypass: bypassFunction,
-		configure: (proxy) => {
-			proxy.on("proxyRes", (proxyRes, req, res) => {
-				return proxyResFunction("/jira/", proxyRes, req, res);
-			});
-		},
-	};
+for (const [url, target] of Object.entries(jira_proxies)) {
+	if (target && config.API_KEY) {
+		proxies[url] = {
+			target: target,
+			changeOrigin: true,
+			selfHandleResponse: true,
+			agent: false,
+			headers: {
+				Connection: "close",
+				Authorization: "Basic " + btoa(config.API_USERNAME + ":" + config.API_KEY),
+			},
+			rewrite: (path) => path.replace(new RegExp(`^${url}`), ""),
+			bypass: bypassFunction,
+			configure: (proxy) => {
+				proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(url, proxyRes, req, res));
+			},
+		};
+	}
 }
 
 proxies["/server/"] = {

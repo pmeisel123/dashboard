@@ -42,9 +42,8 @@ export const isExternalLink = (url: string) => {
 	if (url.match(/^http/)) {
 		return true;
 	}
-	const urlObj = new URL(url, "http://random.com");
 	const matches = matchRoutes(pages, {
-		pathname: urlObj.pathname,
+		pathname: url.split("?")[0],
 	});
 	const lastMatch = matches ? matches[matches.length - 1] : null;
 	if (!lastMatch || !lastMatch.route.element) {

@@ -141,7 +141,7 @@ export const FlowInternal: FC<{
 		}, 300);
 
 		return () => clearTimeout(timeout);
-	}, [fitView, nodes.length, size]);
+	}, [fitView, nodes, size]);
 
 	const nodeIdWithNode = new Map<string, Node>();
 	nodes.forEach((node) => {
@@ -201,8 +201,15 @@ export const FlowInternal: FC<{
 					onEdgesChange={onEdgesChange}
 					connectionLineType={ConnectionLineType.SmoothStep}
 					proOptions={{ hideAttribution: true }}
+					draggable={false} // Disables canvas panning via drag
+					// Disable node/edge specific interactions
+					nodesDraggable={false} // Disables dragging individual nodes
+					nodesConnectable={false} // Disables ability to start connections from nodes
+					nodesFocusable={false} // Disables keyboard focus for nodes
+					edgesFocusable={false} // Disables keyboard focus for edges
+					connectOnClick={false} // Disables connection by clicking on ha
 				>
-					<Controls position="top-right">
+					<Controls position="top-right" showInteractive={false}>
 						<LayoutControls
 							showDirectionControls={true}
 							showAutoLayoutToggle={true}

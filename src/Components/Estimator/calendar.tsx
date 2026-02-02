@@ -3,6 +3,7 @@ import type { HolidayProps, UsersGroupProps } from "@src/Api";
 import { getAllUsHolidays, getDateString, getHolidayDayString } from "@src/Api";
 import { allGroups } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
+import { useEffect, useState } from "react";
 import { EstimatorCell } from "./const";
 
 interface cellData {
@@ -22,9 +23,7 @@ const Calendar: FC<{
 	isDashboard?: boolean;
 	setLastDay: Dispatch<SetStateAction<string>>;
 }> = ({ allJiraUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard, setLastDay }) => {
-	if (!Object.keys(allJiraUsersGroups.users).length) {
-		return <></>;
-	}
+	const [rows, setRows] = useState<cellData[][]>([]);
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 	const nextyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
@@ -44,9 +43,6 @@ const Calendar: FC<{
 		{} as Record<string, HolidayProps>,
 	);
 
-	const current_day = new Date();
-	current_day.setDate(current_day.getDate() - current_day.getDay());
-	current_day.setHours(0, 0, 0, 0);
 	let local_users = users;
 	let user_count = local_users.size;
 	if (!user_count) {
@@ -61,91 +57,100 @@ const Calendar: FC<{
 		}
 	}
 	user_count = local_users.size;
-	let remainingTimEstimate = totalTimEstimate;
-	let rows: cellData[][] = [];
-	let extra = true;
-	let max_rows = 30;
-	while ((remainingTimEstimate > 0 || extra) && max_rows) {
-		max_rows--;
-		if (!remainingTimEstimate) {
-			extra = false;
-		}
-		let row: cellData[] = [];
-		for (var i = 0; i <= 6; i++) {
-			let title = "";
-			let off = "";
-			let description = "";
-			let working = 0;
+	useEffect(() => {
+		let remainingTimEstimate = totalTimEstimate;
+		let extra = true;
+		let max_rows = 30;
+		let current_day = new Date();
+		current_day.setDate(current_day.getDate() - current_day.getDay());
+		current_day.setHours(0, 0, 0, 0);
+		let newrows: cellData[][] = [];
+		while ((remainingTimEstimate > 0 || extra) && max_rows) {
+			max_rows--;
 			if (!remainingTimEstimate) {
-				description = "-";
-			} else if (current_day.getDay() == 0 || current_day.getDay() == 6) {
-				description = "Weekend";
-			} else if (current_day < today) {
-				working = 0;
-			} else {
-				const holiday_string = getHolidayDayString(current_day);
-				let skip = false;
-				const holiday = usHolidays[holiday_string];
-				if (holiday) {
-					description = holiday.name;
-					title = description;
-					if (holiday.bank) {
-						skip = true;
-					} else {
-						title += "\n\n";
-					}
-				}
-				if (!skip) {
-					local_users.forEach((user_id) => {
-						const user = allJiraUsersGroups.users[user_id];
-						if (!user || !user.vacations || !user.vacations.includes(holiday_string)) {
-							working++;
-							if (user) {
-								if (!title) {
-									title = "Working:\n";
-								}
-								title += user.name + "\n";
-							}
-						} else {
-							if (user) {
-								if (!off) {
-									off = "Off:\n";
-								}
-								off += user.name + "\n";
-							}
-						}
-					});
-					if (!working) {
-						description = "Vacation";
-					} else {
-						if (off) {
-							if (title) {
-								title += "\n";
-							}
-							title += off;
-						}
-					}
-				}
-				remainingTimEstimate -= working;
-				if (remainingTimEstimate < 0) {
-					remainingTimEstimate = 0;
-				}
-				if (!remainingTimEstimate) {
-					setLastDay(getDateString(current_day));
-					description = "WORK COMPLETE!!!";
-				}
+				extra = false;
 			}
-			row.push({
-				day: new Date(current_day),
-				working: working,
-				workleft: remainingTimEstimate,
-				description: description,
-				title: title,
-			});
-			current_day.setDate(current_day.getDate() + 1);
-			current_day.setHours(0, 0, 0, 0);
+			let row: cellData[] = [];
+			for (var i = 0; i <= 6; i++) {
+				let title = "";
+				let off = "";
+				let description = "";
+				let working = 0;
+				if (!remainingTimEstimate) {
+					description = "-";
+				} else if (current_day.getDay() == 0 || current_day.getDay() == 6) {
+					description = "Weekend";
+				} else if (current_day < today) {
+					working = 0;
+				} else {
+					const holiday_string = getHolidayDayString(current_day);
+					let skip = false;
+					const holiday = usHolidays[holiday_string];
+					if (holiday) {
+						description = holiday.name;
+						title = description;
+						if (holiday.bank) {
+							skip = true;
+						} else {
+							title += "\n\n";
+						}
+					}
+					if (!skip) {
+						local_users.forEach((user_id) => {
+							const user = allJiraUsersGroups.users[user_id];
+							if (!user || !user.vacations || !user.vacations.includes(holiday_string)) {
+								working++;
+								if (user) {
+									if (!title) {
+										title = "Working:\n";
+									}
+									title += user.name + "\n";
+								}
+							} else {
+								if (user) {
+									if (!off) {
+										off = "Off:\n";
+									}
+									off += user.name + "\n";
+								}
+							}
+						});
+						if (!working) {
+							description = "Vacation";
+						} else {
+							if (off) {
+								if (title) {
+									title += "\n";
+								}
+								title += off;
+							}
+						}
+					}
+					remainingTimEstimate -= working;
+					if (remainingTimEstimate < 0) {
+						remainingTimEstimate = 0;
+					}
+					if (!remainingTimEstimate) {
+						setLastDay(getDateString(current_day));
+						description = "WORK COMPLETE!!!";
+					}
+				}
+				row.push({
+					day: new Date(current_day),
+					working: working,
+					workleft: remainingTimEstimate,
+					description: description,
+					title: title,
+				});
+				current_day.setDate(current_day.getDate() + 1);
+				current_day.setHours(0, 0, 0, 0);
+			}
+			newrows.push(row);
 		}
-		rows.push(row);
+		setRows(newrows);
+	}, [allJiraUsersGroups, totalTimEstimate, local_users]);
+	if (!Object.keys(allJiraUsersGroups.users).length) {
+		return <></>;
 	}
 
 	return (

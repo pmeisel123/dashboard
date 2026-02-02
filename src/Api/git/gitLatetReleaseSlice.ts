@@ -12,7 +12,6 @@ const initialState: Record<string, GitLatestReleaseSlice> = {
 export const fetchLatestRelease = createAsyncThunk(
 	"git/getLatestReleases",
 	async ([repo, config]: [string, ConfigProps]) => {
-		console.log(config);
 		const data: LatestRelease | null = await getLatestRelease(repo, config);
 		return data;
 	},

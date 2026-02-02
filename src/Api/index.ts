@@ -1,3 +1,5 @@
+export * from "./config";
+export * from "./configSlice";
 export * from "./git";
 export * from "./holiday";
 export * from "./misc";
@@ -9,5 +11,3 @@ export * from "./users";
 export * from "./usersSlice";
 export * from "./vacations";
 export * from "./wiki";
-export * from "./config";
-export * from "./configSlice";

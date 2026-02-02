@@ -34,8 +34,7 @@ const log = (type: string, req: IncomingMessage, url_start: string | null, messa
 			" request: " +
 			(url_start || "") +
 			(req.url || "") +
-			" from IP:" +
-			(req.socket.remoteAddress || "unknown"),
+			(type == "CACHE" ? "" : " from IP:" + (req.socket.remoteAddress || "unknown")),
 	);
 };
 
@@ -170,6 +169,25 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 	});
 };
 
+const setProxy = (repo_path: string, target: string, headers: { [key: string]: string }) => {
+	proxies[repo_path] = {
+		target: target,
+		changeOrigin: true,
+		selfHandleResponse: true,
+		secure: true,
+		agent: false,
+		headers: {
+			Connection: "close",
+			...headers,
+		},
+		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
+		bypass: bypassFunction,
+		configure: (proxy) => {
+			proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(repo_path, proxyRes, req, res));
+		},
+	};
+};
+
 config.GITREPOS.forEach((repo, index: number) => {
 	const repo_path = "/git_" + index;
 	const repo_name = repo.name;
@@ -180,25 +198,12 @@ config.GITREPOS.forEach((repo, index: number) => {
 		url: repo.url,
 	};
 
-	proxies[repo_path] = {
-		target: repo_target,
-		changeOrigin: true,
-		secure: false,
-		selfHandleResponse: true,
-		agent: false,
-		headers: {
-			Connection: "close",
-			Accept: "application/vnd.github+json",
-			Authorization: "Bearer " + config.GITTOKEN,
-			"X-GitHub-Api-Version": "2022-11-28",
-			"User-Agent": "validator",
-		},
-		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
-		bypass: bypassFunction,
-		configure: (proxy) => {
-			proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(repo_path, proxyRes, req, res));
-		},
-	};
+	setProxy(repo_path, repo_target, {
+		Accept: "application/vnd.github+json",
+		Authorization: "Bearer " + config.GITTOKEN,
+		"X-GitHub-Api-Version": "2022-11-28",
+		"User-Agent": "validator",
+	});
 });
 
 const jira_proxies = {
@@ -208,24 +213,14 @@ const jira_proxies = {
 
 for (const [url, target] of Object.entries(jira_proxies)) {
 	if (target && config.API_KEY) {
-		proxies[url] = {
-			target: target,
-			changeOrigin: true,
-			selfHandleResponse: true,
-			agent: false,
-			headers: {
-				Connection: "close",
-				Authorization: "Basic " + btoa(config.API_USERNAME + ":" + config.API_KEY),
-			},
-			rewrite: (path) => path.replace(new RegExp(`^${url}`), ""),
-			bypass: bypassFunction,
-			configure: (proxy) => {
-				proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(url, proxyRes, req, res));
-			},
-		};
+		setProxy(url, target, {
+			Accept: "application/json",
+			Authorization: "Basic " + Buffer.from(config.API_USERNAME + ":" + config.API_KEY).toString("base64"),
+		});
 	}
 }
 
+console.log(proxies);
 proxies["/server/"] = {
 	target: "http://127.0.0.1:" + config.PORT,
 	changeOrigin: true,

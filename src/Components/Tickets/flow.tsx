@@ -212,7 +212,7 @@ export const FlowInternal: FC<{
 					<Controls position="top-right" showInteractive={false}>
 						<LayoutControls
 							showDirectionControls={true}
-							showAutoLayoutToggle={true}
+							showAutoLayoutToggle={false}
 							showSpacingControls={true}
 							showApplyLayoutButton={true}
 						/>

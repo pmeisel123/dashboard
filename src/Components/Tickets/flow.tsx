@@ -163,7 +163,7 @@ export const FlowInternal: FC<{
 	);
 
 	if (!initialNodes.length) {
-		return <>No tickets founds.</>;
+		return <>No tickets found.</>;
 	}
 	return (
 		<LayoutProvider

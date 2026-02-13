@@ -9,10 +9,10 @@ import { getHolidayDuck } from "./const";
 export const Duck = () => {
 	let default_duck = "ducky.png";
 	let default_duck_title = "ducky.png";
-	const [max_silly, setMaxSilly] = useState<number>(30);
+	const [max_silly, setMaxSilly] = useState<number>(300);
 	const [searchParams] = useSearchParams();
 	const [duck, setDuck] = useState<string>(default_duck);
-	const [silly, setSilly] = useState<number>(parseInt(searchParams.get("silly") || "0"));
+	const [silly, setSilly] = useState<number>(parseInt(searchParams.get("silly") || "300"));
 	const [orderSilly] = useState<boolean>(searchParams.get("orderSilly") == "true");
 	const [duckTitle, setDuckTitle] = useState<string>("");
 
@@ -25,7 +25,7 @@ export const Duck = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		setMaxSilly(config.DUCKS.length * 4);
+		setMaxSilly(config.DUCKS.length * 10);
 	}, [config]);
 
 	let today = getHolidayDayString(new Date());
@@ -47,9 +47,7 @@ export const Duck = () => {
 		}
 	};
 	useEffect(() => {
-		if (orderSilly) {
-			randomSilly();
-		}
+		randomSilly();
 		const duckInterval = setInterval(() => {
 			randomSilly();
 		}, 10000);

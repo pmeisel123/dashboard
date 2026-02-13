@@ -220,7 +220,6 @@ for (const [url, target] of Object.entries(jira_proxies)) {
 	}
 }
 
-console.log(proxies);
 proxies["/server/"] = {
 	target: "http://127.0.0.1:" + config.PORT,
 	changeOrigin: true,

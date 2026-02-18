@@ -148,7 +148,7 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 			pendingPromises.delete(cacheKey);
 		}
 		setTimeout(() => {
-			log("CACHE", req, path, "Clearing cached response:");
+			// log("CACHE", req, path, "Clearing cached response:");
 			apiCache.delete(cacheKey);
 			pendingResolvers.delete(cacheKey);
 			pendingPromises.delete(cacheKey);

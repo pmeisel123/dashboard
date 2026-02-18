@@ -37,7 +37,7 @@ const FuzzySearchComponent: FC<{
 
 	const fuseOptions = {
 		keys: ["name"],
-		threshold: 0.5, // Match sensitivity (0.0 requires perfect match, 1.0 matches anything)
+		threshold: 0.3, // Match sensitivity (0.0 requires perfect match, 1.0 matches anything)
 		ignoreLocation: true,
 	};
 

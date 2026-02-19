@@ -74,6 +74,7 @@ export const loadConfig = (): ConfigPropsFile => {
 		GITTOKEN: "",
 		HOST: "",
 		PORT: 3000,
+		USE_SSL: false,
 		VACATION_KEY: "email",
 		GITREPOS: [],
 	};
@@ -108,6 +109,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			GITTOKEN_DEFINED: configFile.GITTOKEN ? true : false,
 			HOST: configFile.HOST,
 			PORT: configFile.PORT,
+			USE_SSL: configFile.USE_SSL,
 			VACATION_KEY: configFile.VACATION_KEY,
 			GIT_REPOS_PATHS: git_proxies_name_path,
 			DUCKS: ducks,

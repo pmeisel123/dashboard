@@ -26,6 +26,7 @@ function EditConfigPage() {
 	const [tab, setTab] = useState<string>(searchParams.get("tab") || "Miscellaneous");
 	const [host, setHost] = useState<string>("");
 	const [port, setPort] = useState<number>(3000);
+	const [useSsl, setUseSsl] = useState<boolean>(false);
 	const [vacationKey, setVacationKey] = useState<VacationKeyType>("email");
 	const [apiKey, setApiKey] = useState<string>("");
 	const [apiUrl, setApiUrl] = useState<string>("");
@@ -79,6 +80,7 @@ function EditConfigPage() {
 	useEffect(() => {
 		setHost(config.HOST);
 		setPort(config.PORT);
+		setUseSsl(config.USE_SSL);
 		setVacationKey(config.VACATION_KEY);
 		setAllowVacationEdit(config.ALLOW_VACATION_EDITS);
 		setApiConfluenceUrl(config.API_CONFLUENCE_URL);
@@ -114,6 +116,7 @@ function EditConfigPage() {
 			ALLOW_VACATION_EDITS: allowVacationEdit,
 			HOST: host,
 			PORT: port,
+			USE_SSL: useSsl,
 			API_USERNAME: userName,
 			VACATION_KEY: vacationKey,
 			API_CONFLUENCE_URL: apiConfluenceUrl,
@@ -128,11 +131,15 @@ function EditConfigPage() {
 			GITREPOS: repos,
 		};
 		postConfigApi(newConfig).then(() => {
-			dispatch(fetchConfig()).then((data) => {
-				setLoading(false);
-				console.log(data);
-				dispatch(fetchUsersAndGroups(data.payload as ConfigProps));
-			});
+			if (useSsl != config.USE_SSL || host != config.HOST || port != config.PORT) {
+				window.location.href = `${useSsl ? "https" : "http"}://${host}:${port}`;
+			} else {
+				dispatch(fetchConfig()).then((data) => {
+					setLoading(false);
+					console.log(data);
+					dispatch(fetchUsersAndGroups(data.payload as ConfigProps));
+				});
+			}
 		});
 	};
 
@@ -172,6 +179,8 @@ function EditConfigPage() {
 						setHost={setHost}
 						port={port}
 						setPort={setPort}
+						useSsl={useSsl}
+						setUseSsl={setUseSsl}
 						vacationKey={vacationKey}
 						setVacationKey={setVacationKey}
 						allowVacationEdit={allowVacationEdit}
@@ -183,6 +192,7 @@ function EditConfigPage() {
 						allowDashboardEdit={allowDashboardEdit}
 						setAllowDashboardEdit={setAllowDashboardEdit}
 						origAllowDashboardEdit={config.ALLOW_DASHBOARD_EDIT}
+						config={config}
 					/>
 				</TabPanel>
 				<TabPanel value="Jira">

@@ -16,6 +16,7 @@ const initialState: ConfigProps & LoadedSlice = {
 	GITTOKEN_DEFINED: false,
 	HOST: "",
 	PORT: 3000,
+	USE_SSL: false,
 	VACATION_KEY: "email",
 	GIT_REPOS_PATHS: {},
 	ALLOW_CONFIG_EDIT: true,

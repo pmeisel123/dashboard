@@ -23,6 +23,7 @@ const apiCache = new Map<string, CachedResponse>();
 const CACHE_TTL = 60 * 1000; // 1 minute
 const FORBIDDEN_HTTP2_HEADERS = ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade", "te"];
 
+const INTERNAL_URL = (config.USE_SSL ? "https" : "http") + "://127.0.0.1:" + config.PORT;
 const log = (type: string, req: IncomingMessage, url_start: string | null, message: string) => {
 	console.log(
 		new Date().toISOString() +
@@ -221,7 +222,7 @@ for (const [url, target] of Object.entries(jira_proxies)) {
 }
 
 proxies["/server/"] = {
-	target: "http://127.0.0.1:" + config.PORT,
+	target: INTERNAL_URL,
 	changeOrigin: true,
 	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
 		if (res) {
@@ -232,7 +233,7 @@ proxies["/server/"] = {
 };
 
 proxies["^/.*\\.(git|env|crt|pem)"] = {
-	target: "http://127.0.0.1:" + config.PORT,
+	target: INTERNAL_URL,
 	changeOrigin: true,
 	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
 		const match = req.url?.match(/\.(git|env|crt|pem)/i);
@@ -249,7 +250,7 @@ proxies["^/.*\\.(git|env|crt|pem)"] = {
 
 proxies["/src/Server"] = {
 	// technicall there is nothing secure under /src/Server but block it anyway
-	target: "http://127.0.0.1:" + config.PORT,
+	target: INTERNAL_URL,
 	changeOrigin: true,
 	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
 		log("Blocked", req, "", "access attempt");
@@ -279,7 +280,7 @@ export default defineConfig({
 	},
 	plugins: [
 		react(),
-		basicSsl(),
+		config.USE_SSL ? basicSsl() : null,
 		ViteRestart({
 			restart: ["./config.json"],
 		}),

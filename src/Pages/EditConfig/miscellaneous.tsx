@@ -1,5 +1,17 @@
-import { Checkbox, FormControlLabel, FormLabel, Grid, InputLabel, Radio, RadioGroup, TextField } from "@mui/material";
-import type { VacationKeyType } from "@src/Api/Types";
+import {
+	Alert,
+	Checkbox,
+	FormControlLabel,
+	FormLabel,
+	Grid,
+	InputLabel,
+	MenuItem,
+	Radio,
+	RadioGroup,
+	Select,
+	TextField,
+} from "@mui/material";
+import type { ConfigProps, VacationKeyType } from "@src/Api/Types";
 import type { ChangeEvent, Dispatch, FC, SetStateAction } from "react";
 
 export const EditMiscellaneousConfigTab: FC<{
@@ -7,6 +19,8 @@ export const EditMiscellaneousConfigTab: FC<{
 	setHost: Dispatch<SetStateAction<string>>;
 	port: number;
 	setPort: Dispatch<SetStateAction<number>>;
+	useSsl: boolean;
+	setUseSsl: Dispatch<SetStateAction<boolean>>;
 	vacationKey: VacationKeyType;
 	setVacationKey: Dispatch<SetStateAction<VacationKeyType>>;
 	allowVacationEdit: boolean;
@@ -20,11 +34,15 @@ export const EditMiscellaneousConfigTab: FC<{
 	allowDashboardEdit: boolean;
 	setAllowDashboardEdit: Dispatch<SetStateAction<boolean>>;
 	origAllowDashboardEdit: boolean;
+
+	config: ConfigProps;
 }> = ({
 	host,
 	setHost,
 	port,
 	setPort,
+	useSsl,
+	setUseSsl,
 	vacationKey,
 	setVacationKey,
 	allowVacationEdit,
@@ -36,6 +54,7 @@ export const EditMiscellaneousConfigTab: FC<{
 	allowDashboardEdit,
 	setAllowDashboardEdit,
 	origAllowDashboardEdit,
+	config,
 }) => {
 	const handleVacationChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setVacationKey(event.target.value as VacationKeyType);
@@ -45,6 +64,19 @@ export const EditMiscellaneousConfigTab: FC<{
 			Domain you are running this dashboard on
 			<Grid container spacing={1}>
 				<Grid>
+					<InputLabel id="http">Protocol</InputLabel>
+					<Select
+						label="Protocol"
+						value={useSsl ? "https" : "http"}
+						onChange={(event) => {
+							setUseSsl(event.target.value == "https");
+						}}
+					>
+						<MenuItem value="http">http</MenuItem>
+						<MenuItem value="https">https</MenuItem>
+					</Select>
+				</Grid>
+				<Grid>
 					<InputLabel id="http">&nbsp;</InputLabel>
 					<div
 						style={{
@@ -52,7 +84,7 @@ export const EditMiscellaneousConfigTab: FC<{
 							fontSize: "16px",
 						}}
 					>
-						https://
+						://
 					</div>
 				</Grid>
 				<Grid>
@@ -89,6 +121,14 @@ export const EditMiscellaneousConfigTab: FC<{
 					/>
 				</Grid>
 			</Grid>
+			{(useSsl != config.USE_SSL || host != config.HOST || port != config.PORT) && (
+				<Alert severity="warning">
+					<div>
+						Changing the host, port, or protocol may require to restart the server and/or change the browser
+						url.
+					</div>
+				</Alert>
+			)}
 			<FormLabel id="vacationKey">Vacation key: How Jira Users and vacation api link user</FormLabel>
 			<RadioGroup
 				row

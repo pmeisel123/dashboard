@@ -75,6 +75,7 @@ export interface ConfigProps {
 	GITTOKEN_DEFINED: boolean;
 	HOST: string;
 	PORT: number;
+	USE_SSL: boolean;
 	VACATION_KEY: VacationKeyType;
 	GIT_REPOS_PATHS: { [key: string]: RepoNamePaths };
 	ALLOW_CONFIG_EDIT: boolean;
@@ -98,6 +99,7 @@ export interface ConfigPropsFile {
 	GITTOKEN: string;
 	HOST: string;
 	PORT: number;
+	USE_SSL: boolean;
 	VACATION_KEY: VacationKeyType;
 	GITREPOS: ReposProps[];
 }

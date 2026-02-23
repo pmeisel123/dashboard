@@ -261,6 +261,19 @@ proxies["/src/Server"] = {
 	},
 };
 
+proxies["^(?!/(index\\.html|vacation\\.csv))/[^/]+\\.[^/]+$"] = {
+	// This is a catch all for any request that looks like it's trying to access a file directly at the root, except for index.html and vacation.csv which need to be accessed directly
+	target: INTERNAL_URL,
+	changeOrigin: true,
+	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+		log("Blocked", req, "", "access attempt");
+		if (res) {
+			res.writeHead(404, { "Content-Type": "text/plain" });
+		}
+		return false;
+	},
+};
+
 // https://vite.dev/config/
 export default defineConfig({
 	server: {
@@ -270,6 +283,7 @@ export default defineConfig({
 		proxy: proxies,
 		fs: {
 			allow: ["src", "node_modules", "index.html"],
+			// this should be redundant with the proxy rules but is an extra layer of security to prevent accidental exposure of sensitive files
 			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "**/src/Server/**"],
 		},
 	},

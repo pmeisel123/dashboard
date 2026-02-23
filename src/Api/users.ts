@@ -15,7 +15,8 @@ export const getUserGroupApi = async (userId: string) => {
 	if (ajax_result && ajax_result.groups && ajax_result.groups.items) {
 		ajax_result.groups.items.forEach((group: any) => {
 			let name = group.name;
-			if (!name.match(/(^org|jira|atlassian|confluence)/i)) {
+			// Filtering groups that have capital letters, a space, or don't have dashes (to remove default groups like "jira-software-users")
+			if (name.match(/([A-Z ]|^[^-]+$)/)) {
 				groups.push(group.name);
 			}
 		});

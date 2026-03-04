@@ -1,5 +1,5 @@
 import { Delete } from "@mui/icons-material";
-import { Button, InputLabel, TextField } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, InputLabel, TextField } from "@mui/material";
 import type { RoutePageProps } from "@src/Api";
 import Strike from "@tiptap/extension-strike";
 import { useEditor } from "@tiptap/react";
@@ -78,6 +78,7 @@ const stringHtmlToArrayOfNodes = (str: string) => {
 
 const SortListPage = () => {
 	const [searchTerm, setSearchTerm] = useState<string>("");
+	const [addDate, setAddDate] = useState<boolean>(false);
 	const [size, setSize] = useState<string>("32px");
 	const rteRef = useRef<RichTextEditorRef>(null);
 	const [list, setList] = useState<string>(() => window.localStorage.getItem("getSortList") || "<p></p>");
@@ -171,10 +172,18 @@ const SortListPage = () => {
 				value={searchTerm}
 				onChange={(e) => setSearchTerm(e.target.value)}
 			/>
+			<FormControlLabel
+				control={<Checkbox checked={addDate} onChange={(e) => setAddDate(e.target.checked)} />}
+				label="Add Date"
+			/>
 			<Button
 				disabled={!searchTerm.trim()}
 				onClick={() => {
-					const newList = list + "<p>" + searchTerm + "</p>";
+					let newTerm = searchTerm.trim();
+					if (addDate) {
+						newTerm += " - " + new Date().toISOString().split("T")[0];
+					}
+					const newList = list + "<p>" + newTerm + "</p>";
 					sortList(newList);
 					setSearchTerm("");
 				}}

@@ -256,12 +256,13 @@ proxies["/src/Server"] = {
 		log("Blocked", req, "", "access attempt");
 		if (res) {
 			res.writeHead(404, { "Content-Type": "text/plain" });
+			res.end("Not Found");
 		}
 		return false;
 	},
 };
 
-proxies["^(?!/(index\\.html|vacation\\.csv))/[^/]+\\.[^/]+$"] = {
+proxies["^(?!/(index\\.html|vacation\\.csv|favicon\\.ico))/[^/]+\\.[^/]+$"] = {
 	// This is a catch all for any request that looks like it's trying to access a file directly at the root, except for index.html and vacation.csv which need to be accessed directly
 	target: INTERNAL_URL,
 	changeOrigin: true,
@@ -269,6 +270,34 @@ proxies["^(?!/(index\\.html|vacation\\.csv))/[^/]+\\.[^/]+$"] = {
 		log("Blocked", req, "", "access attempt");
 		if (res) {
 			res.writeHead(404, { "Content-Type": "text/plain" });
+			res.end("Not Found");
+		}
+		return false;
+	},
+};
+
+proxies["/"] = {
+	target: INTERNAL_URL,
+	changeOrigin: true,
+	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+		const maliciousIpPattern =
+			/^(204\.76\.|36\.70\.|45\.148\.10\.151|195\.178\.110\.15|2\.57\.121\.25|2\.57\.122\.238|92\.118\.39\.56|15\.197\.148\.33|172\.67\.128\.220|173\.254\.31\.34|216\.144\.210\.189|89\.124\.77\.148|128\.71\.76\.84|5\.34\.98\.239|67\.213|64\.62\.156)/;
+		const clientIp = req.socket?.remoteAddress;
+		if (req && req.url) {
+			if (clientIp && !clientIp.match(/96\.230\.98/)) {
+				log("REQUEST", req, "", "received from outside IP:");
+			} else if (!req.url.match(/^\/(src|node_modules|@|vacation.csv|ducks)/)) {
+				log("REQUEST", req, "", "received:");
+			}
+			if (clientIp && maliciousIpPattern.test(clientIp)) {
+				log("Blocked", req, "", "access attempt from suspicious IP:");
+				if (res) {
+					res.writeHead(404, { "Content-Type": "text/plain" });
+					res.end("Not Found");
+				}
+				return false;
+			}
+			return req.url;
 		}
 		return false;
 	},

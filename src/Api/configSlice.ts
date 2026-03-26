@@ -22,6 +22,7 @@ const initialState: ConfigProps & LoadedSlice = {
 	ALLOW_CONFIG_EDIT: true,
 	ALLOW_DASHBOARD_EDIT: true,
 	DUCKS: [],
+	CUSTOM_NAV_LINKS: {},
 	loaded: null,
 };
 

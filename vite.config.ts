@@ -25,6 +25,8 @@ const FORBIDDEN_HTTP2_HEADERS = ["connection", "keep-alive", "proxy-connection",
 
 const INTERNAL_URL = (config.USE_SSL ? "https" : "http") + "://127.0.0.1:" + config.PORT;
 const log = (type: string, req: IncomingMessage, url_start: string | null, message: string) => {
+	const userAgent = req.headers["user-agent"] || "unknown";
+	const remoteIp = req.socket.remoteAddress || "unknown";
 	console.log(
 		new Date().toISOString() +
 			" " +
@@ -35,7 +37,7 @@ const log = (type: string, req: IncomingMessage, url_start: string | null, messa
 			" request: " +
 			(url_start || "") +
 			(req.url || "") +
-			(type == "CACHE" ? "" : " from IP:" + (req.socket.remoteAddress || "unknown")),
+			(type === "CACHE" ? "" : ` from IP:${remoteIp}, User Agent:${userAgent}`),
 	);
 };
 
@@ -281,14 +283,9 @@ proxies["/"] = {
 	changeOrigin: true,
 	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
 		const maliciousIpPattern =
-			/^(204\.76\.|36\.70\.|45\.148\.10\.151|195\.178\.110\.15|2\.57\.121\.25|2\.57\.122\.238|92\.118\.39\.56|15\.197\.148\.33|172\.67\.128\.220|173\.254\.31\.34|216\.144\.210\.189|89\.124\.77\.148|128\.71\.76\.84|5\.34\.98\.239|67\.213|64\.62\.156)/;
+			/^(27.115\.|204\.76\.|36\.70\.|45\.148\.10\.151|195\.178\.110\.15|2\.57\.121\.25|2\.57\.122\.238|92\.118\.39\.56|15\.197\.148\.33|172\.67\.128\.220|173\.254\.31\.34|216\.144\.210\.189|89\.124\.77\.148|128\.71\.76\.84|5\.34\.98\.239|67\.213|64\.62\.156)/;
 		const clientIp = req.socket?.remoteAddress;
 		if (req && req.url) {
-			if (clientIp && !clientIp.match(/96\.230\.98/)) {
-				log("REQUEST", req, "", "received from outside IP:");
-			} else if (!req.url.match(/^\/(src|node_modules|@|vacation.csv|ducks)/)) {
-				log("REQUEST", req, "", "received:");
-			}
 			if (clientIp && maliciousIpPattern.test(clientIp)) {
 				log("Blocked", req, "", "access attempt from suspicious IP:");
 				if (res) {
@@ -296,6 +293,11 @@ proxies["/"] = {
 					res.end("Not Found");
 				}
 				return false;
+			}
+			if (clientIp && !clientIp.match(/96\.230\.98/)) {
+				log("REQUEST", req, "", "received from outside IP:");
+			} else if (!req.url.match(/^\/(src|node_modules|@|vacation.csv|ducks)/)) {
+				log("REQUEST", req, "", "received:");
 			}
 			return req.url;
 		}

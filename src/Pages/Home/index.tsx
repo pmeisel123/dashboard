@@ -123,6 +123,36 @@ const HomePage = () => {
 					})}
 				</>
 			)}
+
+			{config.CUSTOM_NAV_LINKS && (
+				<div>
+				<span style={{ display: "block", margin: "10px 0", fontWeight: "bold" }}>Custom Links</span>
+				{
+				Object.keys(config.CUSTOM_NAV_LINKS)
+					.sort(
+						(a, b) =>
+							(config.CUSTOM_NAV_LINKS?.[a]?.sort ?? 0) - (config.CUSTOM_NAV_LINKS?.[b]?.sort ?? 0),
+					)
+					.map((key) => {
+						const linkData = config.CUSTOM_NAV_LINKS?.[key];
+						if (!linkData) return null;
+
+						return (
+							<ListItem disablePadding key={key}>
+								<ListItemButton
+									title={key}
+									component={Link}
+									to={linkData.url}
+									selected={location.pathname === linkData.url}
+									target={linkData.url.startsWith("http") ? "_blank" : undefined}
+								>
+									<ListItemText primary={key} />
+								</ListItemButton>
+							</ListItem>
+						);
+					})}
+				</div>
+			)}
 			<SavePageList />
 		</Box>
 	);

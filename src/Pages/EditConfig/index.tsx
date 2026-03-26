@@ -6,6 +6,7 @@ import type {
 	ConfigProps,
 	ConfigPropsFile,
 	CustomFieldsObjectProps,
+	CustomNavLinks,
 	DashboardProps,
 	RepoNamePaths,
 	VacationKeyType,
@@ -14,6 +15,7 @@ import type { SyntheticEvent } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { EditCustonNavTab } from "./customnav";
 import { EditDashboardConfigTab } from "./dashboard";
 import { EditGitConfigTab } from "./git";
 import { EditJiraConfigTab } from "./jira";
@@ -44,6 +46,7 @@ function EditConfigPage() {
 	const [allowDashboardEdit, setAllowDashboardEdit] = useState<boolean>(true);
 	const [editApiKey, setEditApiKey] = useState<boolean>(true);
 	const [editToken, setEditToken] = useState<boolean>(true);
+	const [links, setLinks] = useState<{ [key: string]: CustomNavLinks }>({});
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -95,6 +98,7 @@ function EditConfigPage() {
 		setGitRepoPaths(config.GIT_REPOS_PATHS);
 		setAllowConfigEdit(config.ALLOW_CONFIG_EDIT);
 		setAllowDashboardEdit(config.ALLOW_DASHBOARD_EDIT);
+		setLinks(config.CUSTOM_NAV_LINKS || {});
 	}, [config]);
 
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
@@ -129,6 +133,7 @@ function EditConfigPage() {
 			DASHBOARD_SPEED_SECONDS: dashboardSpeed,
 			DONE_STATUS: doneStatus,
 			GITREPOS: repos,
+			CUSTOM_NAV_LINKS: links || {},
 		};
 		postConfigApi(newConfig).then(() => {
 			if (useSsl != config.USE_SSL || host != config.HOST || port != config.PORT) {
@@ -164,6 +169,7 @@ function EditConfigPage() {
 					<Tab label="Jira" value="Jira" />
 					<Tab label="Git" value="Git" />
 					<Tab label="Dashboards" value="Dashboards" />
+					<Tab label="Custon Links" value="CustonLinks" />
 				</TabList>
 				<Button
 					variant="contained"
@@ -243,6 +249,9 @@ function EditConfigPage() {
 							ALLOW_DASHBOARD_EDIT: false to ALLOW_DASHBOARD_EDIT: true
 						</Alert>
 					)}
+				</TabPanel>
+				<TabPanel value="CustonLinks">
+					<EditCustonNavTab links={links} setLinks={setLinks} />
 				</TabPanel>
 			</TabContext>
 			<Button variant="contained" onClick={save} sx={{ width: "4em" }} disabled={!config.ALLOW_CONFIG_EDIT}>

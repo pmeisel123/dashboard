@@ -62,6 +62,11 @@ export interface EditableRow {
 	key: string;
 }
 
+export interface CustomNavLinks {
+	url: string;
+	sort: number;
+}
+
 export interface ConfigProps {
 	ALLOW_VACATION_EDITS: boolean;
 	API_CONFLUENCE_URL: string;
@@ -81,6 +86,7 @@ export interface ConfigProps {
 	ALLOW_CONFIG_EDIT: boolean;
 	ALLOW_DASHBOARD_EDIT: boolean;
 	DUCKS: string[];
+	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 }
 
 export interface ConfigPropsFile {
@@ -102,6 +108,7 @@ export interface ConfigPropsFile {
 	USE_SSL: boolean;
 	VACATION_KEY: VacationKeyType;
 	GITREPOS: ReposProps[];
+	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 }
 
 export interface LoadedSlice {

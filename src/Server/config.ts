@@ -113,6 +113,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			VACATION_KEY: configFile.VACATION_KEY,
 			GIT_REPOS_PATHS: git_proxies_name_path,
 			DUCKS: ducks,
+			CUSTOM_NAV_LINKS: configFile.CUSTOM_NAV_LINKS || {},
 		};
 		return JSON.stringify(config, null, 2);
 	}
@@ -145,6 +146,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			DONE_STATUS: configBody.DONE_STATUS.sort((a, b) => {
 				return a.localeCompare(b, undefined, { sensitivity: "base" });
 			}),
+			CUSTOM_NAV_LINKS: configFile.ALLOW_CONFIG_EDIT ? configBody.CUSTOM_NAV_LINKS : configFile.CUSTOM_NAV_LINKS,
 		};
 
 		if (existsSync(filePath)) {

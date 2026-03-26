@@ -60,6 +60,31 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 						</ListItem>
 					);
 				})}
+				{config.CUSTOM_NAV_LINKS &&
+					Object.keys(config.CUSTOM_NAV_LINKS)
+						.sort(
+							(a, b) =>
+								(config.CUSTOM_NAV_LINKS?.[a]?.sort ?? 0) - (config.CUSTOM_NAV_LINKS?.[b]?.sort ?? 0),
+						)
+						.map((key) => {
+							const linkData = config.CUSTOM_NAV_LINKS?.[key];
+							if (!linkData) return null;
+
+							return (
+								<ListItem disablePadding key={key}>
+									<ListItemButton
+										title={key}
+										component={Link}
+										to={linkData.url}
+										onClick={handleClick}
+										selected={location.pathname + location.search === linkData.url}
+										target={linkData.url.startsWith("http") ? "_blank" : undefined}
+									>
+										<ListItemText primary={key} />
+									</ListItemButton>
+								</ListItem>
+							);
+						})}
 			</List>
 			<SavePageList width={width} parentHandleClick={handleClick} />
 		</Drawer>

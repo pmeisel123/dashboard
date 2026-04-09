@@ -18,16 +18,16 @@ import {
 } from "mui-tiptap";
 import type { FC } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const FuzzySearchComponent: FC<{
 	listString: string;
 	searchTerm: string;
-	removeItem: (prevState: string) => void;
+	removeItem: (text: string) => void;
 }> = ({ listString, searchTerm, removeItem }) => {
 	const list = useMemo(() => {
 		if (!listString) return [];
-		const template = document.createElement("template");
-		template.innerHTML = listString.trim();
+		if (typeof document === "undefined") return [];
 		return stringHtmlToArrayOfNodes(listString).map((el, index) => ({
 			id: index.toString(),
 			name: el.textContent?.trim() || "",
@@ -35,11 +35,14 @@ const FuzzySearchComponent: FC<{
 		}));
 	}, [listString]);
 
-	const fuseOptions = {
-		keys: ["name"],
-		threshold: 0.3, // Match sensitivity (0.0 requires perfect match, 1.0 matches anything)
-		ignoreLocation: true,
-	};
+	const fuseOptions = useMemo(
+		() => ({
+			keys: ["name"],
+			threshold: 0.3, // Match sensitivity (0.0 requires perfect match, 1.0 matches anything)
+			ignoreLocation: true,
+		}),
+		[],
+	);
 
 	const fuse = useMemo(() => new Fuse(list, fuseOptions), [list, fuseOptions]);
 
@@ -70,27 +73,46 @@ const FuzzySearchComponent: FC<{
 	);
 };
 
-const stringHtmlToArrayOfNodes = (str: string) => {
+const stringHtmlToArrayOfNodes = (str: string): HTMLElement[] => {
+	if (typeof document === "undefined") return [];
 	const template = document.createElement("template");
-	template.innerHTML = str.trim();
-	return Array.from(template.content.children);
+	template.innerHTML = (str || "").trim();
+	return Array.from(template.content.children) as HTMLElement[];
 };
 
 const SortListPage = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [searchTerm, setSearchTerm] = useState<string>("");
-	const [addDate, setAddDate] = useState<boolean>(false);
+	const [addDate, setAddDate] = useState<boolean>(searchParams.get("addDate") === "true");
 	const [size, setSize] = useState<string>("32px");
 	const rteRef = useRef<RichTextEditorRef>(null);
-	const [list, setList] = useState<string>(() => window.localStorage.getItem("getSortList") || "<p></p>");
+	const [list, setList] = useState<string>(() =>
+		typeof window !== "undefined" ? window.localStorage.getItem("getSortList") || "<p></p>" : "<p></p>",
+	);
 	useEffect(() => {
 		const handler = setTimeout(() => {
-			window.localStorage.setItem("getSortList", list);
+			try {
+				if (typeof window !== "undefined") {
+					window.localStorage.setItem("getSortList", list);
+				}
+			} catch (_e) {
+				// ignore storage errors
+			}
 		}, 500);
 		const newSize = Math.max(1, Math.ceil(Math.log10(stringHtmlToArrayOfNodes(list).length + 1)));
 		setSize(newSize * 10 + "px");
 
 		return () => clearTimeout(handler);
 	}, [list]);
+	useEffect(() => {
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (addDate) {
+			newSearchParams.set("addDate", "true");
+		} else {
+			newSearchParams.delete("addDate");
+		}
+		setSearchParams(newSearchParams);
+	}, [addDate]);
 	const editorStyles = {
 		"& .ProseMirror": {
 			counterReset: "line",
@@ -125,31 +147,35 @@ const SortListPage = () => {
 	});
 	const updateList = (items: HTMLElement[]) => {
 		const newHtml = items.map((item) => item.outerHTML).join("");
-		editor.commands.setContent(newHtml);
+		if (editor && editor.commands) {
+			editor.commands.setContent(newHtml);
+		}
 		setList(newHtml);
 	};
 
 	const removeItem = (text: string) => {
-		const items = stringHtmlToArrayOfNodes(list).filter(
-			(node) => node.textContent && node.textContent.trim() !== "" && node.textContent?.trim() !== text.trim(),
-		) as HTMLElement[];
+		const items = stringHtmlToArrayOfNodes(list).filter((node) => {
+			const txt = (node.textContent || "").trim();
+			return txt !== "" && txt !== text.trim();
+		}) as HTMLElement[];
 		updateList(items);
 	};
 	const dedupeAndSortList = (contentToDedupe = list) => {
 		if (!contentToDedupe) return;
-		const items = stringHtmlToArrayOfNodes(contentToDedupe);
-		const uniqueMap = new Map();
+		const items = stringHtmlToArrayOfNodes(contentToDedupe).filter((n) => (n.textContent || "").trim() !== "");
+		const uniqueMap = new Map<string, HTMLElement>();
 		items.forEach((item) => {
-			if (!uniqueMap.has(item.textContent || "")) {
-				uniqueMap.set(item.textContent || "", item);
+			const key = (item.textContent || "").trim();
+			if (key && !uniqueMap.has(key)) {
+				uniqueMap.set(key, item);
 			}
-			const result = Array.from(uniqueMap.values()).sort((a, b) => {
-				const aText = a.textContent || "";
-				const bText = b.textContent || "";
-				return aText.toLowerCase().localeCompare(bText.toLowerCase());
-			});
-			updateList(result);
 		});
+		const result = Array.from(uniqueMap.values()).sort((a, b) => {
+			const aText = (a.textContent || "").toLowerCase();
+			const bText = (b.textContent || "").toLowerCase();
+			return aText.localeCompare(bText);
+		});
+		updateList(result);
 	};
 	const sortList = (contentToSort = list) => {
 		if (!contentToSort) return;

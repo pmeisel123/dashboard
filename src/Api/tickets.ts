@@ -3,10 +3,10 @@ import type { ConfigProps, CustomFieldsFromJiraProps, TicketProps } from "./Type
 
 const getNameFromPerson = (person: any): string | null => {
 	return person?.displayName ?? null;
-}
+};
 const getIdFromPerson = (person: any): string | null => {
 	return person?.accountId ?? null;
-}
+};
 
 const convertEstimateToDays = (estimate?: number | null): number | null => {
 	if (typeof estimate === "number" && !isNaN(estimate)) {
@@ -14,7 +14,7 @@ const convertEstimateToDays = (estimate?: number | null): number | null => {
 		return estimate / (60 * 60 * 8);
 	}
 	return null;
-}
+};
 
 const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null => {
 	if (!issue?.fields) return null;
@@ -99,7 +99,7 @@ const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null =>
 		blocks: blocks,
 		blocked_by: blocked_by,
 	};
-}
+};
 
 export const getTicketsApi = async (search: string, config: ConfigProps): Promise<TicketProps[]> => {
 	const extraFieldsArray = config.CUSTOM_FIELDS ? Object.keys(config.CUSTOM_FIELDS) : [];

@@ -1,13 +1,14 @@
+// https://github.com/pmeisel123/dashboard/blob/main/src/Api/tickets.ts
 import type { ConfigProps, CustomFieldsFromJiraProps, TicketProps } from "./Types";
 
-function getNameFromPerson(person: any): string | null {
+const getNameFromPerson = (person: any): string | null => {
 	return person?.displayName ?? null;
 }
-function getIdFromPerson(person: any): string | null {
+const getIdFromPerson = (person: any): string | null => {
 	return person?.accountId ?? null;
 }
 
-function convertEstimateToDays(estimate?: number | null): number | null {
+const convertEstimateToDays = (estimate?: number | null): number | null => {
 	if (typeof estimate === "number" && !isNaN(estimate)) {
 		// Default Jira assumes 8 hours in a day
 		return estimate / (60 * 60 * 8);
@@ -15,7 +16,7 @@ function convertEstimateToDays(estimate?: number | null): number | null {
 	return null;
 }
 
-function ticketFromIssue(issue: any, config: ConfigProps): TicketProps | null {
+const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null => {
 	if (!issue?.fields) return null;
 
 	const fields = issue.fields;

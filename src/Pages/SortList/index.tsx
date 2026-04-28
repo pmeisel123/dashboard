@@ -1,7 +1,6 @@
 import { Delete } from "@mui/icons-material";
 import { Button, Checkbox, FormControlLabel, InputLabel, TextField } from "@mui/material";
 import type { RoutePageProps } from "@src/Api";
-import Strike from "@tiptap/extension-strike";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Fuse from "fuse.js";
@@ -167,7 +166,7 @@ const SortListPage = () => {
 		},
 	};
 	const editor = useEditor({
-		extensions: [StarterKit, Strike],
+		extensions: [StarterKit],
 		content: list,
 		onUpdate: ({ editor }) => {
 			const html = editor.getHTML();

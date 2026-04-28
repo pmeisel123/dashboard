@@ -25,6 +25,17 @@ const FuzzySearchComponent: FC<{
 	searchTerm: string;
 	removeItem: (text: string) => void;
 }> = ({ listString, searchTerm, removeItem }) => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [sortDate, setSortDate] = useState<boolean>(searchParams.get("sortDate") === "true");
+	useEffect(() => {
+		const newSearchParams = new URLSearchParams(searchParams.toString());
+		if (sortDate) {
+			newSearchParams.set("sortDate", "true");
+		} else {
+			newSearchParams.delete("sortDate");
+		}
+		setSearchParams(newSearchParams);
+	}, [sortDate]);
 	const list = useMemo(() => {
 		if (!listString) return [];
 		if (typeof document === "undefined") return [];
@@ -53,15 +64,33 @@ const FuzzySearchComponent: FC<{
 		return fuse.search(searchTerm).map((result) => result.item);
 	}, [searchTerm, fuse]);
 
+
+	const dateRegex = /- (\d{4}-\d{2}-\d{2})$/;
+	const processedResults = useMemo(() => {
+		if (!sortDate) return results;
+
+		return [...results].sort((a, b) => {
+			const aDate = new Date(a.name.match(dateRegex)?.[1] || 0);
+			const bDate = new Date(b.name.match(dateRegex)?.[1] || 0);
+			return bDate.getTime() - aDate.getTime();
+		});
+	}, [results, sortDate]);
+
 	if (!searchTerm) {
 		return null;
 	}
 	return (
 		<div>
 			Matches for "<strong>{searchTerm}</strong>":
+			<br />
+			<FormControlLabel
+				control={<Checkbox size="small" checked={sortDate} onChange={(e) => setSortDate(e.target.checked)} />}
+				label="Sort By Date"
+				slotProps={{ typography: { variant: "body2", fontSize: "0.8rem" } }}
+			/>
 			<ul>
-				{results.map((item) => (
-					<li key={item.id}>
+				{processedResults.map((item) => (
+					<li key={sortDate + " " + item.id}>
 						<span dangerouslySetInnerHTML={{ __html: item.description }} />
 						<Button onClick={() => removeItem(item.name)}>
 							<Delete color="error" />

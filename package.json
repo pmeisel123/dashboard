@@ -8,7 +8,10 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"prettier": "npx prettier --write ."
+		"prettier": "npx prettier --write .",
+		"test": "vitest",
+		"test:ui": "vitest --ui",
+		"test:run": "vitest run"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",

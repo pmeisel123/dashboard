@@ -5,7 +5,7 @@ import { IncomingMessage, ServerResponse } from "node:http";
 import zlib from "node:zlib";
 import path from "path";
 import type { ProxyOptions } from "vite";
-import { defineConfig } from "vite";
+import { defineConfig } from 'vitest/config'
 import ViteRestart from "vite-plugin-restart";
 import type { ConfigPropsFile, RepoNamePaths } from "./src/Api/Types";
 import { Server, loadConfig } from "./src/Server/";
@@ -234,7 +234,7 @@ proxies["/server/"] = {
 	},
 };
 
-proxies["^/.*\\.(git|env|crt|pem)"] = {
+proxies["^/.*\\.(git|env|crt|pem|test.ts)"] = {
 	target: INTERNAL_URL,
 	changeOrigin: true,
 	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
@@ -307,6 +307,10 @@ proxies["/"] = {
 
 // https://vite.dev/config/
 export default defineConfig({
+	test: {
+	    globals: true,
+	    environment: 'node',
+	  },
 	server: {
 		host: "0.0.0.0",
 		port: config.PORT,

@@ -310,6 +310,7 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: "node",
+		setupFiles: ["./vitest.setup.ts"],
 	},
 	server: {
 		host: "0.0.0.0",

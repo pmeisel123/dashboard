@@ -5,8 +5,8 @@ import { IncomingMessage, ServerResponse } from "node:http";
 import zlib from "node:zlib";
 import path from "path";
 import type { ProxyOptions } from "vite";
-import { defineConfig } from 'vitest/config'
 import ViteRestart from "vite-plugin-restart";
+import { defineConfig } from "vitest/config";
 import type { ConfigPropsFile, RepoNamePaths } from "./src/Api/Types";
 import { Server, loadConfig } from "./src/Server/";
 
@@ -308,9 +308,9 @@ proxies["/"] = {
 // https://vite.dev/config/
 export default defineConfig({
 	test: {
-	    globals: true,
-	    environment: 'node',
-	  },
+		globals: true,
+		environment: "node",
+	},
 	server: {
 		host: "0.0.0.0",
 		port: config.PORT,
@@ -329,10 +329,12 @@ export default defineConfig({
 	},
 	plugins: [
 		react(),
-		config.USE_SSL ? basicSsl({
-			certDir: './certs/',
-			name: 'dashboard',
-		}) : null,
+		config.USE_SSL
+			? basicSsl({
+					certDir: "./certs/",
+					name: "dashboard",
+				})
+			: null,
 		ViteRestart({
 			restart: ["./config.json"],
 		}),

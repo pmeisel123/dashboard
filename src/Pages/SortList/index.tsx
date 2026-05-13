@@ -63,7 +63,6 @@ const FuzzySearchComponent: FC<{
 		return fuse.search(searchTerm).map((result) => result.item);
 	}, [searchTerm, fuse]);
 
-
 	const dateRegex = /- (\d{4}-\d{2}-\d{2})$/;
 	const processedResults = useMemo(() => {
 		if (!sortDate) return results;

@@ -325,7 +325,10 @@ export default defineConfig({
 	},
 	plugins: [
 		react(),
-		config.USE_SSL ? basicSsl() : null,
+		config.USE_SSL ? basicSsl({
+			certDir: './certs/',
+			name: 'dashboard',
+		}) : null,
 		ViteRestart({
 			restart: ["./config.json"],
 		}),

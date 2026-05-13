@@ -214,8 +214,6 @@ vi.mock("@src/Api", async (importOriginal) => {
 vi.mock("@src/Pages/pageRegistry", async (importOriginal) => {
 	if (process.env.SKIP_TEST_MOCKS === "1") return await importOriginal();
 
-	console.log("--- @src/Pages/pageRegistry is successfully mocked globally! ---");
-
 	return {
 		getDynamicPages: () => [
 			{

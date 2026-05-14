@@ -1,5 +1,5 @@
 {
-	"name": "validator",
+	"name": "dashboard",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
@@ -11,7 +11,8 @@
 		"prettier": "npx prettier --write .",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
-		"test:run": "vitest run"
+		"test:run": "vitest run",
+		"test:summary": "vitest run --reporter=dot --silent"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",

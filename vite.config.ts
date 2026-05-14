@@ -205,7 +205,7 @@ config.GITREPOS.forEach((repo, index: number) => {
 		Accept: "application/vnd.github+json",
 		Authorization: "Bearer " + config.GITTOKEN,
 		"X-GitHub-Api-Version": "2022-11-28",
-		"User-Agent": "validator",
+		"User-Agent": "dashboard",
 	});
 });
 

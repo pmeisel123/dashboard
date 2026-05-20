@@ -1,5 +1,5 @@
 import { Delete } from "@mui/icons-material";
-import { Button, Checkbox, FormControlLabel, InputLabel, TextField } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { RoutePageProps } from "@src/Api";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -19,6 +19,14 @@ import type { FC } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
+const THRESHOLD_OPTIONS = [
+	{ value: 0, label: "Exact Match Only" },
+	{ value: 2, label: "Strict" },
+	{ value: 4, label: "Balanced" },
+	{ value: 6, label: "Loose" },
+	{ value: 8, label: "Very Loose" },
+	{ value: 10, label: "Match Anything" },
+];
 const FuzzySearchComponent: FC<{
 	listString: string;
 	searchTerm: string;
@@ -26,6 +34,9 @@ const FuzzySearchComponent: FC<{
 }> = ({ listString, searchTerm, removeItem }) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [sortDate, setSortDate] = useState<boolean>(searchParams.get("sortDate") === "true");
+	const [threshold, setThreshold] = useState<number>(
+		searchParams.get("threshold") ? parseInt(searchParams.get("threshold") as string) : 4,
+	);
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
 		if (sortDate) {
@@ -33,8 +44,13 @@ const FuzzySearchComponent: FC<{
 		} else {
 			newSearchParams.delete("sortDate");
 		}
+		if (threshold !== 4) {
+			newSearchParams.set("threshold", threshold.toString());
+		} else {
+			newSearchParams.delete("threshold");
+		}
 		setSearchParams(newSearchParams);
-	}, [sortDate]);
+	}, [sortDate, threshold]);
 	const list = useMemo(() => {
 		if (!listString) return [];
 		if (typeof document === "undefined") return [];
@@ -48,10 +64,10 @@ const FuzzySearchComponent: FC<{
 	const fuseOptions = useMemo(
 		() => ({
 			keys: ["name"],
-			threshold: 0.3, // Match sensitivity (0.0 requires perfect match, 1.0 matches anything)
+			threshold: threshold / 10,
 			ignoreLocation: true,
 		}),
-		[],
+		[threshold],
 	);
 
 	const fuse = useMemo(() => new Fuse(list, fuseOptions), [list, fuseOptions]);
@@ -72,7 +88,7 @@ const FuzzySearchComponent: FC<{
 			const bDate = new Date(b.name.match(dateRegex)?.[1] || 0);
 			return bDate.getTime() - aDate.getTime();
 		});
-	}, [results, sortDate]);
+	}, [results, sortDate, threshold]);
 
 	if (!searchTerm) {
 		return null;
@@ -85,6 +101,29 @@ const FuzzySearchComponent: FC<{
 				control={<Checkbox size="small" checked={sortDate} onChange={(e) => setSortDate(e.target.checked)} />}
 				label="Sort By Date"
 				slotProps={{ typography: { variant: "body2", fontSize: "0.8rem" } }}
+			/>
+			<FormControlLabel
+				label="Search Threshold"
+				slotProps={{ typography: { variant: "body2", fontSize: "0.8rem" } }}
+				control={
+					<Select
+						size="small"
+						value={threshold}
+						onChange={(e) => setThreshold(Number(e.target.value))}
+						sx={{
+							fontSize: "0.8rem",
+							minWidth: 150,
+							ml: 1,
+							mr: 1,
+						}}
+					>
+						{THRESHOLD_OPTIONS.map((option) => (
+							<MenuItem key={option.value} value={option.value} sx={{ fontSize: "0.8rem" }}>
+								{option.label}
+							</MenuItem>
+						))}
+					</Select>
+				}
 			/>
 			<ul>
 				{processedResults.map((item) => (

@@ -322,6 +322,9 @@ export default defineConfig({
 			// this should be redundant with the proxy rules but is an extra layer of security to prevent accidental exposure of sensitive files
 			deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "**/src/Server/**"],
 		},
+		warmup: {
+			clientFiles: ["./src/main.tsx", "./index.html"],
+		},
 	},
 	resolve: {
 		alias: {
@@ -342,6 +345,7 @@ export default defineConfig({
 	],
 	optimizeDeps: {
 		include: ["@mui/x-data-grid"],
+		holdUntilCrawlEnd: true,
 	},
 	publicDir: "src/assets",
 });

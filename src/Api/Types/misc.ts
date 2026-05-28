@@ -87,6 +87,7 @@ export interface ConfigProps {
 	ALLOW_DASHBOARD_EDIT: boolean;
 	DUCKS: string[];
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
+	GEMINI_API_KEY_DEFINED: boolean;
 }
 
 export interface ConfigPropsFile {
@@ -109,6 +110,7 @@ export interface ConfigPropsFile {
 	VACATION_KEY: VacationKeyType;
 	GITREPOS: ReposProps[];
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
+	GEMINI_API_KEYS: string[];
 }
 
 export interface LoadedSlice {

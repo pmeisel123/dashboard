@@ -10,7 +10,7 @@ export const getConfigApi = async () => {
 		},
 	};
 	let response = await fetch(url, paramaters);
-	const ajax_result: ConfigProps = await response.json();
+	const ajax_result = (await response.json()) as ConfigProps;
 	return ajax_result;
 };
 
@@ -25,6 +25,6 @@ export const postConfigApi = async (config: ConfigPropsFile) => {
 		body: JSON.stringify(config),
 	};
 	const response = await fetch(url, requestOptions);
-	const data = await response;
+	const data = response;
 	return data;
 };

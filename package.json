@@ -17,6 +17,7 @@
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.1",
+		"@google/genai": "^2.5.0",
 		"@hebcal/cities": "^6.1.0",
 		"@hebcal/core": "^6.0.6",
 		"@jalez/react-flow-automated-layout": "^1.2.4",

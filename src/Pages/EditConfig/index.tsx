@@ -18,6 +18,7 @@ import { useSearchParams } from "react-router-dom";
 import { EditCustonNavTab } from "./customnav";
 import { EditDashboardConfigTab } from "./dashboard";
 import { EditGitConfigTab } from "./git";
+import { EditGoogleGeminiConfigTab } from "./googleapi";
 import { EditJiraConfigTab } from "./jira";
 import { EditMiscellaneousConfigTab } from "./miscellaneous";
 
@@ -46,6 +47,8 @@ function EditConfigPage() {
 	const [allowDashboardEdit, setAllowDashboardEdit] = useState<boolean>(true);
 	const [editApiKey, setEditApiKey] = useState<boolean>(true);
 	const [editToken, setEditToken] = useState<boolean>(true);
+	const [geminiApiKeys, setGeminiApiKeys] = useState<string[]>([]);
+	const [editGeminiApiKeys, setEditGeminiApiKeys] = useState<boolean>(true);
 	const [links, setLinks] = useState<{ [key: string]: CustomNavLinks }>({});
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
@@ -99,6 +102,7 @@ function EditConfigPage() {
 		setAllowConfigEdit(config.ALLOW_CONFIG_EDIT);
 		setAllowDashboardEdit(config.ALLOW_DASHBOARD_EDIT);
 		setLinks(config.CUSTOM_NAV_LINKS || {});
+		setEditGeminiApiKeys(!config.GEMINI_API_KEY_DEFINED);
 	}, [config]);
 
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
@@ -134,6 +138,7 @@ function EditConfigPage() {
 			DONE_STATUS: doneStatus,
 			GITREPOS: repos,
 			CUSTOM_NAV_LINKS: links || {},
+			GEMINI_API_KEYS: geminiApiKeys,
 		};
 		postConfigApi(newConfig).then(() => {
 			if (useSsl != config.USE_SSL || host != config.HOST || port != config.PORT) {
@@ -168,6 +173,7 @@ function EditConfigPage() {
 					<Tab label="Miscellaneous" value="Miscellaneous" />
 					<Tab label="Jira" value="Jira" />
 					<Tab label="Git" value="Git" />
+					<Tab label="Google Gemini" value="GoogleGemini" />
 					<Tab label="Dashboards" value="Dashboards" />
 					<Tab label="Custon Links" value="CustonLinks" />
 				</TabList>
@@ -227,6 +233,14 @@ function EditConfigPage() {
 						setGitRepoPaths={setGitRepoPaths}
 						editToken={editToken}
 						setEditToken={setEditToken}
+					/>
+				</TabPanel>
+				<TabPanel value="GoogleGemini">
+					<EditGoogleGeminiConfigTab
+						geminiApiKeys={geminiApiKeys}
+						setGeminiApiKeys={setGeminiApiKeys}
+						editGeminiApiKeys={editGeminiApiKeys}
+						setEditGeminiApiKeys={setEditGeminiApiKeys}
 					/>
 				</TabPanel>
 				<TabPanel value="Dashboards">

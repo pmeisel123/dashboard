@@ -226,9 +226,10 @@ for (const [url, target] of Object.entries(jira_proxies)) {
 proxies["/server/"] = {
 	target: INTERNAL_URL,
 	changeOrigin: true,
-	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+	bypass: async (req: IncomingMessage, res: ServerResponse | undefined) => {
 		if (res) {
-			Server(req, res);
+			const handled = await Server(req, res);
+			if (handled) return req.url;
 		}
 		return false;
 	},

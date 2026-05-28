@@ -50,7 +50,7 @@ const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps
 };
 
 const TicketTable: FC<{
-	tickets: TicketProps[];
+	tickets: { [key: string]: TicketProps };
 	defaultEstimate: number | null;
 	loading: boolean;
 	totalTimEstimate: number;
@@ -433,13 +433,17 @@ const TicketTable: FC<{
 	}
 
 	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
+		let className = "";
 		if (params.row.isdone) {
-			return "MuiDataGrid-row-done";
+			className += "MuiDataGrid-row-done ";
 		}
 		if (user && params.row.assignee_id != user) {
-			return "MuiDataGrid-row-notowner";
+			className += "MuiDataGrid-row-notowner";
 		}
-		return params.row.isdone ? "MuiDataGrid-row-done" : "";
+		if (params.row.is_epic) {
+			className += "MuiDataGrid-row-epic";
+		}
+		return className;
 	};
 	const getVisibility = () => {
 		if (isDashboard) {
@@ -483,7 +487,7 @@ const TicketTable: FC<{
 							},
 						}}
 						loading={loading}
-						rows={tickets}
+						rows={Object.values(tickets)}
 						columns={columns}
 						getRowClassName={getRowClassName}
 						defaultColumnModel={defaultColumnModel}
@@ -509,7 +513,7 @@ const TicketTable: FC<{
 				</TabPanel>
 				<TabPanel value="flow">
 					<TicketFlow
-						tickets={tickets}
+						tickets={Object.values(tickets)}
 						defaultEstimate={defaultEstimate}
 						config={config}
 						theme={theme}

@@ -13,7 +13,7 @@ import type { rowProp } from "./const";
 const BranchesTable: FC<{
 	ticketsBranches: BranchesAndTicket;
 	allJiraUsersGroups: UsersGroupProps;
-	ticketKeys: { [key: string]: TicketProps };
+	tickets: { [key: string]: TicketProps };
 	isDashboard?: boolean;
 	defaultSort?: string;
 	defaultSortDirection?: "asc" | "desc";
@@ -23,7 +23,7 @@ const BranchesTable: FC<{
 }> = ({
 	ticketsBranches,
 	allJiraUsersGroups,
-	ticketKeys,
+	tickets,
 	isDashboard,
 	defaultSort,
 	defaultSortDirection,
@@ -155,8 +155,8 @@ const BranchesTable: FC<{
 		let ticket_assignee: string | null = null;
 		let ticket_status: string | null = null;
 		let ticket_assignee_id: string | null = null;
-		if (ticket_key && ticket_key in ticketKeys) {
-			const ticket = ticketKeys[ticket_key];
+		if (ticket_key && ticket_key in tickets) {
+			const ticket = tickets[ticket_key];
 			ticket_status = ticket.status;
 			ticket_summary = ticket.summary;
 			ticket_assignee = ticket.assignee;
@@ -223,7 +223,7 @@ const BranchesTable: FC<{
 		});
 		setRows(rows);
 		filterRows(rows);
-	}, [ticketsBranches, allJiraUsersGroups, ticketKeys, loaded]);
+	}, [ticketsBranches, allJiraUsersGroups, tickets, loaded]);
 
 	useEffect(() => {
 		filterRows(rows);

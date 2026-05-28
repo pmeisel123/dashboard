@@ -21,6 +21,9 @@ export interface TicketProps {
 	labels: string[] | null;
 	blocks: string[];
 	blocked_by: string[];
+	is_epic: boolean;
+	child_keys: string[];
+	parent_in_results: boolean;
 }
 
 interface BaseCustomFieldProps {

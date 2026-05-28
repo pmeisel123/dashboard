@@ -29,6 +29,8 @@ const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null =>
 	const summary: string | null = fields.summary ?? null;
 	const created: any = fields.created ?? null;
 	const updated: any = fields.updated ?? null;
+	const is_epic: boolean = fields.issuetype?.name === "Epic";
+	console.log(fields.issuetype);
 	let timeestimate: number | null = fields.timeestimate ?? null;
 	let timeoriginalestimate: number | null = fields.timeoriginalestimate ?? null;
 	let timespent: number | null = fields.timespent ?? null;
@@ -98,20 +100,23 @@ const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null =>
 		customFields: custom_fields,
 		blocks: blocks,
 		blocked_by: blocked_by,
+		is_epic: is_epic,
+		child_keys: [],
+		parent_in_results: false,
 	};
 };
 
-export const getTicketsApi = async (search: string, config: ConfigProps): Promise<TicketProps[]> => {
+export const getTicketsApi = async (search: string, config: ConfigProps): Promise<{ [key: string]: TicketProps }> => {
 	const extraFieldsArray = config.CUSTOM_FIELDS ? Object.keys(config.CUSTOM_FIELDS) : [];
 	const extra_fields = extraFieldsArray.length ? `${extraFieldsArray.join(",")},` : "";
 	const main_url =
 		"/jira/rest/api/3/search/jql?maxResults=5000&validateQuery=1&fields=" +
 		extra_fields +
-		"key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent,labels,issuelinks&jql=" +
+		"key,assignee,creator,status,summary,updated,created,parent,timeoriginalestimate,timeestimate,timespent,labels,issuelinks,issuetype&jql=" +
 		encodeURIComponent(search);
 
 	let last = false;
-	const result: TicketProps[] = [];
+	const result: { [key: string]: TicketProps } = {};
 	let url = main_url;
 	const options: RequestInit = {
 		method: "GET",
@@ -119,16 +124,25 @@ export const getTicketsApi = async (search: string, config: ConfigProps): Promis
 			"Content-Type": "application/json",
 		},
 	};
+	const parentToChildrenMap: { [key: string]: string[] } = {};
 	while (!last) {
 		const response = await fetch(url, options);
 		const ajax_result: any = await response.json();
 		if (ajax_result?.issues) {
 			for (const issue of ajax_result.issues) {
 				const ticket = ticketFromIssue(issue, config);
-				if (ticket != null) result.push(ticket);
+				if (ticket == null) {
+					continue;
+				}
+				if (ticket.parentkey) {
+					if (!parentToChildrenMap[ticket.parentkey]) {
+						parentToChildrenMap[ticket.parentkey] = [];
+					}
+					parentToChildrenMap[ticket.parentkey].push(ticket.key);
+				}
+				result[ticket.key] = ticket;
 			}
 		}
-
 		// If Jira-like pagination is being used via nextPageToken/isLast
 		if (ajax_result?.isLast === false && ajax_result?.nextPageToken) {
 			url = `${main_url}&nextPageToken=${ajax_result.nextPageToken}`;
@@ -136,6 +150,19 @@ export const getTicketsApi = async (search: string, config: ConfigProps): Promis
 			last = true;
 		}
 	}
+
+	for (const parentKey in parentToChildrenMap) {
+		const children = parentToChildrenMap[parentKey];
+		const parentTicket = result[parentKey];
+		if (parentTicket) {
+			parentTicket.child_keys.push(...children);
+			children.forEach((childKey) => {
+				const childTicket = result[childKey];
+				childTicket.parent_in_results = true;
+			});
+		}
+	}
+	console.log(result);
 	return result;
 };
 
@@ -152,4 +179,84 @@ export const getCustomFieldsApi = async (): Promise<CustomFieldsFromJiraProps[]>
 	return (ajax_result || [])
 		.filter((record: any) => typeof record.key === "string" && record.key.startsWith("customfield_"))
 		.map((record: any) => ({ Key: record.key, Name: record.name }));
+};
+
+const getEstimate = (
+	tickets: { [key: string]: TicketProps },
+	ticket: TicketProps,
+	type: "timeestimate" | "timeoriginalestimate" | "timespent",
+	defaultEstimate: number = 0,
+) => {
+	console.log("Calculating " + type + " for ticket " + ticket.key);
+	if (type == "timespent") {
+		return ticket.timespent || 0;
+	}
+	if (ticket.isdone && type == "timeestimate") {
+		console.log(ticket.key + " is done, returning 0 for timeestimate");
+		return 0;
+	}
+	const estimate = ticket[type];
+	if (tickets[ticket.key].child_keys.length > 0) {
+		if (estimate != null) {
+			const children_estimate = getEstimations(tickets, defaultEstimate, 0, tickets[ticket.key].child_keys);
+			let child_estimate = 0;
+			if (type == "timeestimate") {
+				child_estimate = children_estimate.totalTimEstimate;
+			} else if (type == "timeoriginalestimate") {
+				child_estimate = children_estimate.totalTimeOriginalEstimate;
+			}
+			console.log(
+				ticket.key +
+					" has children, parent estimate: " +
+					estimate +
+					", children combined estimate: " +
+					child_estimate,
+			);
+			if (child_estimate < estimate) {
+				return estimate - child_estimate;
+			}
+		}
+		console.log(
+			ticket.key +
+				" has children but no parent estimate, returning 0 for parent and relying on children estimates",
+		);
+		return 0;
+	}
+	if (estimate != null) {
+		console.log(ticket.key + " has no children, returning its own estimate of " + estimate);
+		return estimate;
+	}
+	console.log(ticket.key + " has no estimate, returning default estimate of " + defaultEstimate);
+	return defaultEstimate;
+};
+
+export const getEstimations = (
+	tickets: { [key: string]: TicketProps },
+	defaultEstimate: number = 0,
+	estimatePadding: number = 0,
+	childrenKeys: string[] = [],
+): {
+	totalTimEstimate: number;
+	totalTimeOriginalEstimate: number;
+	totalTimeSpent: number;
+} => {
+	console.log(
+		"Calculating estimations for tickets: " +
+			(childrenKeys.length ? childrenKeys.join(", ") : Object.keys(tickets).join(", ")),
+	);
+	if (Object.values(tickets).length === 0) {
+		return { totalTimEstimate: estimatePadding, totalTimeOriginalEstimate: estimatePadding, totalTimeSpent: 0 };
+	}
+	const ticketKeys = childrenKeys.length > 0 ? childrenKeys : Object.keys(tickets);
+	return ticketKeys.reduce(
+		(acc, key) => {
+			console.log("Processing ticket " + key);
+			const ticket = tickets[key];
+			acc.totalTimEstimate += getEstimate(tickets, ticket, "timeestimate", defaultEstimate);
+			acc.totalTimeOriginalEstimate += getEstimate(tickets, ticket, "timeoriginalestimate", defaultEstimate);
+			acc.totalTimeSpent += getEstimate(tickets, ticket, "timespent", defaultEstimate);
+			return acc;
+		},
+		{ totalTimEstimate: estimatePadding, totalTimeOriginalEstimate: estimatePadding, totalTimeSpent: 0 },
+	);
 };

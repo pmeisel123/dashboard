@@ -25,6 +25,7 @@ export const loadConfig = (): ConfigPropsFile => {
 		API_USERNAME: "",
 		API_KEY: "",
 		API_URL: "",
+		GEMINI_API_KEYS: [],
 		CUSTOM_FIELDS: {},
 		DASHBOARDS: {
 			company: {
@@ -114,6 +115,8 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			GIT_REPOS_PATHS: git_proxies_name_path,
 			DUCKS: ducks,
 			CUSTOM_NAV_LINKS: configFile.CUSTOM_NAV_LINKS || {},
+			GEMINI_API_KEY_DEFINED:
+				configFile.GEMINI_API_KEYS && Object.keys(configFile.GEMINI_API_KEYS).length ? true : false,
 		};
 		return JSON.stringify(config, null, 2);
 	}
@@ -125,6 +128,10 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 		}
 		const configBody: ConfigPropsFile = JSON.parse(requestBody);
 		const hasNewApiCredentials = !!(configBody.API_KEY && configBody.API_USERNAME);
+		const geminiKeyClean = configBody.GEMINI_API_KEYS
+			? configBody.GEMINI_API_KEYS.filter((str) => str.trim() !== "")
+			: [];
+		console.log(geminiKeyClean);
 		const config: ConfigPropsFile = {
 			...configBody,
 
@@ -137,6 +144,8 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 
 			GITTOKEN: configBody.GITTOKEN ? configBody.GITTOKEN : configFile.GITTOKEN,
 			GITREPOS: configBody.GITTOKEN ? configBody.GITREPOS : configFile.GITREPOS,
+
+			GEMINI_API_KEYS: geminiKeyClean ? geminiKeyClean : configFile.GEMINI_API_KEYS,
 
 			DASHBOARDS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARDS : configFile.DASHBOARDS,
 			DASHBOARD_DUCKS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARD_DUCKS : configFile.DASHBOARD_DUCKS,

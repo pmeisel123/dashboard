@@ -106,6 +106,16 @@ const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null =>
 	};
 };
 
+const setPath = (tickets: { [key: string]: TicketProps }, ticket: TicketProps): string[] => {
+	let path = [ticket.key];
+	if (ticket.parent_in_results && ticket.parentkey && tickets[ticket.parentkey]) {
+		const parent_path = setPath(tickets, tickets[ticket.parentkey]);
+		path = [...parent_path, ...path];
+	}
+	tickets[ticket.key].path = path;
+	return path;
+};
+
 export const getTicketsApi = async (search: string, config: ConfigProps): Promise<{ [key: string]: TicketProps }> => {
 	const extraFieldsArray = config.CUSTOM_FIELDS ? Object.keys(config.CUSTOM_FIELDS) : [];
 	const extra_fields = extraFieldsArray.length ? `${extraFieldsArray.join(",")},` : "";
@@ -161,6 +171,9 @@ export const getTicketsApi = async (search: string, config: ConfigProps): Promis
 				childTicket.parent_in_results = true;
 			});
 		}
+	}
+	for (const key in result) {
+		setPath(result, result[key]);
 	}
 	console.log(result);
 	return result;

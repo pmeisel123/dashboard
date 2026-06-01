@@ -1,7 +1,92 @@
 import { GoogleGenAI } from "@google/genai";
+import { createHash } from "crypto";
 import type { IncomingMessage } from "node:http";
 import type { HolidayProps, TicketProps, UserProps } from "../src/Api/Types";
 import { loadConfig } from "./config";
+interface CachedResponse {
+	body: string;
+	timestamp: number;
+}
+
+const apiResponseCache = new Map<string, CachedResponse>();
+const apiRequestCache = new Map<string, number>();
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+const DoAiRequest = async (prompt: string, config: ReturnType<typeof loadConfig>, structuredOutputSchema: any) => {
+	const geminiModels = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
+	const prompt_key = prompt ? createHash("sha256").update(prompt).digest("hex") : "no_prompt";
+	console.log("prompt_key", prompt_key);
+
+	if (apiRequestCache.has(prompt_key)) {
+		let cachedRequestTimeStamp = apiRequestCache.get(prompt_key);
+		// If there's an ongoing request for the same prompt, wait until it's done or until 5 minutes have passed
+		while (
+			apiRequestCache.has(prompt_key) &&
+			cachedRequestTimeStamp &&
+			Date.now() - cachedRequestTimeStamp < 60 * 5 * 1000
+		) {
+			cachedRequestTimeStamp = apiRequestCache.get(prompt_key);
+			console.log(
+				"Gemini API request already in progress for this prompt, waiting before retrying...",
+				prompt_key,
+			);
+			await sleep(1000);
+		}
+	}
+	const cached = apiResponseCache.get(prompt_key);
+	if (cached && Date.now() - cached.timestamp < 60 * 60 * 1000) {
+		// If cached response is less than 1 hour old, return it
+		// In theory gemini responses should be the same for the same data
+		console.log("Returning cached response for Gemini API");
+		return cached.body;
+	}
+
+	console.log("Setting request cache for " + prompt_key);
+	apiRequestCache.set(prompt_key, Date.now());
+
+	let foundResponse = false;
+	let last_error: any = "";
+	for (let j = 0; j < config.GEMINI_API_KEYS.length; j++) {
+		const key = config.GEMINI_API_KEYS[j];
+		const ai = new GoogleGenAI({ apiKey: key });
+
+		for (let i = 0; i < geminiModels.length; i++) {
+			const model = geminiModels[i];
+			if (!foundResponse) {
+				try {
+					const response = await ai.models.generateContent({
+						model: model,
+						contents: prompt,
+						config: {
+							responseMimeType: "application/json",
+							responseSchema: structuredOutputSchema,
+							temperature: 0,
+						},
+					});
+
+					const responseText = response.text ?? "{}";
+					foundResponse = true;
+					const responseJson = JSON.stringify({ response: JSON.parse(responseText), modelUsed: model });
+					const newCacheEntry: CachedResponse = {
+						body: responseJson,
+						timestamp: Date.now(),
+					};
+					apiResponseCache.set(prompt_key, newCacheEntry);
+					apiRequestCache.delete(prompt_key);
+					console.log("Deleting request cache for (pass) " + prompt_key);
+					return responseJson;
+				} catch (error) {
+					last_error = error;
+					console.error(`Failed processing Gemini request with model ${model}:`, error);
+				}
+			}
+		}
+	}
+	console.log("Deleting request cache for (failed)" + prompt_key);
+	apiRequestCache.delete(prompt_key);
+
+	return JSON.stringify({ error: last_error?.message || last_error });
+};
 
 export const GetGeminiData = async (req: IncomingMessage, requestBody: string | null) => {
 	const config = loadConfig();
@@ -16,6 +101,7 @@ export const GetGeminiData = async (req: IncomingMessage, requestBody: string | 
 			estimatePadding: number;
 		};
 
+		// Sanitize the input
 		const userVacationSummary = users.map((u: UserProps) => ({
 			name: u.name,
 			vacations: u.vacations,
@@ -27,42 +113,65 @@ export const GetGeminiData = async (req: IncomingMessage, requestBody: string | 
 					return acc;
 				}
 				acc[ticket.key] = {
-					...ticket,
+					id: ticket.id,
+					key: ticket.key,
+					assignee: ticket.assignee,
+					assignee_id: ticket.assignee_id,
+					creator: ticket.creator,
+					status: ticket.status,
+					summary: ticket.summary,
+					created: ticket.created,
+					updated: ticket.updated,
 					timeestimate: ticket.timeestimate ?? (ticket.is_epic ? 0 : defaultEstimate),
+					timeoriginalestimate: ticket.timeoriginalestimate,
+					timespent: ticket.timespent,
+					parentkey: ticket.parentkey,
+					parentname: ticket.parentname,
+					isdone: ticket.isdone,
+					customFields: ticket.customFields,
+					labels: ticket.labels,
+					blocks: ticket.blocks,
+					blocked_by: ticket.blocked_by,
+					is_epic: ticket.is_epic,
+					child_keys: ticket.child_keys,
+					parent_in_results: ticket.parent_in_results,
+					path: ticket.path,
 				};
 				return acc;
 			},
 			{} as Record<string, TicketProps>,
 		);
+		const local_holidays: Record<string, HolidayProps> = Object.fromEntries(
+			Object.entries(holidays)
+				.filter(([_, holiday]) => holiday.bank)
+				.map(([key, holiday]) => [
+					key,
+					{ name: holiday.name, date: holiday.date, type: holiday.type, bank: holiday.bank },
+				]),
+		);
 
 		const prompt = `
-	  Today's date is ${new Date().toISOString().split("T")[0]}. Using the following project data, calculate a realistic project completion date.
-	  
-	  SCHEDULING RULES:
-	  1. Base Schedule: Map and schedule all active Jira Tickets based on user availability. Do not schedule work on weekends (Saturday/Sunday) or the provided US Bank Holidays. Suspend task progression for individual users during their specific vacation dates.
-	  2. Padding Task: Treat the provided "Estimate Padding" (${estimatePadding} days) as a single final task.
-	  3. Padding Resource Allocation: Once work on the padding begins, it can be split equally among all users who are currently active (not on vacation). Divide the remaining padding days by the total active workforce to calculate the final velocity.
-	  4. timeestimate: is the estimate in days.
-	  5. Parents estimate is greater than the sum of its children then include the difference as a separate task with the same parent, this task should be scheduled after all children are completed and before the padding task begins.
-	  6. If the remaining work, including padding, for a day is less than or equal to 0 the work is considered completed and should not be included in the remaining work calculations for subsequent days.
-	  7. Vacations each 1 full day. There are no ranges, just individual dates. If a user has a vacation on a given day, they cannot be assigned any work on that day and their portion of the padding task is effectively removed from the schedule for that day.
-	  
-	  WEEKLY WORK REMAINING BURNDOWN RECORDING:
-	  8. Generate a comprehensive timeline loop tracking the absolute cumulative remaining work (in total worker-days across all unfinished tasks and padding) at the end of each week.
-	  9. Construct a key-value hash representing this burndown metric. Each key must be the exact calendar date of that week's trailing Friday (formatted strictly as "YYYY-MM-DD") and the corresponding numeric value must be the remaining pool of effort units remaining after that Friday's schedule wraps up.
-	  
-	  DATA:
-	  - Jira Tickets: ${JSON.stringify(local_tickets)}
-	  - Assigned Users Vacations: ${JSON.stringify(userVacationSummary)}
-	  - US Bank Holidays: ${JSON.stringify(holidays)}
-	  
-	  Return response strictly adhering to the mandated structured schema. Provide a detailed breakdown showing when base tasks finish, how the padding work was divided among active users, and what bottlenecks (vacations/holidays) shifted the final date inside the reasoning field.
-	`;
+			Today's date is ${new Date().toISOString().split("T")[0]}. Using the following project data, calculate a realistic project completion date.
 
-		let last_error: any = "";
-		let foundResponse = false;
+			SCHEDULING RULES:
+			1. Base Schedule: Map and schedule all active Jira Tickets based on user availability. Do not schedule work on weekends (Saturday/Sunday) or the provided US Bank Holidays. Suspend task progression for individual users during their specific vacation dates.
+			2. Padding Task: Treat the provided "Estimate Padding" (${estimatePadding} days) as a single final task.
+			3. Padding Resource Allocation: Once work on the padding begins, it can be split equally among all users who are currently active (not on vacation). Divide the remaining padding days by the total active workforce to calculate the final velocity.
+			4. timeestimate: is the estimate in days.
+			5. Parents estimate is greater than the sum of its children then include the difference as a separate task with the same parent, this task should be scheduled after all children are completed and before the padding task begins.
+			6. If the remaining work, including padding, for a day is less than or equal to 0 the work is considered completed and should not be included in the remaining work calculations for subsequent days.
+			7. Vacations each 1 full day. There are no ranges, just individual dates. If a user has a vacation on a given day, they cannot be assigned any work on that day and their portion of the padding task is effectively removed from the schedule for that day.
 
-		const geminiModels = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
+			WEEKLY WORK REMAINING BURNDOWN RECORDING:
+			8. Generate a comprehensive timeline loop tracking the absolute cumulative remaining work (in total worker-days across all unfinished tasks and padding) at the end of each week.
+			9. Construct a key-value hash representing this burndown metric. Each key must be the exact calendar date of that week's trailing Friday (formatted strictly as "YYYY-MM-DD") and the corresponding numeric value must be the remaining pool of effort units remaining after that Friday's schedule wraps up.
+
+			DATA:
+			- Jira Tickets: ${JSON.stringify(local_tickets)}
+			- Assigned Users Vacations: ${JSON.stringify(userVacationSummary)}
+			- Holidays: ${JSON.stringify(local_holidays)}
+			Return response strictly adhering to the mandated structured schema. Provide a detailed breakdown showing when base tasks finish, how the padding work was divided among active users, and what bottlenecks (vacations/holidays) shifted the final date inside the reasoning field.
+		`;
 
 		const structuredOutputSchema = {
 			type: "OBJECT",
@@ -133,36 +242,8 @@ export const GetGeminiData = async (req: IncomingMessage, requestBody: string | 
 				"reasoning",
 			],
 		};
-		for (let j = 0; j < config.GEMINI_API_KEYS.length; j++) {
-			const key = config.GEMINI_API_KEYS[j];
-			const ai = new GoogleGenAI({ apiKey: key });
 
-			for (let i = 0; i < geminiModels.length; i++) {
-				const model = geminiModels[i];
-				if (!foundResponse) {
-					try {
-						const response = await ai.models.generateContent({
-							model: model,
-							contents: prompt,
-							config: {
-								responseMimeType: "application/json",
-								responseSchema: structuredOutputSchema,
-								temperature: 0,
-							},
-						});
-
-						const responseText = response.text ?? "{}";
-						foundResponse = true;
-						return JSON.stringify({ response: JSON.parse(responseText), modelUsed: model });
-					} catch (error) {
-						last_error = error;
-						console.error(`Failed processing Gemini request with model ${model}:`, error);
-					}
-				}
-			}
-		}
-
-		return JSON.stringify({ error: last_error?.message || last_error });
+		return await DoAiRequest(prompt, config, structuredOutputSchema);
 	}
 
 	return false;

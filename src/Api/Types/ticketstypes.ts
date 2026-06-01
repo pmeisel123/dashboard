@@ -24,6 +24,7 @@ export interface TicketProps {
 	is_epic: boolean;
 	child_keys: string[];
 	parent_in_results: boolean;
+	path?: string[];
 }
 
 interface BaseCustomFieldProps {

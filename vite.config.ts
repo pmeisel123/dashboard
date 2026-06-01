@@ -265,7 +265,7 @@ proxies["/src/Server"] = {
 	},
 };
 
-proxies["^(?!/(index\\.html|vacation\\.csv|favicon\\.ico))/[^/]+\\.[^/]+$"] = {
+proxies["^(?!/(index\\.html|vacation\\.csv|favicon\\.ico))/[^/?]+\\.[^/?]+(?:\\?|$)"] = {
 	// This is a catch all for any request that looks like it's trying to access a file directly at the root, except for index.html and vacation.csv which need to be accessed directly
 	target: INTERNAL_URL,
 	changeOrigin: true,
@@ -288,7 +288,7 @@ proxies["/"] = {
 		const clientIp = req.socket?.remoteAddress;
 		if (req && req.url) {
 			if (clientIp && maliciousIpPattern.test(clientIp)) {
-				log("Blocked", req, "", "access attempt from suspicious IP:");
+				log("Blocked4", req, "", "access attempt from suspicious IP:");
 				if (res) {
 					res.writeHead(404, { "Content-Type": "text/plain" });
 					res.end("Not Found");

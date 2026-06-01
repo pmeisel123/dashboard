@@ -80,6 +80,7 @@ export const CommitsTable: FC<{
 						{params.row.ticket}
 					</Link>
 				),
+				valueGetter: (_params, row) => row.ticket,
 			},
 			{
 				field: "ticket_summary",
@@ -95,6 +96,11 @@ export const CommitsTable: FC<{
 								{tickets[params.row.ticket].summary}
 							</Link>
 						);
+					}
+				},
+				valueGetter: (_params, row) => {
+					if (row.ticket && row.ticket in tickets) {
+						return tickets[row.ticket].summary;
 					}
 				},
 				flex: 4,

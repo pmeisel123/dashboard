@@ -140,13 +140,15 @@ const BranchesComparePage: FC<{
 			}
 		});
 		if (ticket_search) {
+			console.log("Searching tickets with JQL: " + ticket_search);
 			dispatch(fetchTickets([ticket_search, config])).then((data: any) => {
 				let local_tickets = { ...tickets };
-				if (data && data.payload && data.payload.length) {
-					data.payload.forEach((ticket: TicketProps) => {
-						local_tickets[ticket.key] = ticket;
-					});
+				console.log("Got tickets data from API: ", data);
+				if (data && data.payload && Object.keys(data.payload).length) {
+					console.log("Processing tickets data: ", data.payload);
+					local_tickets = { ...local_tickets, ...data.payload };
 				}
+				console.log(local_tickets);
 				setTickets(local_tickets);
 			});
 		}

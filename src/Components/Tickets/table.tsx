@@ -168,6 +168,65 @@ const TicketTable: FC<{
 			flex: 2,
 			minWidth: 125,
 		},
+		{
+			field: "path",
+			headerName: "path",
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				if (params.row.path && Array.isArray(params.row.path) && params.row.path.length > 0) {
+					return (
+						<div style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+							{params.row.path.map((key: string, index: number) => (
+								<Fragment key={index}>
+									<Link
+										href={`${config.API_URL}/browse/${key}`}
+										target="_blank"
+										rel="noopener noreferrer"
+										sx={{ whiteSpace: "nowrap" }}
+									>
+										{key}
+									</Link>
+									{params.row.path &&
+										Array.isArray(params.row.path) &&
+										params.row.path.length > 0 &&
+										index < params.row.path.length - 1 && <span>{"\u00a0>\u00a0\u200b"}</span>}
+								</Fragment>
+							))}
+						</div>
+					);
+				}
+				return null;
+			},
+			valueGetter: (_params, row) => {
+				if (row.path) {
+					return row.path.join(" > ");
+				}
+			},
+			sortComparator: (_v1, _v2, cellParams1, cellParams2) => {
+				const arr1: string[] = cellParams1.api.getRow(cellParams1.id)?.path || [];
+				const arr2: string[] = cellParams2.api.getRow(cellParams2.id)?.path || [];
+
+				const maxLen = Math.max(arr1.length, arr2.length);
+				const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
+				for (let i = 0; i < maxLen; i++) {
+					const item1 = arr1[i];
+					const item2 = arr2[i];
+
+					if (item1 === undefined) return -1;
+					if (item2 === undefined) return 1;
+
+					// Compare the keys at this index naturally (e.g., 'OPS-2' vs 'OPS-17')
+					const comparison = collator.compare(item1, item2);
+					if (comparison !== 0) {
+						return comparison;
+					}
+				}
+
+				return 0;
+			},
+			width: 150,
+			minWidth: 80,
+		},
 		{ field: "assignee", headerName: "assignee", flex: 2 },
 		{ field: "creator", headerName: "creator", flex: 2 },
 		{
@@ -452,10 +511,10 @@ const TicketTable: FC<{
 				tmp[field_name] = [
 					"key",
 					"parentkey",
+					"path",
 					"assignee",
 					"status",
 					"labels",
-					"parentkey",
 					"timeestimate",
 					"summary",
 					"creator",

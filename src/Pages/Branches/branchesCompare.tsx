@@ -15,7 +15,7 @@ import {
 	getBranchesCompare,
 	isSliceRecent,
 } from "@src/Api";
-import { CommitsSelector, CommitsTable } from "@src/Components";
+import { AiReleaseNotes, CommitsSelector, CommitsTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -182,6 +182,7 @@ const BranchesComparePage: FC<{
 	if (!Object.keys(ticketsBranches.branches).length) {
 		return;
 	}
+
 	return (
 		<>
 			<CommitsSelector
@@ -196,6 +197,16 @@ const BranchesComparePage: FC<{
 				setUseLatestRelease={setUseLatestRelease}
 				releases={releases[repo]?.releases || []}
 			/>
+			{repo &&
+				branch1 &&
+				branch2 &&
+				!loading &&
+				releases[repo] &&
+				isSliceRecent(releases[repo]) &&
+				latestRelease[repo] &&
+				isSliceRecent(latestRelease[repo]) &&
+				ticketsBranches.branches &&
+				Object.keys(ticketsBranches.branches).length && <AiReleaseNotes tickets={tickets} commits={commits} />}
 			{repo && branch1 && branch2 && (
 				<CommitsTable
 					repo={repo}

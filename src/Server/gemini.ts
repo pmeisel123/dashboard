@@ -1,7 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
+import type { Schema } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { createHash } from "crypto";
 import type { IncomingMessage } from "node:http";
-import type { HolidayProps, TicketProps, UserProps } from "../src/Api/Types";
+import type { BranchCommit, HolidayProps, TicketProps, UserProps } from "../src/Api/Types";
 import { loadConfig } from "./config";
 interface CachedResponse {
 	body: string;
@@ -11,11 +12,67 @@ interface CachedResponse {
 const apiResponseCache = new Map<string, CachedResponse>();
 const apiRequestCache = new Map<string, number>();
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-
+const structuredReleaseNotesOutputSchema: Schema = {
+	type: Type.OBJECT,
+	properties: {
+		releaseNotes: {
+			type: Type.OBJECT,
+			properties: {
+				version: {
+					type: Type.STRING,
+					description: "The version name or tag of the upcoming release.",
+				},
+				date: {
+					type: Type.STRING,
+					description: "The release date formatted as YYYY-MM-DD.",
+				},
+				sections: {
+					type: Type.ARRAY,
+					description: "Categorized changes included in this release version.",
+					items: {
+						type: Type.OBJECT,
+						properties: {
+							title: {
+								type: Type.STRING,
+								description: "The category title, e.g., 'New Features' or 'Improvements & Bug Fixes'.",
+							},
+							items: {
+								type: Type.ARRAY,
+								description: "Individual modification notes under this category.",
+								items: {
+									type: Type.OBJECT,
+									properties: {
+										ticket: {
+											type: Type.STRING,
+											description:
+												"The Jira ticket key identifier (e.g., 'OPS-18'). If no ticket key exists for this item, you MUST omit this property key from the object completely.",
+										},
+										summary: {
+											type: Type.STRING,
+											description: "A brief, punchy summary title of the change.",
+										},
+										description: {
+											type: Type.STRING,
+											description:
+												"Optional detailed description outlining the modification context.",
+										},
+									},
+									required: ["summary"],
+								},
+							},
+						},
+						required: ["title", "items"],
+					},
+				},
+			},
+			required: ["version", "date", "sections"],
+		},
+	},
+	required: ["releaseNotes"],
+};
 const DoAiRequest = async (prompt: string, config: ReturnType<typeof loadConfig>, structuredOutputSchema: any) => {
 	const geminiModels = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
 	const prompt_key = prompt ? createHash("sha256").update(prompt).digest("hex") : "no_prompt";
-	console.log("prompt_key", prompt_key);
 
 	if (apiRequestCache.has(prompt_key)) {
 		let cachedRequestTimeStamp = apiRequestCache.get(prompt_key);
@@ -26,16 +83,12 @@ const DoAiRequest = async (prompt: string, config: ReturnType<typeof loadConfig>
 			Date.now() - cachedRequestTimeStamp < 60 * 5 * 1000
 		) {
 			cachedRequestTimeStamp = apiRequestCache.get(prompt_key);
-			console.log(
-				"Gemini API request already in progress for this prompt, waiting before retrying...",
-				prompt_key,
-			);
 			await sleep(1000);
 		}
 	}
 	const cached = apiResponseCache.get(prompt_key);
-	if (cached && Date.now() - cached.timestamp < 60 * 60 * 1000) {
-		// If cached response is less than 1 hour old, return it
+	if (cached && Date.now() - cached.timestamp < 60 * 60 * 1000 * 6) {
+		// If cached response is less than 6 hour old, return it
 		// In theory gemini responses should be the same for the same data
 		console.log("Returning cached response for Gemini API");
 		return cached.body;
@@ -89,6 +142,56 @@ const DoAiRequest = async (prompt: string, config: ReturnType<typeof loadConfig>
 };
 
 export const GetGeminiData = async (req: IncomingMessage, requestBody: string | null) => {
+	console.log("Received Gemini API request", req.url);
+	if (req.url === "/server/gemini/estimator") {
+		return GetEstimatorData(req, requestBody);
+	}
+	if (req.url === "/server/gemini/releasenotes") {
+		return GetReleaseNotes(req, requestBody);
+	}
+};
+
+const GetReleaseNotes = async (req: IncomingMessage, requestBody: string | null) => {
+	const config = loadConfig();
+	if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {
+		const parsedBody = JSON.parse(requestBody);
+		const { tickets, commits } = parsedBody as { tickets: { [key: string]: TicketProps }; commits: BranchCommit[] };
+		const data: {
+			sha: string;
+			message: string;
+			ticket: TicketProps | null;
+			creator: string;
+			date: string;
+		}[] = [];
+		commits.forEach((commit) => {
+			const commit_creator = commit.creator;
+			const commit_date = commit.date;
+			const commit_message = commit.message;
+			const commit_sha = commit.sha;
+			const commit_ticket_id = commit.ticket;
+			let ticket: TicketProps | null = null;
+			if (commit_ticket_id && tickets[commit_ticket_id]) {
+				ticket = tickets[commit_ticket_id];
+			}
+			data.push({
+				sha: commit_sha,
+				message: commit_message,
+				creator: commit_creator,
+				date: commit_date,
+				ticket: ticket,
+			});
+		});
+		const prompt = `
+		Using the following commit and ticket data, generate release notes for the upcoming release.
+		Summarize as much as possible
+		Commits: ${JSON.stringify(data)}
+		`;
+		console.log(prompt);
+		return await DoAiRequest(prompt, config, structuredReleaseNotesOutputSchema);
+	}
+};
+
+const GetEstimatorData = async (req: IncomingMessage, requestBody: string | null) => {
 	const config = loadConfig();
 
 	if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {

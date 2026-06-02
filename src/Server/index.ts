@@ -11,7 +11,7 @@ export const ServerMap = (req: IncomingMessage, requestBody: string | null) => {
 	if (req.url === "/server/config") {
 		return ConfigServer(req, requestBody);
 	}
-	if (req.url === "/server/gemini") {
+	if (req.url?.match("^/server/gemini/")) {
 		return GetGeminiData(req, requestBody);
 	}
 	return false;

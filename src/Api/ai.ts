@@ -5,6 +5,7 @@ import type {
 	HolidayProps,
 	TicketProps,
 	UserProps,
+	AiError
 } from "@src/Api";
 
 export const postGeminiApi = async (
@@ -13,7 +14,7 @@ export const postGeminiApi = async (
 	holidays: Record<string, HolidayProps>,
 	defaultEstimate: number,
 	estimatePadding: number,
-): Promise<AiEstimationsResponseWrapper> => {
+): Promise<AiEstimationsResponseWrapper | AiError> => {
 	const url = "server/gemini/estimator";
 	const requestOptions = {
 		method: "POST",
@@ -29,14 +30,14 @@ export const postGeminiApi = async (
 		}),
 	};
 	const response = await fetch(url, requestOptions);
-	const data: AiEstimationsResponseWrapper = await response.json();
+	const data: AiEstimationsResponseWrapper | AiError = await response.json();
 	return data;
 };
 
 export const postGeminiApiForReleaseNotes = async (
 	tickets: { [key: string]: TicketProps },
 	commits: BranchCommit[],
-): Promise<AiReleaseNotesResponseWrapper> => {
+): Promise<AiReleaseNotesResponseWrapper | AiError> => {
 	const url = "server/gemini/releasenotes";
 	const requestOptions = {
 		method: "POST",
@@ -49,6 +50,6 @@ export const postGeminiApiForReleaseNotes = async (
 		}),
 	};
 	const response = await fetch(url, requestOptions);
-	const data: AiReleaseNotesResponseWrapper = await response.json();
+	const data: AiReleaseNotesResponseWrapper | AiError = await response.json();
 	return data;
 };

@@ -9,6 +9,14 @@ interface CachedResponse {
 	timestamp: number;
 }
 
+
+const geminiModels = [
+	"gemini-3.5-flash",
+	"gemini-3-flash",
+	"gemini-3.1-flash-lite",
+	"gemini-2.5-flash",
+	"gemini-2.5-pro"
+];
 const apiResponseCache = new Map<string, CachedResponse>();
 const apiRequestCache = new Map<string, number>();
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
@@ -71,7 +79,6 @@ const structuredReleaseNotesOutputSchema: Schema = {
 	required: ["releaseNotes"],
 };
 const DoAiRequest = async (prompt: string, config: ReturnType<typeof loadConfig>, structuredOutputSchema: any) => {
-	const geminiModels = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"];
 	const prompt_key = prompt ? createHash("sha256").update(prompt).digest("hex") : "no_prompt";
 
 	if (apiRequestCache.has(prompt_key)) {
@@ -183,171 +190,150 @@ const GetReleaseNotes = async (req: IncomingMessage, requestBody: string | null)
 		});
 		const prompt = `
 		Using the following commit and ticket data, generate release notes for the upcoming release.
-		Summarize as much as possible
+		Summarize as much as possible, make readable for non technical people
 		Commits: ${JSON.stringify(data)}
 		`;
-		console.log(prompt);
 		return await DoAiRequest(prompt, config, structuredReleaseNotesOutputSchema);
 	}
 };
 
 const GetEstimatorData = async (req: IncomingMessage, requestBody: string | null) => {
-	const config = loadConfig();
+  const config = loadConfig();
+  if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {
+    const parsedBody = JSON.parse(requestBody);
+    const { users, tickets, holidays, defaultEstimate, estimatePadding } = parsedBody as {
+      users: UserProps[];
+      tickets: { [key: string]: TicketProps };
+      holidays: Record<string, HolidayProps>;
+      defaultEstimate: number;
+      estimatePadding: number;
+    };
 
-	if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {
-		const parsedBody = JSON.parse(requestBody);
-		const { users, tickets, holidays, defaultEstimate, estimatePadding } = parsedBody as {
-			users: UserProps[];
-			tickets: { [key: string]: TicketProps };
-			holidays: Record<string, HolidayProps>;
-			defaultEstimate: number;
-			estimatePadding: number;
-		};
+    // Sanitize the input
+    const userVacationSummary = users.map((u: UserProps) => ({
+      name: u.name,
+      vacations: u.vacations,
+    }));
 
-		// Sanitize the input
-		const userVacationSummary = users.map((u: UserProps) => ({
-			name: u.name,
-			vacations: u.vacations,
-		}));
+    const local_tickets: { [key: string]: TicketProps } = Object.values(tickets).reduce(
+      (acc, ticket) => {
+        if (ticket.isdone === true) {
+          return acc;
+        }
+        acc[ticket.key] = {
+          id: ticket.id,
+          key: ticket.key,
+          assignee: ticket.assignee,
+          assignee_id: ticket.assignee_id,
+          creator: ticket.creator,
+          status: ticket.status,
+          summary: ticket.summary,
+          created: ticket.created,
+          updated: ticket.updated,
+          timeestimate: ticket.timeestimate ?? (ticket.is_epic ? 0 : defaultEstimate),
+          timeoriginalestimate: ticket.timeoriginalestimate,
+          timespent: ticket.timespent,
+          parentkey: ticket.parentkey,
+          parentname: ticket.parentname,
+          isdone: ticket.isdone,
+          customFields: ticket.customFields,
+          labels: ticket.labels,
+          blocks: ticket.blocks,
+          blocked_by: ticket.blocked_by,
+          is_epic: ticket.is_epic,
+          child_keys: ticket.child_keys,
+          parent_in_results: ticket.parent_in_results,
+          path: ticket.path,
+        };
+        return acc;
+      },
+      {} as Record<string, TicketProps>,
+    );
 
-		const local_tickets: { [key: string]: TicketProps } = Object.values(tickets).reduce(
-			(acc, ticket) => {
-				if (ticket.isdone === true) {
-					return acc;
-				}
-				acc[ticket.key] = {
-					id: ticket.id,
-					key: ticket.key,
-					assignee: ticket.assignee,
-					assignee_id: ticket.assignee_id,
-					creator: ticket.creator,
-					status: ticket.status,
-					summary: ticket.summary,
-					created: ticket.created,
-					updated: ticket.updated,
-					timeestimate: ticket.timeestimate ?? (ticket.is_epic ? 0 : defaultEstimate),
-					timeoriginalestimate: ticket.timeoriginalestimate,
-					timespent: ticket.timespent,
-					parentkey: ticket.parentkey,
-					parentname: ticket.parentname,
-					isdone: ticket.isdone,
-					customFields: ticket.customFields,
-					labels: ticket.labels,
-					blocks: ticket.blocks,
-					blocked_by: ticket.blocked_by,
-					is_epic: ticket.is_epic,
-					child_keys: ticket.child_keys,
-					parent_in_results: ticket.parent_in_results,
-					path: ticket.path,
-				};
-				return acc;
-			},
-			{} as Record<string, TicketProps>,
-		);
-		const local_holidays: Record<string, HolidayProps> = Object.fromEntries(
-			Object.entries(holidays)
-				.filter(([_, holiday]) => holiday.bank)
-				.map(([key, holiday]) => [
-					key,
-					{ name: holiday.name, date: holiday.date, type: holiday.type, bank: holiday.bank },
-				]),
-		);
+    const local_holidays: Record<string, any> = Object.fromEntries(
+      Object.entries(holidays)
+        .filter(([_, holiday]) => holiday.bank)
+        .map(([key, holiday]) => [
+          key,
+          { name: holiday.name, date: holiday.date },
+        ]),
+    );
 
-		const prompt = `
-			Today's date is ${new Date().toISOString().split("T")[0]}. Using the following project data, calculate a realistic project completion date.
+	   const prompt = `
+	Today's date is ${new Date().toISOString().split("T")[0]}.
 
-			SCHEDULING RULES:
-			1. Base Schedule: Map and schedule all active Jira Tickets based on user availability. Do not schedule work on weekends (Saturday/Sunday) or the provided US Bank Holidays. Suspend task progression for individual users during their specific vacation dates.
-			2. Padding Task: Treat the provided "Estimate Padding" (${estimatePadding} days) as a single final task.
-			3. Padding Resource Allocation: Once work on the padding begins, it can be split equally among all users who are currently active (not on vacation). Divide the remaining padding days by the total active workforce to calculate the final velocity.
-			4. timeestimate: is the estimate in days.
-			5. Parents estimate is greater than the sum of its children then include the difference as a separate task with the same parent, this task should be scheduled after all children are completed and before the padding task begins.
-			6. If the remaining work, including padding, for a day is less than or equal to 0 the work is considered completed and should not be included in the remaining work calculations for subsequent days.
-			7. Vacations each 1 full day. There are no ranges, just individual dates. If a user has a vacation on a given day, they cannot be assigned any work on that day and their portion of the padding task is effectively removed from the schedule for that day.
+	CRITICAL SYSTEM EXECUTIVE DIRECTIVE:
+	You are an advanced project simulation engine. You are strictly forbidden from guessing or using division averages. Perform your day-by-day calculation engine execution internally, but only report the final state summaries at the close of each Friday to save output space.
 
-			WEEKLY WORK REMAINING BURNDOWN RECORDING:
-			8. Generate a comprehensive timeline loop tracking the absolute cumulative remaining work (in total worker-days across all unfinished tasks and padding) at the end of each week.
-			9. Construct a key-value hash representing this burndown metric. Each key must be the exact calendar date of that week's trailing Friday (formatted strictly as "YYYY-MM-DD") and the corresponding numeric value must be the remaining pool of effort units remaining after that Friday's schedule wraps up.
+	MANDATED SIMULATION RULES:
+	1. Dynamic Pools: Identify all unique workers dynamically from the "Assigned Users Vacations" structure. 
+	2. Dynamic Effort: Programmatically sum the "timeestimate" fields of all uncompleted tickets. If a parent ticket's estimate is greater than the sum of its children, include that difference as a trailing task before padding. Add the dynamic "Estimate Padding" (${estimatePadding} days) to calculate the absolute initial effort tracking pool.
+	3. Sequential Blocker Logic: A ticket's remaining balance cannot be reduced if its key is present in an active "blocked_by" array of another uncompleted task. Assign active workers to unblocked tasks first.
+	4. Weekly Matrix Aggregation: Loop chronologically day-by-day starting from Today's Date:
+	   - On Saturdays, Sundays, and dates matching keys in the "Holidays" structure, zero effort is burned.
+	   - On working weekdays, verify user vacation dates. If an individual user is on vacation, their velocity is 0. Otherwise, deduct 1 person-day from available unblocked work.
+	   - Once base tasks hit 0, burn down padding by dividing the remaining effort equally among available active workers on that day.
+	5. Termination State: Stop the simulation immediately on the calendar day the remaining work balance hits exactly 0. 
 
-			DATA:
-			- Jira Tickets: ${JSON.stringify(local_tickets)}
-			- Assigned Users Vacations: ${JSON.stringify(userVacationSummary)}
-			- Holidays: ${JSON.stringify(local_holidays)}
-			Return response strictly adhering to the mandated structured schema. Provide a detailed breakdown showing when base tasks finish, how the padding work was divided among active users, and what bottlenecks (vacations/holidays) shifted the final date inside the reasoning field.
-		`;
+	DATA INGESTION VALUES:
+	- Jira Tickets: ${JSON.stringify(local_tickets)}
+	- Assigned Users Vacations: ${JSON.stringify(userVacationSummary)}
+	- Holidays: ${JSON.stringify(local_holidays)}
 
-		const structuredOutputSchema = {
-			type: "OBJECT",
-			properties: {
-				estimatedCompletionDate: {
-					type: "STRING",
-					description: "The estimated completion date of the project in YYYY-MM-DD format.",
-				},
-				howManyDaysOfWork: {
-					type: "NUMBER",
-					description: "Total calendar or worker effort days required to finish.",
-				},
-				dailyWorkRemaining: {
-					type: "ARRAY",
-					description:
-						"A chronological timeline listing total remaining project workload at the end of each working day. Exclude weekends.",
-					items: {
-						type: "OBJECT",
-						properties: {
-							date: { type: "STRING", description: "The calendar date in YYYY-MM-DD format." },
-							daysLeft: {
-								type: "NUMBER",
-								description: "The total remaining days of active work left across the project.",
-							},
-							whoIsWorking: {
-								type: "ARRAY",
-								description: "List of users working on that day.",
-								items: { type: "STRING" },
-							},
-						},
-						required: ["date", "daysLeft"],
-					},
-				},
-				weeklyWorkRemaining: {
-					type: "ARRAY",
-					description:
-						"A sequential timeline listing remaining workload totals at the close of every Friday.",
-					items: {
-						type: "OBJECT",
-						properties: {
-							date: {
-								type: "STRING",
-								description: "The Friday date of the work week ending in YYYY-MM-DD format.",
-							},
-							daysLeft: {
-								type: "NUMBER",
-								description: "The total remaining days of active work left across the project.",
-							},
-							howManyDaysOfWorkPerUser: {
-								type: "OBJECT",
-								description:
-									"A key-value hash where each key is a user's name and the corresponding value is the number of days of work they have scheduled for that week.",
-							},
-						},
-						required: ["date", "daysLeft"],
-					},
-				},
-				reasoning: {
-					type: "STRING",
-					description: "Detailed breakdown of the schedule generation logic.",
-				},
-			},
-			required: [
-				"estimatedCompletionDate",
-				"howManyDaysOfWork",
-				"weeklyWorkRemaining",
-				"dailyWorkRemaining",
-				"reasoning",
-			],
-		};
+	Return the finalized JSON object precisely adhering to the provided structural schema constraints. Keep the reasoning field concise.
+	`;
 
-		return await DoAiRequest(prompt, config, structuredOutputSchema);
-	}
+	    console.log("Generated prompt for Gemini API:", prompt);
 
-	return false;
-};
+	    // Optimized schema removing daily tracking blocks
+	    const structuredOutputSchema = {
+	      type: "OBJECT",
+	      properties: {
+	        estimatedCompletionDate: {
+	          type: "STRING",
+	          description: "The absolute final project completion date calculated dynamically from the simulation in YYYY-MM-DD format.",
+	        },
+	        howManyDaysOfWork: {
+	          type: "NUMBER",
+	          description: "The total initial cumulative effort tracking pool days calculated dynamically by summing base tasks, parent deltas, and the padding task.",
+	        },
+	        weeklyWorkRemaining: {
+	          type: "ARRAY",
+	          description: "A sequential list tracking progress at the exact close of every work week's trailing Friday.",
+	          items: {
+	            type: "OBJECT",
+	            properties: {
+	              date: { type: "STRING", description: "The exact calendar date of the trailing Friday in YYYY-MM-DD format." },
+	              daysLeft: { type: "NUMBER", description: "The total remaining pool of effort units remaining after this Friday's schedule wraps up." },
+	              howManyDaysOfWorkPerUser: {
+	                type: "ARRAY",
+	                description: "An explicit breakdown of the specific active effort days contributed by each distinct worker during this single week chunk.",
+	                items: {
+	                  type: "OBJECT",
+	                  properties: {
+	                    userName: { type: "STRING", description: "The full name of the resource identified dynamically from the data." },
+	                    daysWorkedThisWeek: { type: "NUMBER", description: "The exact numeric count of days this user was actively assigned work during this week (0 to 5)." }
+	                  },
+	                  required: ["userName", "daysWorkedThisWeek"]
+	                }
+	              },
+	            },
+	            required: ["date", "daysLeft", "howManyDaysOfWorkPerUser"],
+	          },
+	        },
+	        reasoning: {
+	          type: "STRING",
+	          description: "A concise summary text verifying the parsed task totals, listed blocking bottlenecks, and total vacation days processed.",
+	        },
+	      },
+	      required: [
+	        "estimatedCompletionDate",
+	        "howManyDaysOfWork",
+	        "weeklyWorkRemaining",
+	        "reasoning",
+	      ],
+	    };
+
+	    return await DoAiRequest(prompt, config, structuredOutputSchema);
+	  }
+	};

@@ -1,5 +1,12 @@
 // ==========================================
-// 1. Release Notes Interfaces
+// Error Interfaces
+// ==========================================
+export interface AiError {
+	error: string;
+}
+
+// ==========================================
+// Release Notes Interfaces
 // ==========================================
 export interface AiReleaseNoteItem {
 	ticket?: string;
@@ -23,7 +30,7 @@ export interface AiReleaseNotesResponse {
 }
 
 // ==========================================
-// 2. Estimations Interfaces
+// Estimations Interfaces
 // ==========================================
 export interface AiWorkPerUser {
 	[username: string]: number;
@@ -50,7 +57,7 @@ export interface AiEstimations {
 }
 
 // ==========================================
-// 3. API Response Interfaces
+// API Response Interfaces
 // ==========================================
 export interface AiReleaseNotesResponseWrapper {
 	response: AiReleaseNotesResponse;
@@ -63,6 +70,6 @@ export interface AiEstimationsResponseWrapper {
 }
 
 export interface AiApiResponse {
-	response: AiReleaseNotesResponse | AiEstimations;
+	response: AiReleaseNotesResponse | AiEstimations | AiError;
 	modelUsed: string;
 }

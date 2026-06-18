@@ -1,4 +1,4 @@
-import type { HolidayProps, TicketProps, UserProps, UsersGroupProps } from "@src/Api";
+import type { HolidayProps, TicketProps, UserProps, UsersGroupProps, AiEstimationsResponseWrapper, AiError } from "@src/Api";
 import { getAllUsHolidays, postGeminiApi } from "@src/Api";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ const AiEstimator: FC<{
 	estimatePadding: number;
 	setAiLastDay: Dispatch<SetStateAction<string>>;
 }> = ({ users, tickets, allJiraUsersGroups, defaultEstimate, estimatePadding, setAiLastDay }) => {
-	const [aiData, setAiData] = useState<any>(null);
+	const [aiData, setAiData] = useState<AiEstimationsResponseWrapper | AiError | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
 	const today = new Date();
@@ -39,10 +39,9 @@ const AiEstimator: FC<{
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				setLoading(true);
 				const data = await postGeminiApi(local_users, tickets, usHolidays, defaultEstimate, estimatePadding);
 				setAiData(data);
-				console.log(data);
+				setLoading(true);
 			} catch (error) {
 				console.error("Failed to fetch Gemini data:", error);
 			} finally {
@@ -53,13 +52,23 @@ const AiEstimator: FC<{
 		fetchData();
 	}, [users, tickets, allJiraUsersGroups]); // Re-runs if inputs change
 
-	if (loading) return <>Loading AI estimations (this may be slow)...</>;
-	if (!aiData || !aiData.response || !aiData.response.estimatedCompletionDate)
+	if (loading || !aiData) return <>Loading AI estimations (this may be slow)...</>;
+
+	if ("error" in aiData) {
+		return (
+			<>
+				Failed to load AI estimations. Error: {aiData.error}
+			</>
+		);
+	}
+
+	if (!aiData || !aiData.response || !aiData.response.estimatedCompletionDate) {
 		return (
 			<>
 				Failed to load AI estimations. <pre>{JSON.stringify(aiData)}</pre>
 			</>
 		);
+	}
 	setAiLastDay(aiData.response.estimatedCompletionDate);
 	return (
 		<>

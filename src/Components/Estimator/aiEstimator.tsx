@@ -3,6 +3,9 @@ import { getAllUsHolidays, postGeminiApi } from "@src/Api";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 
+const DISABLED = true;
+// The AI estimator is currently disabled. This is because the Gemini API is very bad at estimating completion dates, and it is not worth the cost to use it. We may re-enable it in the future if the Gemini API improves.
+
 const AiEstimator: FC<{
 	users: Set<string>;
 	tickets: { [key: string]: TicketProps };
@@ -11,6 +14,9 @@ const AiEstimator: FC<{
 	estimatePadding: number;
 	setAiLastDay: Dispatch<SetStateAction<string>>;
 }> = ({ users, tickets, allJiraUsersGroups, defaultEstimate, estimatePadding, setAiLastDay }) => {
+	if (DISABLED) {
+		return;
+	}
 	const [aiData, setAiData] = useState<AiEstimationsResponseWrapper | AiError | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 

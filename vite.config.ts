@@ -1,4 +1,4 @@
-import basicSsl from "@vitejs/plugin-basic-ssl";
+/// <reference types="vitest" />
 import react from "@vitejs/plugin-react";
 import type { IncomingHttpHeaders } from "node:http";
 import { IncomingMessage, ServerResponse } from "node:http";
@@ -6,9 +6,11 @@ import zlib from "node:zlib";
 import path from "path";
 import type { ProxyOptions } from "vite";
 import ViteRestart from "vite-plugin-restart";
-import { defineConfig } from "vitest/config";
 import type { ConfigPropsFile, RepoNamePaths } from "./src/Api/Types";
 import { Server, loadConfig } from "./src/Server/";
+import fs from 'node:fs';
+import forge from 'node-forge';
+import { defineConfig } from 'vitest/config';
 
 const config: ConfigPropsFile = loadConfig();
 const proxies: { [key: string]: ProxyOptions } = {};
@@ -24,6 +26,70 @@ const CACHE_TTL = 60 * 1000; // 1 minute
 const FORBIDDEN_HTTP2_HEADERS = ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade", "te"];
 
 const INTERNAL_URL = (config.USE_SSL ? "https" : "http") + "://127.0.0.1:" + config.PORT;
+
+const certsDir = path.resolve(__dirname, './certs');
+const certKeyPath = path.join(certsDir, 'dashboard.key');
+const certCrtPath = path.join(certsDir, 'dashboard.crt');
+
+if (config.USE_SSL && (!fs.existsSync(certKeyPath) || !fs.existsSync(certCrtPath))) {
+  try {
+    if (!fs.existsSync(certsDir)) {
+      fs.mkdirSync(certsDir, { recursive: true });
+    }
+
+    console.log('Generating separate dashboard.key and dashboard.crt files...');
+
+    // Generate a new RSA key pair
+    const keys = forge.pki.rsa.generateKeyPair(2048);
+    const cert = forge.pki.createCertificate();
+
+    cert.publicKey = keys.publicKey;
+    cert.serialNumber = '01';
+    cert.validity.notBefore = new Date();
+    cert.validity.notAfter = new Date();
+    cert.validity.notAfter.setFullYear(cert.validity.notBefore.getFullYear() + 10); // Valid for 10 year
+
+	const attrs = [
+	  { name: 'commonName', value: config.HOST || 'localhost' },
+	  { name: 'countryName', value: 'US' },
+	  { name: 'organizationName', value: 'Dashboard' },
+	  { name: 'organizationalUnitName', value: 'Dashboard' }
+	];
+
+    cert.setSubject(attrs);
+    cert.setIssuer(attrs);
+
+    // Set Subject Alternative Names (SAN) so modern browsers accept it
+    cert.setExtensions([
+      {
+        name: 'subjectAltName',
+        altNames: [
+          { type: 2, value: 'localhost' },
+          { type: 2, value: config.HOST || '0.0.0.0' },
+          { type: 7, ip: '127.0.0.1' },
+          { type: 7, ip: '0.0.0.0' }
+        ]
+      }
+    ]);
+
+    // Self-sign the certificate
+    cert.sign(keys.privateKey, forge.md.sha256.create());
+
+    // Convert to PEM standard format strings
+    const pemKey = forge.pki.privateKeyToPem(keys.privateKey);
+    const pemCert = forge.pki.certificateToPem(cert);
+
+    // Write files to disk matching production names
+    fs.writeFileSync(certKeyPath, pemKey);
+    fs.writeFileSync(certCrtPath, pemCert);
+
+    console.log('Certificates generated successfully.');
+  } catch (error) {
+    console.error('Failed to programmatically generate development certificates:', error);
+  }
+}
+const hasCerts = fs.existsSync(certKeyPath) && fs.existsSync(certCrtPath);
+
 const log = (type: string, req: IncomingMessage, url_start: string | null, message: string) => {
 	const userAgent = req.headers["user-agent"] || "unknown";
 	const remoteIp = req.socket.remoteAddress || "unknown";
@@ -306,7 +372,7 @@ proxies["/"] = {
 	},
 };
 
-// https://vite.dev/config/
+
 export default defineConfig({
 	test: {
 		globals: true,
@@ -326,6 +392,12 @@ export default defineConfig({
 		warmup: {
 			clientFiles: ["./src/main.tsx", "./index.html"],
 		},
+		https: config.USE_SSL && hasCerts
+		     ? {
+		         key: fs.readFileSync(certKeyPath),
+		         cert: fs.readFileSync(certCrtPath),
+		       }
+		     : undefined,
 	},
 	resolve: {
 		alias: {
@@ -334,12 +406,6 @@ export default defineConfig({
 	},
 	plugins: [
 		react(),
-		config.USE_SSL
-			? basicSsl({
-					certDir: "./certs/",
-					name: "dashboard",
-				})
-			: null,
 		ViteRestart({
 			restart: ["./config.json"],
 		}),

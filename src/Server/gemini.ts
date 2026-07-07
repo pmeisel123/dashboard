@@ -190,6 +190,7 @@ const GetReleaseNotes = async (req: IncomingMessage, requestBody: string | null)
 		const prompt = `
 		Using the following commit and ticket data, generate release notes for the upcoming release.
 		Summarize as much as possible, make readable for non technical people
+		If there is a ticket associated with a commit, it should be the main reference for the release note, if not, use the commit message.
 		Commits: ${JSON.stringify(data)}
 		`;
 		return await DoAiRequest(prompt, config, structuredReleaseNotesOutputSchema);

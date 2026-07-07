@@ -1,11 +1,11 @@
 import type {
+	AiError,
 	AiEstimationsResponseWrapper,
 	AiReleaseNotesResponseWrapper,
 	BranchCommit,
 	HolidayProps,
 	TicketProps,
 	UserProps,
-	AiError
 } from "@src/Api";
 
 export const postGeminiApi = async (

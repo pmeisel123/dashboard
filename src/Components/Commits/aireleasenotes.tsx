@@ -1,5 +1,5 @@
 import { Box, Link } from "@mui/material";
-import type { AiReleaseNotesResponseWrapper, BranchCommit, RootState, TicketProps, AiError } from "@src/Api";
+import type { AiError, AiReleaseNotesResponseWrapper, BranchCommit, RootState, TicketProps } from "@src/Api";
 import { postGeminiApiForReleaseNotes } from "@src/Api";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -23,7 +23,7 @@ export const AiReleaseNotes: FC<{
 	if ("error" in notes) {
 		return <div>Error loading Ai Release Notes: {notes.error}</div>;
 	}
-	if (!('response' in notes) || !notes.response || !notes.response.releaseNotes) {
+	if (!("response" in notes) || !notes.response || !notes.response.releaseNotes) {
 		return <div>Error loading Ai Release Notes. Unknown error.</div>;
 	}
 	return (

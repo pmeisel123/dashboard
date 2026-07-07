@@ -1,4 +1,11 @@
-import type { HolidayProps, TicketProps, UserProps, UsersGroupProps, AiEstimationsResponseWrapper, AiError } from "@src/Api";
+import type {
+	AiError,
+	AiEstimationsResponseWrapper,
+	HolidayProps,
+	TicketProps,
+	UserProps,
+	UsersGroupProps,
+} from "@src/Api";
 import { getAllUsHolidays, postGeminiApi } from "@src/Api";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -61,11 +68,7 @@ const AiEstimator: FC<{
 	if (loading || !aiData) return <>Loading AI estimations (this may be slow)...</>;
 
 	if ("error" in aiData) {
-		return (
-			<>
-				Failed to load AI estimations. Error: {aiData.error}
-			</>
-		);
+		return <>Failed to load AI estimations. Error: {aiData.error}</>;
 	}
 
 	if (!aiData || !aiData.response || !aiData.response.estimatedCompletionDate) {

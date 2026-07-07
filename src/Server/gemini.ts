@@ -9,13 +9,12 @@ interface CachedResponse {
 	timestamp: number;
 }
 
-
 const geminiModels = [
 	"gemini-3.5-flash",
 	"gemini-3-flash",
 	"gemini-3.1-flash-lite",
 	"gemini-2.5-flash",
-	"gemini-2.5-pro"
+	"gemini-2.5-pro",
 ];
 const apiResponseCache = new Map<string, CachedResponse>();
 const apiRequestCache = new Map<string, number>();
@@ -198,68 +197,65 @@ const GetReleaseNotes = async (req: IncomingMessage, requestBody: string | null)
 };
 
 const GetEstimatorData = async (req: IncomingMessage, requestBody: string | null) => {
-  const config = loadConfig();
-  if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {
-    const parsedBody = JSON.parse(requestBody);
-    const { users, tickets, holidays, defaultEstimate, estimatePadding } = parsedBody as {
-      users: UserProps[];
-      tickets: { [key: string]: TicketProps };
-      holidays: Record<string, HolidayProps>;
-      defaultEstimate: number;
-      estimatePadding: number;
-    };
+	const config = loadConfig();
+	if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {
+		const parsedBody = JSON.parse(requestBody);
+		const { users, tickets, holidays, defaultEstimate, estimatePadding } = parsedBody as {
+			users: UserProps[];
+			tickets: { [key: string]: TicketProps };
+			holidays: Record<string, HolidayProps>;
+			defaultEstimate: number;
+			estimatePadding: number;
+		};
 
-    // Sanitize the input
-    const userVacationSummary = users.map((u: UserProps) => ({
-      name: u.name,
-      vacations: u.vacations,
-    }));
+		// Sanitize the input
+		const userVacationSummary = users.map((u: UserProps) => ({
+			name: u.name,
+			vacations: u.vacations,
+		}));
 
-    const local_tickets: { [key: string]: TicketProps } = Object.values(tickets).reduce(
-      (acc, ticket) => {
-        if (ticket.isdone === true) {
-          return acc;
-        }
-        acc[ticket.key] = {
-          id: ticket.id,
-          key: ticket.key,
-          assignee: ticket.assignee,
-          assignee_id: ticket.assignee_id,
-          creator: ticket.creator,
-          status: ticket.status,
-          summary: ticket.summary,
-          created: ticket.created,
-          updated: ticket.updated,
-          timeestimate: ticket.timeestimate ?? (ticket.is_epic ? 0 : defaultEstimate),
-          timeoriginalestimate: ticket.timeoriginalestimate,
-          timespent: ticket.timespent,
-          parentkey: ticket.parentkey,
-          parentname: ticket.parentname,
-          isdone: ticket.isdone,
-          customFields: ticket.customFields,
-          labels: ticket.labels,
-          blocks: ticket.blocks,
-          blocked_by: ticket.blocked_by,
-          is_epic: ticket.is_epic,
-          child_keys: ticket.child_keys,
-          parent_in_results: ticket.parent_in_results,
-          path: ticket.path,
-        };
-        return acc;
-      },
-      {} as Record<string, TicketProps>,
-    );
+		const local_tickets: { [key: string]: TicketProps } = Object.values(tickets).reduce(
+			(acc, ticket) => {
+				if (ticket.isdone === true) {
+					return acc;
+				}
+				acc[ticket.key] = {
+					id: ticket.id,
+					key: ticket.key,
+					assignee: ticket.assignee,
+					assignee_id: ticket.assignee_id,
+					creator: ticket.creator,
+					status: ticket.status,
+					summary: ticket.summary,
+					created: ticket.created,
+					updated: ticket.updated,
+					timeestimate: ticket.timeestimate ?? (ticket.is_epic ? 0 : defaultEstimate),
+					timeoriginalestimate: ticket.timeoriginalestimate,
+					timespent: ticket.timespent,
+					parentkey: ticket.parentkey,
+					parentname: ticket.parentname,
+					isdone: ticket.isdone,
+					customFields: ticket.customFields,
+					labels: ticket.labels,
+					blocks: ticket.blocks,
+					blocked_by: ticket.blocked_by,
+					is_epic: ticket.is_epic,
+					child_keys: ticket.child_keys,
+					parent_in_results: ticket.parent_in_results,
+					path: ticket.path,
+				};
+				return acc;
+			},
+			{} as Record<string, TicketProps>,
+		);
 
-    const local_holidays: Record<string, any> = Object.fromEntries(
-      Object.entries(holidays)
-        .filter(([_, holiday]) => holiday.bank)
-        .map(([key, holiday]) => [
-          key,
-          { name: holiday.name, date: holiday.date },
-        ]),
-    );
+		const local_holidays: Record<string, any> = Object.fromEntries(
+			Object.entries(holidays)
+				.filter(([_, holiday]) => holiday.bank)
+				.map(([key, holiday]) => [key, { name: holiday.name, date: holiday.date }]),
+		);
 
-	   const prompt = `
+		const prompt = `
 	Today's date is ${new Date().toISOString().split("T")[0]}.
 
 	CRITICAL SYSTEM EXECUTIVE DIRECTIVE:
@@ -283,57 +279,72 @@ const GetEstimatorData = async (req: IncomingMessage, requestBody: string | null
 	Return the finalized JSON object precisely adhering to the provided structural schema constraints. Keep the reasoning field concise.
 	`;
 
-	    console.log("Generated prompt for Gemini API:", prompt);
+		console.log("Generated prompt for Gemini API:", prompt);
 
-	    // Optimized schema removing daily tracking blocks
-	    const structuredOutputSchema = {
-	      type: "OBJECT",
-	      properties: {
-	        estimatedCompletionDate: {
-	          type: "STRING",
-	          description: "The absolute final project completion date calculated dynamically from the simulation in YYYY-MM-DD format.",
-	        },
-	        howManyDaysOfWork: {
-	          type: "NUMBER",
-	          description: "The total initial cumulative effort tracking pool days calculated dynamically by summing base tasks, parent deltas, and the padding task.",
-	        },
-	        weeklyWorkRemaining: {
-	          type: "ARRAY",
-	          description: "A sequential list tracking progress at the exact close of every work week's trailing Friday.",
-	          items: {
-	            type: "OBJECT",
-	            properties: {
-	              date: { type: "STRING", description: "The exact calendar date of the trailing Friday in YYYY-MM-DD format." },
-	              daysLeft: { type: "NUMBER", description: "The total remaining pool of effort units remaining after this Friday's schedule wraps up." },
-	              howManyDaysOfWorkPerUser: {
-	                type: "ARRAY",
-	                description: "An explicit breakdown of the specific active effort days contributed by each distinct worker during this single week chunk.",
-	                items: {
-	                  type: "OBJECT",
-	                  properties: {
-	                    userName: { type: "STRING", description: "The full name of the resource identified dynamically from the data." },
-	                    daysWorkedThisWeek: { type: "NUMBER", description: "The exact numeric count of days this user was actively assigned work during this week (0 to 5)." }
-	                  },
-	                  required: ["userName", "daysWorkedThisWeek"]
-	                }
-	              },
-	            },
-	            required: ["date", "daysLeft", "howManyDaysOfWorkPerUser"],
-	          },
-	        },
-	        reasoning: {
-	          type: "STRING",
-	          description: "A concise summary text verifying the parsed task totals, listed blocking bottlenecks, and total vacation days processed.",
-	        },
-	      },
-	      required: [
-	        "estimatedCompletionDate",
-	        "howManyDaysOfWork",
-	        "weeklyWorkRemaining",
-	        "reasoning",
-	      ],
-	    };
+		// Optimized schema removing daily tracking blocks
+		const structuredOutputSchema = {
+			type: "OBJECT",
+			properties: {
+				estimatedCompletionDate: {
+					type: "STRING",
+					description:
+						"The absolute final project completion date calculated dynamically from the simulation in YYYY-MM-DD format.",
+				},
+				howManyDaysOfWork: {
+					type: "NUMBER",
+					description:
+						"The total initial cumulative effort tracking pool days calculated dynamically by summing base tasks, parent deltas, and the padding task.",
+				},
+				weeklyWorkRemaining: {
+					type: "ARRAY",
+					description:
+						"A sequential list tracking progress at the exact close of every work week's trailing Friday.",
+					items: {
+						type: "OBJECT",
+						properties: {
+							date: {
+								type: "STRING",
+								description: "The exact calendar date of the trailing Friday in YYYY-MM-DD format.",
+							},
+							daysLeft: {
+								type: "NUMBER",
+								description:
+									"The total remaining pool of effort units remaining after this Friday's schedule wraps up.",
+							},
+							howManyDaysOfWorkPerUser: {
+								type: "ARRAY",
+								description:
+									"An explicit breakdown of the specific active effort days contributed by each distinct worker during this single week chunk.",
+								items: {
+									type: "OBJECT",
+									properties: {
+										userName: {
+											type: "STRING",
+											description:
+												"The full name of the resource identified dynamically from the data.",
+										},
+										daysWorkedThisWeek: {
+											type: "NUMBER",
+											description:
+												"The exact numeric count of days this user was actively assigned work during this week (0 to 5).",
+										},
+									},
+									required: ["userName", "daysWorkedThisWeek"],
+								},
+							},
+						},
+						required: ["date", "daysLeft", "howManyDaysOfWorkPerUser"],
+					},
+				},
+				reasoning: {
+					type: "STRING",
+					description:
+						"A concise summary text verifying the parsed task totals, listed blocking bottlenecks, and total vacation days processed.",
+				},
+			},
+			required: ["estimatedCompletionDate", "howManyDaysOfWork", "weeklyWorkRemaining", "reasoning"],
+		};
 
-	    return await DoAiRequest(prompt, config, structuredOutputSchema);
-	  }
-	};
+		return await DoAiRequest(prompt, config, structuredOutputSchema);
+	}
+};

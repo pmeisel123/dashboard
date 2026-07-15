@@ -238,8 +238,8 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 	});
 };
 
-const setProxy = (repo_path: string, target: string, headers: { [key: string]: string }) => {
-	proxies[repo_path] = {
+const setProxy = (url: string, target: string, headers: { [key: string]: string }) => {
+	proxies[url] = {
 		target: target,
 		changeOrigin: true,
 		selfHandleResponse: true,
@@ -249,10 +249,10 @@ const setProxy = (repo_path: string, target: string, headers: { [key: string]: s
 			Connection: "close",
 			...headers,
 		},
-		rewrite: (path) => path.replace(new RegExp(`^${repo_path}`), ""),
+		rewrite: (path) => path.replace(new RegExp(`^${url}`), ""),
 		bypass: bypassFunction,
 		configure: (proxy) => {
-			proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(repo_path, proxyRes, req, res));
+			proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(url, proxyRes, req, res));
 		},
 	};
 };
@@ -286,6 +286,17 @@ for (const [url, target] of Object.entries(jira_proxies)) {
 			Accept: "application/json",
 			Authorization: "Basic " + Buffer.from(config.API_USERNAME + ":" + config.API_KEY).toString("base64"),
 		});
+	}
+}
+
+if (config.SLACK_TOKENS && Object.keys(config.SLACK_TOKENS).length > 0) {
+	for (const [key, token] of Object.entries(config.SLACK_TOKENS)) {
+		if (key && token) {
+			setProxy("/slack/" + key, "https://slack.com/api/", {
+				Accept: "application/json",
+				Authorization: "Bearer " + token,
+			});
+		}
 	}
 }
 

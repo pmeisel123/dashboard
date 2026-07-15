@@ -139,6 +139,7 @@ function EditConfigPage() {
 			GITREPOS: repos,
 			CUSTOM_NAV_LINKS: links || {},
 			GEMINI_API_KEYS: geminiApiKeys,
+			SLACK_TOKENS: {},
 		};
 		postConfigApi(newConfig).then(() => {
 			if (useSsl != config.USE_SSL || host != config.HOST || port != config.PORT) {

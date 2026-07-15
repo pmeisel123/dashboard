@@ -78,6 +78,7 @@ export const loadConfig = (): ConfigPropsFile => {
 		USE_SSL: false,
 		VACATION_KEY: "email",
 		GITREPOS: [],
+		SLACK_TOKENS: {},
 	};
 	return config;
 };
@@ -117,6 +118,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			CUSTOM_NAV_LINKS: configFile.CUSTOM_NAV_LINKS || {},
 			GEMINI_API_KEY_DEFINED:
 				configFile.GEMINI_API_KEYS && Object.keys(configFile.GEMINI_API_KEYS).length ? true : false,
+			SLACK_TOKEN_KEYS: configFile.SLACK_TOKENS ? Object.keys(configFile.SLACK_TOKENS) : [],
 		};
 		return JSON.stringify(config, null, 2);
 	}
@@ -131,7 +133,12 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 		const geminiKeyClean = configBody.GEMINI_API_KEYS
 			? configBody.GEMINI_API_KEYS.filter((str) => str.trim() !== "")
 			: [];
-		console.log(geminiKeyClean);
+		const slackTokenClean = configBody.SLACK_TOKENS
+			? (Object.fromEntries(
+					Object.entries(configBody.SLACK_TOKENS).filter(([_, value]) => value.trim() !== ""),
+				) as Record<string, string>)
+			: {};
+
 		const config: ConfigPropsFile = {
 			...configBody,
 
@@ -146,6 +153,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			GITREPOS: configBody.GITTOKEN ? configBody.GITREPOS : configFile.GITREPOS,
 
 			GEMINI_API_KEYS: geminiKeyClean ? geminiKeyClean : configFile.GEMINI_API_KEYS,
+			SLACK_TOKENS: slackTokenClean ? slackTokenClean : configFile.SLACK_TOKENS,
 
 			DASHBOARDS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARDS : configFile.DASHBOARDS,
 			DASHBOARD_DUCKS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARD_DUCKS : configFile.DASHBOARD_DUCKS,

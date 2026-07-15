@@ -88,6 +88,7 @@ export interface ConfigProps {
 	DUCKS: string[];
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 	GEMINI_API_KEY_DEFINED: boolean;
+	SLACK_TOKEN_KEYS: string[];
 }
 
 export interface ConfigPropsFile {
@@ -111,6 +112,7 @@ export interface ConfigPropsFile {
 	GITREPOS: ReposProps[];
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 	GEMINI_API_KEYS: string[];
+	SLACK_TOKENS: { [key: string]: string };
 }
 
 export interface LoadedSlice {

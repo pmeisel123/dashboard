@@ -130,6 +130,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 		}
 		const configBody: ConfigPropsFile = JSON.parse(requestBody);
 		const hasNewApiCredentials = !!(configBody.API_KEY && configBody.API_USERNAME);
+		console.log(configBody.GEMINI_API_KEYS);
 		const geminiKeyClean = configBody.GEMINI_API_KEYS
 			? configBody.GEMINI_API_KEYS.filter((str) => str.trim() !== "")
 			: [];
@@ -152,7 +153,8 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			GITTOKEN: configBody.GITTOKEN ? configBody.GITTOKEN : configFile.GITTOKEN,
 			GITREPOS: configBody.GITTOKEN ? configBody.GITREPOS : configFile.GITREPOS,
 
-			GEMINI_API_KEYS: geminiKeyClean ? geminiKeyClean : configFile.GEMINI_API_KEYS,
+			GEMINI_API_KEYS:
+				geminiKeyClean && Object.keys(geminiKeyClean).length ? geminiKeyClean : configFile.GEMINI_API_KEYS,
 			SLACK_TOKENS: slackTokenClean ? slackTokenClean : configFile.SLACK_TOKENS,
 
 			DASHBOARDS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARDS : configFile.DASHBOARDS,

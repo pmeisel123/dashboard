@@ -20,6 +20,10 @@ interface CachedResponse {
 	headers: IncomingHttpHeaders;
 	timestamp: number;
 }
+interface SlackAPIResponse {
+	ok: boolean;
+	error?: string;
+}
 
 const apiCache = new Map<string, CachedResponse>();
 const CACHE_TTL = 60 * 1000; // 1 minute
@@ -166,7 +170,20 @@ const bypassFunction = async (req: IncomingMessage, res: ServerResponse | undefi
 	return;
 };
 
-const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: IncomingMessage, res: ServerResponse) => {
+type CustomResponseHook = (
+	decodedBuffer: Buffer,
+	res: ServerResponse,
+	req: IncomingMessage,
+	url: string,
+) => Promise<boolean> | boolean;
+
+const proxyResFunction = (
+	path: string,
+	proxyRes: IncomingMessage,
+	req: IncomingMessage,
+	res: ServerResponse,
+	customResponse?: CustomResponseHook,
+) => {
 	if (proxyRes.statusCode === 304 || proxyRes.headers["content-length"] === "0") {
 		Object.entries(proxyRes.headers).forEach(([key, val]) => {
 			if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
@@ -182,63 +199,77 @@ const proxyResFunction = (path: string, proxyRes: IncomingMessage, req: Incoming
 	proxyRes.on("data", (chunk: Buffer) => chunks.push(chunk));
 
 	proxyRes.on("end", () => {
-		const buffer = Buffer.concat(chunks);
-		const url = req.url ?? "";
-		const cacheKey = path + url;
-		const encoding = proxyRes.headers["content-encoding"];
-		let decodedBuffer: Buffer = buffer;
-		if (encoding) {
-			try {
-				if (encoding === "gzip") {
-					decodedBuffer = zlib.gunzipSync(buffer);
-				} else if (encoding === "deflate") {
-					decodedBuffer = zlib.inflateSync(buffer);
-				} else if (encoding === "br") {
-					decodedBuffer = zlib.brotliDecompressSync(buffer);
-				} else {
-					console.log("unknown encoding", encoding);
-				}
-			} catch (e) {
-				console.error("Decompression failed", e);
-			}
-		}
-		const newCacheEntry: CachedResponse = {
-			body: decodedBuffer,
-			headers: { ...proxyRes.headers, "content-encoding": "identity" },
-			timestamp: Date.now(),
-		};
-
-		apiCache.set(cacheKey, newCacheEntry);
-
-		const resolver = pendingResolvers.get(cacheKey);
-		if (resolver) {
-			resolver(newCacheEntry);
-			pendingResolvers.delete(cacheKey);
-			pendingPromises.delete(cacheKey);
-		}
-		setTimeout(() => {
-			// log("CACHE", req, path, "Clearing cached response:");
-			apiCache.delete(cacheKey);
-			pendingResolvers.delete(cacheKey);
-			pendingPromises.delete(cacheKey);
-		}, CACHE_TTL * 2);
-
-		Object.entries(proxyRes.headers).forEach(([key, val]) => {
-			if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
-				if (key.toLowerCase() === "content-encoding") {
-					res.setHeader(key, "identity");
-				} else {
-					res.setHeader(key, val);
+		void (async () => {
+			const buffer = Buffer.concat(chunks);
+			const url = req.url ?? "";
+			const cacheKey = path + url;
+			const encoding = proxyRes.headers["content-encoding"];
+			let decodedBuffer: Buffer = buffer;
+			if (encoding) {
+				try {
+					if (encoding === "gzip") {
+						decodedBuffer = zlib.gunzipSync(buffer);
+					} else if (encoding === "deflate") {
+						decodedBuffer = zlib.inflateSync(buffer);
+					} else if (encoding === "br") {
+						decodedBuffer = zlib.brotliDecompressSync(buffer);
+					} else {
+						console.log("unknown encoding", encoding);
+					}
+				} catch (e) {
+					console.error("Decompression failed", e);
 				}
 			}
-		});
 
-		res.setHeader("content-length", Buffer.byteLength(decodedBuffer));
-		res.end(decodedBuffer);
+			if (customResponse) {
+				const fullyHandled = await customResponse(decodedBuffer, res, req, url);
+				if (fullyHandled) {
+					return; // Stop execution here if the hook took over the response stream
+				}
+			}
+			const newCacheEntry: CachedResponse = {
+				body: decodedBuffer,
+				headers: { ...proxyRes.headers, "content-encoding": "identity" },
+				timestamp: Date.now(),
+			};
+
+			apiCache.set(cacheKey, newCacheEntry);
+
+			const resolver = pendingResolvers.get(cacheKey);
+			if (resolver) {
+				resolver(newCacheEntry);
+				pendingResolvers.delete(cacheKey);
+				pendingPromises.delete(cacheKey);
+			}
+			setTimeout(() => {
+				// log("CACHE", req, path, "Clearing cached response:");
+				apiCache.delete(cacheKey);
+				pendingResolvers.delete(cacheKey);
+				pendingPromises.delete(cacheKey);
+			}, CACHE_TTL * 2);
+
+			Object.entries(proxyRes.headers).forEach(([key, val]) => {
+				if (val !== undefined && !FORBIDDEN_HTTP2_HEADERS.includes(key.toLowerCase())) {
+					if (key.toLowerCase() === "content-encoding") {
+						res.setHeader(key, "identity");
+					} else {
+						res.setHeader(key, val);
+					}
+				}
+			});
+
+			res.setHeader("content-length", Buffer.byteLength(decodedBuffer));
+			res.end(decodedBuffer);
+		})();
 	});
 };
 
-const setProxy = (url: string, target: string, headers: { [key: string]: string }) => {
+const setProxy = (
+	url: string,
+	target: string,
+	headers: { [key: string]: string },
+	customResponse?: CustomResponseHook,
+) => {
 	proxies[url] = {
 		target: target,
 		changeOrigin: true,
@@ -252,7 +283,9 @@ const setProxy = (url: string, target: string, headers: { [key: string]: string 
 		rewrite: (path) => path.replace(new RegExp(`^${url}`), ""),
 		bypass: bypassFunction,
 		configure: (proxy) => {
-			proxy.on("proxyRes", (proxyRes, req, res) => proxyResFunction(url, proxyRes, req, res));
+			proxy.on("proxyRes", (proxyRes, req, res) => {
+				void proxyResFunction(url, proxyRes, req, res, customResponse);
+			});
 		},
 	};
 };
@@ -289,13 +322,62 @@ for (const [url, target] of Object.entries(jira_proxies)) {
 	}
 }
 
+const slackAutoJoinHookWrapper: (token: string | undefined) => CustomResponseHook = (token) => {
+	const slackAutoJoinHook: CustomResponseHook = async (
+		decodedBuffer: Buffer,
+		res: ServerResponse,
+		_req: IncomingMessage,
+		url: string,
+	) => {
+		try {
+			const jsonResponse = JSON.parse(decodedBuffer.toString()) as SlackAPIResponse;
+			if (!jsonResponse.ok && jsonResponse.error === "not_in_channel") {
+				console.log(`[Hook] Slack API response indicates bot is not in channel. Attempting auto-join...`);
+
+				const searchParams = new URLSearchParams(url.split("?")[1] ?? "");
+				const channelId = searchParams.get("channel");
+				const authorizationToken = token ? `Bearer ${token}` : undefined;
+
+				if (channelId && authorizationToken) {
+					console.log(`[Hook] Bot missing from channel ${channelId}. Auto-joining...`);
+					const joinRes = await fetch("https://slack.com/api/conversations.join", {
+						method: "POST",
+						headers: {
+							Authorization: authorizationToken, // Dynamic configurations verified
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ channel: channelId }),
+					});
+
+					const joinData = (await joinRes.json()) as { ok: boolean; error?: string };
+
+					if (joinData.ok) {
+						res.writeHead(403, { "Content-Type": "application/json" });
+						res.end(JSON.stringify({ ok: false, error: "channel_auto_joined_retry_request" }));
+						return true;
+					}
+				}
+			}
+		} catch {
+			// Non-JSON or parsing issues fail safely back to regular proxy response routing
+		}
+		return false;
+	};
+	return slackAutoJoinHook;
+};
+
 if (config.SLACK_TOKENS && Object.keys(config.SLACK_TOKENS).length > 0) {
 	for (const [key, token] of Object.entries(config.SLACK_TOKENS)) {
 		if (key && token) {
-			setProxy("/slack/" + key, "https://slack.com/api/", {
-				Accept: "application/json",
-				Authorization: "Bearer " + token,
-			});
+			setProxy(
+				"/slack/" + key,
+				"https://slack.com/api/",
+				{
+					Accept: "application/json",
+					Authorization: "Bearer " + token,
+				},
+				slackAutoJoinHookWrapper(token),
+			);
 		}
 	}
 }

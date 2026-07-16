@@ -4,6 +4,7 @@ export * from "./configSlice";
 export * from "./git";
 export * from "./holiday";
 export * from "./misc";
+export * from "./slack";
 export * from "./store";
 export * from "./tickets";
 export * from "./ticketsSlice";

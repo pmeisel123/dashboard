@@ -13,10 +13,13 @@ export interface SlackUserProp {
 	profile: {
 		display_name?: string;
 		real_name?: string;
+		image_24?: string;
+		image_48?: string;
+		image_512?: string;
 	};
 }
 
-interface SlackFile {
+export interface SlackFile {
 	id: string;
 	name: string;
 	mimetype: string;
@@ -24,7 +27,7 @@ interface SlackFile {
 }
 
 export interface MessageProp {
-	user: SlackUserProp;
+	user: string;
 	text: string;
 	ts: string;
 	files?: SlackFile[];

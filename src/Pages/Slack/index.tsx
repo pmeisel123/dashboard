@@ -1,4 +1,4 @@
-import { ListItemText, MenuItem, Select } from "@mui/material";
+import { Link, ListItemText, MenuItem, Select } from "@mui/material";
 import type {
 	AppDispatch,
 	ChannelProp,
@@ -32,6 +32,7 @@ const Slack: FC<{
 		if (!localInstance && config && config.SLACK_TOKEN_KEYS && config.SLACK_TOKEN_KEYS.length == 1) {
 			localInstance = config.SLACK_TOKEN_KEYS[0];
 		}
+		setChannel(searchParams.get("channel") || "");
 		setInstance(localInstance);
 	};
 
@@ -93,12 +94,24 @@ const Slack: FC<{
 		console.log("SlackChannel: messages: ", messages);
 	}
 	if (messages && messages.length > 0) {
-		return <SlackChannel messages={messages} channel={channels[channel]} emojis={emojis} users={users} />;
+		return (
+			<>
+				<Link
+					href="#"
+					onClick={(e) => {
+						e.preventDefault();
+						setChannel("");
+					}}
+				>
+					&lt; Back to Channel List
+				</Link>
+				<SlackChannel messages={messages} channel={channels[channel]} emojis={emojis} users={users} />
+			</>
+		);
 	}
 
 	return (
 		<>
-			{messages.length}
 			{config && config.SLACK_TOKEN_KEYS && config.SLACK_TOKEN_KEYS.length > 0 && (
 				<Select
 					value={instance}

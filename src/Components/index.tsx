@@ -10,6 +10,7 @@ export * from "./Estimator";
 export * from "./Jira";
 export * from "./LeftNav";
 export * from "./SavePage";
+export * from "./Slack";
 export * from "./Tickets";
 export * from "./TopNav";
 export * from "./UniqueKey";

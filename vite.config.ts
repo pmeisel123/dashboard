@@ -329,6 +329,7 @@ const slackAutoJoinHookWrapper: (token: string | undefined) => CustomResponseHoo
 		_req: IncomingMessage,
 		url: string,
 	) => {
+		console.log(url);
 		try {
 			const jsonResponse = JSON.parse(decodedBuffer.toString()) as SlackAPIResponse;
 			if (!jsonResponse.ok && jsonResponse.error === "not_in_channel") {

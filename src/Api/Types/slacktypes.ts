@@ -29,3 +29,7 @@ export interface MessageProp {
 	ts: string;
 	files?: SlackFile[];
 }
+
+export interface SlackEmojisProp {
+	[key: string]: string;
+}

@@ -124,5 +124,5 @@ export interface RoutePageProps {
 	name: string;
 	element: ReactNode;
 	description: ReactNode;
-	requires?: "false" | "APIURL" | "ALLOW_VACATION_EDITS" | "API_CONFLUENCE_URL" | "GIT_REPOS_PATHS";
+	requires?: "false" | "APIURL" | "ALLOW_VACATION_EDITS" | "API_CONFLUENCE_URL" | "GIT_REPOS_PATHS" | "SLACK_TOKENS";
 }

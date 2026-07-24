@@ -23,6 +23,5 @@ export const getChannelsApi = async (instance: string): Promise<{ [key: string]:
 			results[channel.name] = channel;
 		}
 	}
-	console.log("getChannelsApi: ", results);
 	return results;
 };

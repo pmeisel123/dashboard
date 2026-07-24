@@ -21,3 +21,5 @@ export const GetBranchCreator = (creator: string, allJiraUsersGroups: UsersGroup
 	}
 	return;
 };
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

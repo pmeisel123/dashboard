@@ -13,11 +13,12 @@ import { SlackChannel, SlackChannels } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const Slack: FC<{
 	searchParamsOveride?: URLSearchParams;
 }> = ({ searchParamsOveride }) => {
+	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
 	const [instance, setInstance] = useState<string>(searchParams.get("instance") || "");
 	const [channels, setChannels] = useState<{ [key: string]: ChannelProp }>({});
@@ -25,6 +26,7 @@ const Slack: FC<{
 	const [users, setUsers] = useState<{ [key: string]: SlackUserProp }>({});
 	const [emojis, setEmojis] = useState<SlackEmojisProp>({});
 	const [messages, setMessages] = useState<MessageProp[]>([]);
+	const [lastUpdated, setLastUpdated] = useState(Date.now());
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const loadParams = () => {
@@ -67,7 +69,6 @@ const Slack: FC<{
 			fetchData();
 			const fetchEmojis = async () => {
 				const data = await getEmojisApi(instance);
-				console.log(data);
 				setEmojis(data);
 			};
 			fetchEmojis();
@@ -83,33 +84,42 @@ const Slack: FC<{
 		if (instance && channel && config && config.SLACK_TOKEN_KEYS && config.SLACK_TOKEN_KEYS.includes(instance)) {
 			const fetchData = async () => {
 				let channelId = channels[channel]?.id;
-				console.log("SlackChannel: instance: ", instance, " channel: ", channel, " channels: ", channels);
 				const data = await getChannelApi(instance, channelId);
 				setMessages(data);
+				setLastUpdated(Date.now());
 			};
 			fetchData();
+			const intervalId = setInterval(() => {
+				fetchData();
+			}, 60000); // Refresh every minute
+			return () => clearInterval(intervalId);
 		}
 	}, [instance, channel, channels, config]);
-	if (instance && messages && messages.length > 0) {
-		console.log("SlackChannel: messages: ", messages);
-	}
-	if (messages && messages.length > 0) {
+
+	if (messages && messages.length > 0 && channel) {
 		return (
 			<>
-				<Link
-					href="#"
-					onClick={(e) => {
-						e.preventDefault();
-						setChannel("");
-					}}
-				>
-					&lt; Back to Channel List
-				</Link>
-				<SlackChannel messages={messages} channel={channels[channel]} emojis={emojis} users={users} />
+				{!isDashboard && (
+					<Link
+						href="#"
+						onClick={(e) => {
+							e.preventDefault();
+							setChannel("");
+						}}
+					>
+						&lt; Back to Channel List
+					</Link>
+				)}
+				<SlackChannel
+					messages={messages}
+					channel={channels[channel]}
+					emojis={emojis}
+					users={users}
+					lastUpdated={lastUpdated}
+				/>
 			</>
 		);
 	}
-
 	return (
 		<>
 			{config && config.SLACK_TOKEN_KEYS && config.SLACK_TOKEN_KEYS.length > 0 && (
@@ -138,7 +148,7 @@ export const GetModulePages = (): RoutePageProps[] => [
 		path: "/SlackChannel/",
 		name: "Slack Channel",
 		element: <Slack />,
-		description: <>List Slack Channels</>,
+		description: <>Portal to access Slack Channels (useful for dashboards)</>,
 		requires: "SLACK_TOKENS",
 	},
 ];

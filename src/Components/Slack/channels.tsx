@@ -13,11 +13,13 @@ export const SlackChannels: FC<{
 			<CustomDataGrid
 				rows={Object.values(channels)}
 				localStorageName="SlackChannels"
+				checkboxSelection={false}
+				disableRowSelectionOnClick
 				columns={[
 					{
 						field: "name",
 						headerName: "Name",
-						width: 200,
+						flex: 1,
 						renderCell: (params: GridRenderCellParams<ChannelProp>) => {
 							if (params.value) {
 								return (
@@ -40,8 +42,8 @@ export const SlackChannels: FC<{
 						},
 					},
 					{ field: "num_members", headerName: "Members", width: 100 },
-					{ field: "description", headerName: "Description", width: 300 },
-					{ field: "topic", headerName: "Topic", width: 300 },
+					{ field: "description", headerName: "Description", flex: 4 },
+					{ field: "topic", headerName: "Topic", flex: 4 },
 				]}
 			/>
 		</>

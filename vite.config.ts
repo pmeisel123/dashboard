@@ -26,7 +26,7 @@ interface SlackAPIResponse {
 }
 
 const apiCache = new Map<string, CachedResponse>();
-const CACHE_TTL = 60 * 1000; // 1 minute
+const CACHE_TTL = 60 * 1000; // 1 minutes
 const FORBIDDEN_HTTP2_HEADERS = ["connection", "keep-alive", "proxy-connection", "transfer-encoding", "upgrade", "te"];
 
 const INTERNAL_URL = (config.USE_SSL ? "https" : "http") + "://127.0.0.1:" + config.PORT;
@@ -125,49 +125,53 @@ const serveFromCache = (res: ServerResponse, cached: CachedResponse) => {
 	res.end(cached.body);
 };
 
-const bypassFunction = async (req: IncomingMessage, res: ServerResponse | undefined) => {
-	if (!res || req.method !== "GET") return;
-	const cacheKey = req.url ?? "";
+const bypassFunction = (timeout?: number) => {
+	const localTimeout = typeof timeout !== "undefined" ? timeout : CACHE_TTL;
+	const bypassFunctionInner = async (req: IncomingMessage, res: ServerResponse | undefined) => {
+		if (!res || req.method !== "GET") return;
+		const cacheKey = req.url ?? "";
 
-	const cached = apiCache.get(cacheKey);
-	// This is mostly to prevent duplicate calls
-	// The browser will cache for 10 minutes
-	// But will rerequest if the user reloads the page
-	if (cached) {
-		if (Date.now() - cached.timestamp < CACHE_TTL) {
-			serveFromCache(res, cached);
-			return req.url;
-		} else {
-			apiCache.delete(cacheKey);
-			if (pendingPromises.has(cacheKey)) {
-				pendingPromises.delete(cacheKey);
-				pendingResolvers.delete(cacheKey);
+		const cached = apiCache.get(cacheKey);
+		// This is mostly to prevent duplicate calls
+		// The browser will cache for 10 minutes
+		// But will rerequest if the user reloads the page
+		if (cached) {
+			if (Date.now() - cached.timestamp < localTimeout) {
+				serveFromCache(res, cached);
+				return req.url;
+			} else {
+				apiCache.delete(cacheKey);
+				if (pendingPromises.has(cacheKey)) {
+					pendingPromises.delete(cacheKey);
+					pendingResolvers.delete(cacheKey);
+				}
 			}
 		}
-	}
 
-	if (pendingPromises.has(cacheKey)) {
-		const result = await Promise.race([
-			pendingPromises.get(cacheKey)!,
-			new Promise<null>((r) => setTimeout(() => r(null), 30000)),
-		]);
-		if (result) {
-			serveFromCache(res, result);
-			return req.url;
+		if (pendingPromises.has(cacheKey)) {
+			const result = await Promise.race([
+				pendingPromises.get(cacheKey)!,
+				new Promise<null>((r) => setTimeout(() => r(null), 30000)),
+			]);
+			if (result) {
+				serveFromCache(res, result);
+				return req.url;
+			}
+			pendingPromises.delete(cacheKey);
+			pendingResolvers.delete(cacheKey);
 		}
-		pendingPromises.delete(cacheKey);
-		pendingResolvers.delete(cacheKey);
-	}
 
-	let resolver: (data: CachedResponse) => void;
-	const promise = new Promise<CachedResponse>((resolve) => {
-		resolver = resolve;
-	});
+		let resolver: (data: CachedResponse) => void;
+		const promise = new Promise<CachedResponse>((resolve) => {
+			resolver = resolve;
+		});
 
-	pendingPromises.set(cacheKey, promise);
-	pendingResolvers.set(cacheKey, resolver!);
+		pendingPromises.set(cacheKey, promise);
+		pendingResolvers.set(cacheKey, resolver!);
 
-	return;
+		return;
+	};
+	return bypassFunctionInner;
 };
 
 type CustomResponseHook = (
@@ -269,6 +273,7 @@ const setProxy = (
 	target: string,
 	headers: { [key: string]: string },
 	customResponse?: CustomResponseHook,
+	bypassTime?: number,
 ) => {
 	proxies[url] = {
 		target: target,
@@ -281,7 +286,7 @@ const setProxy = (
 			...headers,
 		},
 		rewrite: (path) => path.replace(new RegExp(`^${url}`), ""),
-		bypass: bypassFunction,
+		bypass: bypassFunction(bypassTime),
 		configure: (proxy) => {
 			proxy.on("proxyRes", (proxyRes, req, res) => {
 				void proxyResFunction(url, proxyRes, req, res, customResponse);
@@ -325,7 +330,7 @@ for (const [url, target] of Object.entries(jira_proxies)) {
 const slackAutoJoinHookWrapper: (token: string | undefined) => CustomResponseHook = (token) => {
 	const slackAutoJoinHook: CustomResponseHook = async (
 		decodedBuffer: Buffer,
-		res: ServerResponse,
+		_res: ServerResponse,
 		_req: IncomingMessage,
 		url: string,
 	) => {
@@ -353,9 +358,13 @@ const slackAutoJoinHookWrapper: (token: string | undefined) => CustomResponseHoo
 					const joinData = (await joinRes.json()) as { ok: boolean; error?: string };
 
 					if (joinData.ok) {
-						res.writeHead(403, { "Content-Type": "application/json" });
-						res.end(JSON.stringify({ ok: false, error: "channel_auto_joined_retry_request" }));
-						return true;
+						const cacheKey = url ?? "";
+
+						const cached = apiCache.get(cacheKey);
+						if (cached) {
+							apiCache.delete(cacheKey);
+						}
+						return false;
 					}
 				}
 			}
@@ -378,6 +387,7 @@ if (config.SLACK_TOKENS && Object.keys(config.SLACK_TOKENS).length > 0) {
 					Authorization: "Bearer " + token,
 				},
 				slackAutoJoinHookWrapper(token),
+				5 * 1000,
 			);
 		}
 	}
@@ -427,6 +437,19 @@ proxies["/src/Server"] = {
 
 proxies["^(?!/(index\\.html|vacation\\.csv|favicon\\.ico))/[^/?]+\\.[^/?]+(?:\\?|$)"] = {
 	// This is a catch all for any request that looks like it's trying to access a file directly at the root, except for index.html and vacation.csv which need to be accessed directly
+	target: INTERNAL_URL,
+	changeOrigin: true,
+	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {
+		log("Blocked", req, "", "access attempt");
+		if (res) {
+			res.writeHead(404, { "Content-Type": "text/plain" });
+			res.end("Not Found");
+		}
+		return false;
+	},
+};
+proxies["^(@fs|.*/etc)"] = {
+	// Another block
 	target: INTERNAL_URL,
 	changeOrigin: true,
 	bypass: (req: IncomingMessage, res: ServerResponse | undefined) => {

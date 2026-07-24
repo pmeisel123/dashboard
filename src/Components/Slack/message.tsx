@@ -1,4 +1,5 @@
 import type { /*ChannelProp, */ MessageProp, SlackEmojisProp, SlackFile, SlackUserProp } from "@src/Api";
+import type { FC } from "react";
 import { Message } from "slack-blocks-to-jsx";
 import "slack-blocks-to-jsx/dist/style.css";
 
@@ -10,7 +11,7 @@ const decodeUtf8String = (str: string): string => {
 	}
 };
 
-function SlackFileAttachmentList({ files }: { files: SlackFile[] }) {
+export const SlackFileAttachmentList: FC<{ files: SlackFile[] }> = ({ files }) => {
 	return (
 		<div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "12px" }}>
 			{files.map((file) => {
@@ -59,14 +60,14 @@ function SlackFileAttachmentList({ files }: { files: SlackFile[] }) {
 			})}
 		</div>
 	);
-}
+};
 
-export const formatSlackMessage = (
-	message: MessageProp,
-	emojis: SlackEmojisProp,
-	users: { [key: string]: SlackUserProp },
-	//  channels: { [key: string]: ChannelProp },
-) => {
+export const SlackMessage: FC<{
+	message: MessageProp;
+	emojis: SlackEmojisProp;
+	users: { [key: string]: SlackUserProp };
+	//	channels: { [key: string]: ChannelProp };
+}> = ({ message, emojis, users /* channels */ }) => {
 	const { user: userId, text, ts, files } = message;
 	const matchedUser = users[userId];
 	const rawDisplayName = matchedUser

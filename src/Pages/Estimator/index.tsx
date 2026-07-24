@@ -225,7 +225,7 @@ const EstimatorPage: FC<{
 							allJiraUsersGroups={allJiraUsersGroups}
 							totalTimEstimate={totalTimEstimate}
 							visibleUsers={visibleUsers}
-							isDashboard={isDashboard}
+							isDashboard={false}
 							setLastDay={setLastDay}
 							aiLastDay={aiLastDay}
 						/>

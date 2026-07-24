@@ -1,8 +1,10 @@
 import { Box, styled } from "@mui/material";
 import type { ChannelProp, MessageProp, SlackEmojisProp, SlackUserProp } from "@src/Api";
+import { Ago } from "@src/Components";
 import type { FC } from "react";
+import { Fragment } from "react";
 import "slack-blocks-to-jsx/dist/style.css";
-import { formatSlackMessage } from "./message";
+import { SlackMessage } from "./message";
 
 const getDate = (date: Date): string => {
 	return date.toLocaleDateString();
@@ -14,12 +16,15 @@ const StyledDate = styled(Box)(() => ({
 	padding: "5px 0",
 }));
 
+const tenMinutes = 600000;
+
 export const SlackChannel: FC<{
 	messages: MessageProp[];
 	channel: ChannelProp;
 	emojis: SlackEmojisProp;
 	users: { [key: string]: SlackUserProp };
-}> = ({ messages, emojis, users }) => {
+	lastUpdated: number;
+}> = ({ messages, channel, emojis, users, lastUpdated }) => {
 	if (!messages.length) {
 		return null;
 	}
@@ -27,20 +32,38 @@ export const SlackChannel: FC<{
 	day.setHours(0, 0, 0, 0);
 	return (
 		<>
+			{channel && (
+				<>
+					<div>Channel: {channel.name}</div>
+					{channel.description && <div>Description: {channel.description}</div>}
+					{channel.topic && <div>Topic: {channel.topic}</div>}
+				</>
+			)}
+
 			<StyledDate key={getDate(day)}>Today</StyledDate>
 			{messages.map((message) => {
+				const messageTime = (parseFloat(message.ts) || 0) * 1000;
 				let days = [];
-				while ((parseFloat(message.ts) || 0) * 1000 < day.getTime()) {
+				while (messageTime < day.getTime()) {
 					day.setDate(day.getDate() - 1);
-					days.push(getDate(day));
+					days.push(new Date(day));
 				}
+				const isRecent = messageTime > lastUpdated - tenMinutes;
 				return (
-					<>
-						{days.map((displayDay) => (
-							<StyledDate key={displayDay}>{displayDay}</StyledDate>
-						))}
-						<div key={message.ts}>{formatSlackMessage(message, emojis, users)}</div>
-					</>
+					<Fragment key={message.ts}>
+						{!!days.length && (
+							<div style={{ marginBottom: "10px" }}>
+								{days.map((displayDay) => (
+									<StyledDate key={getDate(displayDay)}>
+										{getDate(displayDay)} ({Ago(displayDay)} ago)
+									</StyledDate>
+								))}
+							</div>
+						)}
+						<div style={{ backgroundColor: isRecent ? "#FFD" : "" }} key={message.ts}>
+							<SlackMessage message={message} emojis={emojis} users={users} />
+						</div>
+					</Fragment>
 				);
 			})}
 		</>

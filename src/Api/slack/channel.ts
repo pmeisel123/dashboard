@@ -1,15 +1,7 @@
-import type { MessageProp } from "../Types";
+import type { MessageProp } from "@src/Api";
+import { sleep } from "@src/Api";
 
-export const getChannelApi = async (instance: string, channelId: string): Promise<MessageProp[]> => {
-	const url = "/slack/" + instance + "/conversations.history?channel=" + channelId;
-	console.log("getChannelApi: ", url);
-	const options: RequestInit = {
-		method: "GET",
-		headers: {
-			"Content-Type": "application/json",
-		},
-	};
-	const response = await fetch(url, options);
+export const processResponse = async (response: Response) => {
 	const ajax_result: any = await response.json();
 	const results: MessageProp[] = [];
 	if (ajax_result?.messages) {
@@ -22,7 +14,30 @@ export const getChannelApi = async (instance: string, channelId: string): Promis
 			};
 			results.push(message);
 		}
+	} else {
+		return null;
 	}
-	console.log("getChannelApi: ", results);
+	return results;
+};
+
+export const getChannelApi = async (instance: string, channelId: string): Promise<MessageProp[]> => {
+	const url = "/slack/" + instance + "/conversations.history?channel=" + channelId;
+	const options: RequestInit = {
+		method: "GET",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	};
+	let response = await fetch(url, options);
+	let results: MessageProp[] | null = await processResponse(response);
+	if (results == null) {
+		await sleep(2);
+		response = await fetch(url, options);
+		results = await processResponse(response);
+	}
+	if (results == null) {
+		return [];
+	}
+
 	return results;
 };

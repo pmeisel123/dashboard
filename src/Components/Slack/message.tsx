@@ -1,4 +1,4 @@
-import type { /*ChannelProp, */ MessageProp, SlackEmojisProp, SlackFile, SlackUserProp } from "@src/Api";
+import type { ChannelProp, MessageProp, SlackEmojisProp, SlackFile, SlackUserProp } from "@src/Api";
 import type { FC } from "react";
 import { Message } from "slack-blocks-to-jsx";
 import "slack-blocks-to-jsx/dist/style.css";
@@ -66,8 +66,8 @@ export const SlackMessage: FC<{
 	message: MessageProp;
 	emojis: SlackEmojisProp;
 	users: { [key: string]: SlackUserProp };
-	//	channels: { [key: string]: ChannelProp };
-}> = ({ message, emojis, users /* channels */ }) => {
+	channels: { [key: string]: ChannelProp };
+}> = ({ message, emojis, users, channels }) => {
 	const { user: userId, text, ts, files } = message;
 	const matchedUser = users[userId];
 	const rawDisplayName = matchedUser
@@ -104,20 +104,23 @@ export const SlackMessage: FC<{
 			style={{ fontFamily: "sans-serif", ["--slack-msg-time" as any]: `"${timeDisplayString}"` }}
 		>
 			<style>{`
-        .slack-message-wrapper div[class*="bg-black-primary"],
-        .slack-message-wrapper .slack_blocks_to_jsx--header > div:nth-child(2) {
-          display: none !important;
-        }
-        .slack-message-wrapper .slack_blocks_to_jsx--header > div:last-child {
-          font-size: 0 !important;
-        }
-        .slack-message-wrapper .slack_blocks_to_jsx--header > div:last-child::after {
-          content: var(--slack-msg-time);
-          font-size: 12px;
-          text-transform: uppercase;
-          line-height: 17.6px;
-        }
-      `}</style>
+				.slack-message-wrapper div[class*="bg-black-primary"],
+				.slack-message-wrapper .slack_blocks_to_jsx--header > div:nth-child(2) {
+					display: none !important;
+				}
+				.slack-message-wrapper .slack_blocks_to_jsx--header > div:last-child {
+					font-size: 0 !important;
+					line-height: 0 !important;
+					margin-top: 6px;
+				}
+				.slack-message-wrapper .slack_blocks_to_jsx--header > div:last-child::after {
+					content: var(--slack-msg-time);
+					font-size: 12px;
+				}
+				.slack-message-wrapper #slack_blocks_to_jsx section {
+					max-width: 100%
+				}
+			`}</style>
 			<Message
 				blocks={blocksPayload}
 				name={senderDisplayName}
@@ -149,17 +152,16 @@ export const SlackMessage: FC<{
 							internalMentionedUser?.profile?.display_name || internalMentionedUser?.real_name || data.id;
 						return <strong style={{ color: "#1d1c1d" }}>@{decodeUtf8String(rawMentionName)}</strong>;
 					},
-					/*
-		            channel: (data: any) => {
-            const internalChannel = channels[data.id];
-            const rawChannelName = internalChannel?.name || data.id;
-            return (
-              <span style={{ color: "#1264a3", fontWeight: 500, cursor: "pointer" }}>
-                #{decodeUtf8String(rawChannelName)}
-              </span>
-            );
-          },
-		 */
+
+					channel: (data: any) => {
+						const internalChannel = channels[data.id];
+						const rawChannelName = internalChannel?.name || data.id;
+						return (
+							<span style={{ color: "#1264a3", fontWeight: 500, cursor: "pointer" }}>
+								#{decodeUtf8String(rawChannelName)}
+							</span>
+						);
+					},
 				}}
 			/>
 			{files && files.length > 0 && <SlackFileAttachmentList files={files as unknown as SlackFile[]} />}

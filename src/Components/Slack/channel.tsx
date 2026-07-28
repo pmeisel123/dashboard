@@ -24,7 +24,8 @@ export const SlackChannel: FC<{
 	emojis: SlackEmojisProp;
 	users: { [key: string]: SlackUserProp };
 	lastUpdated: number;
-}> = ({ messages, channel, emojis, users, lastUpdated }) => {
+	channels: { [key: string]: ChannelProp };
+}> = ({ messages, channel, emojis, users, lastUpdated, channels }) => {
 	if (!messages.length) {
 		return null;
 	}
@@ -61,7 +62,7 @@ export const SlackChannel: FC<{
 							</div>
 						)}
 						<div style={{ backgroundColor: isRecent ? "#FFD" : "" }} key={message.ts}>
-							<SlackMessage message={message} emojis={emojis} users={users} />
+							<SlackMessage message={message} emojis={emojis} users={users} channels={channels} />
 						</div>
 					</Fragment>
 				);

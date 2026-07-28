@@ -116,6 +116,7 @@ const Slack: FC<{
 					emojis={emojis}
 					users={users}
 					lastUpdated={lastUpdated}
+					channels={channels}
 				/>
 			</>
 		);

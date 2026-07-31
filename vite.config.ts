@@ -6,7 +6,7 @@ import type { IncomingHttpHeaders } from "node:http";
 import { IncomingMessage, ServerResponse } from "node:http";
 import zlib from "node:zlib";
 import path from "path";
-import type { ProxyOptions, Plugin } from "vite";
+import type { Plugin, ProxyOptions } from "vite";
 import ViteRestart from "vite-plugin-restart";
 import { defineConfig } from "vitest/config";
 import type { ConfigPropsFile, RepoNamePaths } from "./src/Api/Types";
@@ -125,11 +125,10 @@ const serveFromCache = (res: ServerResponse, cached: CachedResponse) => {
 	res.end(cached.body);
 };
 
-
 // From Google AI, prevents vite from displaying the full allowed paths when a bad file is called
 function genericErrorPlugin(): Plugin {
 	return {
-		name: 'generic-error-interceptor',
+		name: "generic-error-interceptor",
 		configureServer(server) {
 			server.middlewares.use((_req: IncomingMessage, res: ServerResponse, next: () => void) => {
 				const chunks: Buffer[] = [];
@@ -142,13 +141,13 @@ function genericErrorPlugin(): Plugin {
 				res.write = function (
 					chunk: Uint8Array | string,
 					encodingOrCb?: BufferEncoding | StreamCallback,
-					cb?: StreamCallback
+					cb?: StreamCallback,
 				): boolean {
 					if (res.statusCode && res.statusCode !== 403) {
 						return originalWrite(chunk, encodingOrCb as BufferEncoding, cb);
 					}
 					if (chunk) {
-						chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : Buffer.from(chunk));
+						chunks.push(typeof chunk === "string" ? Buffer.from(chunk, "utf8") : Buffer.from(chunk));
 					}
 					return true;
 				};
@@ -156,39 +155,46 @@ function genericErrorPlugin(): Plugin {
 				res.end = function (
 					chunk?: Uint8Array | string | (() => void),
 					encodingOrCb?: BufferEncoding | (() => void),
-					cb?: () => void
+					cb?: () => void,
 				): ServerResponse {
 					if (res.statusCode && res.statusCode !== 403) {
 						return originalEnd(chunk as Uint8Array | string, encodingOrCb as BufferEncoding, cb);
 					}
 
-					if (chunk && typeof chunk !== 'function') {
-						chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : Buffer.from(chunk));
+					if (chunk && typeof chunk !== "function") {
+						chunks.push(typeof chunk === "string" ? Buffer.from(chunk, "utf8") : Buffer.from(chunk));
 					}
-					
-					const body = Buffer.concat(chunks).toString('utf8');
 
-					if (res.statusCode === 403 && body.includes('outside of Vite serving allow list')) {
-						res.setHeader('Content-Type', 'text/plain');
-						
-						const cleanMessage = '403 Forbidden: Requested file is outside of the permitted project workspace.';
-						res.setHeader('Content-Length', Buffer.byteLength(cleanMessage));
-						
-						const finalEncoding: BufferEncoding = typeof encodingOrCb === 'string' ? encodingOrCb : 'utf8';
-						const finalCallback = typeof chunk === 'function' ? chunk : (typeof encodingOrCb === 'function' ? encodingOrCb : cb);
+					const body = Buffer.concat(chunks).toString("utf8");
+
+					if (res.statusCode === 403 && body.includes("outside of Vite serving allow list")) {
+						res.setHeader("Content-Type", "text/plain");
+
+						const cleanMessage =
+							"403 Forbidden: Requested file is outside of the permitted project workspace.";
+						res.setHeader("Content-Length", Buffer.byteLength(cleanMessage));
+
+						const finalEncoding: BufferEncoding = typeof encodingOrCb === "string" ? encodingOrCb : "utf8";
+						const finalCallback =
+							typeof chunk === "function"
+								? chunk
+								: typeof encodingOrCb === "function"
+									? encodingOrCb
+									: cb;
 
 						return originalEnd(cleanMessage, finalEncoding, finalCallback);
 					}
 
-					const finalEncoding: BufferEncoding = typeof encodingOrCb === 'string' ? encodingOrCb : 'utf8';
-					const finalCallback = typeof chunk === 'function' ? chunk : (typeof encodingOrCb === 'function' ? encodingOrCb : cb);
+					const finalEncoding: BufferEncoding = typeof encodingOrCb === "string" ? encodingOrCb : "utf8";
+					const finalCallback =
+						typeof chunk === "function" ? chunk : typeof encodingOrCb === "function" ? encodingOrCb : cb;
 
 					return originalEnd(Buffer.concat(chunks), finalEncoding, finalCallback);
 				};
 
 				next();
 			});
-		}
+		},
 	};
 }
 

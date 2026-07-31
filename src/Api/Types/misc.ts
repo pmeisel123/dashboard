@@ -67,6 +67,10 @@ export interface CustomNavLinks {
 	sort: number;
 }
 
+export type SlackTokensType = {
+	[key: string]: string;
+};
+
 export interface ConfigProps {
 	ALLOW_VACATION_EDITS: boolean;
 	API_CONFLUENCE_URL: string;
@@ -90,7 +94,6 @@ export interface ConfigProps {
 	GEMINI_API_KEY_DEFINED: boolean;
 	SLACK_TOKEN_KEYS: string[];
 }
-
 export interface ConfigPropsFile {
 	ALLOW_VACATION_EDITS: boolean;
 	ALLOW_CONFIG_EDIT: boolean;
@@ -112,7 +115,7 @@ export interface ConfigPropsFile {
 	GITREPOS: ReposProps[];
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 	GEMINI_API_KEYS: string[];
-	SLACK_TOKENS: { [key: string]: string };
+	SLACK_TOKENS: SlackTokensType;
 }
 
 export interface LoadedSlice {

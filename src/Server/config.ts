@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { IncomingMessage } from "node:http";
 import { dirname, join } from "node:path";
-import type { ConfigProps, ConfigPropsFile, RepoNamePaths } from "../src/Api/Types";
+import type { ConfigProps, ConfigPropsFile, RepoNamePaths, SlackTokensType } from "../src/Api/Types";
 
 const filePath = join(process.cwd(), "config.json");
 const ducks = fs.readdirSync("./src/assets/ducks/");
@@ -134,11 +134,19 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 		const geminiKeyClean = configBody.GEMINI_API_KEYS
 			? configBody.GEMINI_API_KEYS.filter((str) => str.trim() !== "")
 			: [];
-		const slackTokenClean = configBody.SLACK_TOKENS
-			? (Object.fromEntries(
-					Object.entries(configBody.SLACK_TOKENS).filter(([_, value]) => value.trim() !== ""),
-				) as Record<string, string>)
-			: {};
+		let slackTokenClean: SlackTokensType = {};
+		Object.keys(configBody.SLACK_TOKENS).forEach((token) => {
+			const value = configBody.SLACK_TOKENS[token].trim();
+			console.log(token, value);
+			if (value == "") {
+				if (token in configFile.SLACK_TOKENS) {
+					slackTokenClean[token] = configFile.SLACK_TOKENS[token];
+				}
+			} else {
+				slackTokenClean[token] = value;
+			}
+		});
+		console.log(configBody.SLACK_TOKENS, slackTokenClean);
 
 		const config: ConfigPropsFile = {
 			...configBody,

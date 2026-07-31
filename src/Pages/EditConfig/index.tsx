@@ -9,6 +9,7 @@ import type {
 	CustomNavLinks,
 	DashboardProps,
 	RepoNamePaths,
+	SlackTokensType,
 	VacationKeyType,
 } from "@src/Api/Types";
 import type { SyntheticEvent } from "react";
@@ -21,6 +22,7 @@ import { EditGitConfigTab } from "./git";
 import { EditGoogleGeminiConfigTab } from "./googleapi";
 import { EditJiraConfigTab } from "./jira";
 import { EditMiscellaneousConfigTab } from "./miscellaneous";
+import { EditSlackConfigTab } from "./slack";
 
 const Debug = false;
 
@@ -39,6 +41,9 @@ function EditConfigPage() {
 	const [customFields, setCustomFields] = useState<CustomFieldsObjectProps>({});
 	const [gitRepoPaths, setGitRepoPaths] = useState<{ [key: string]: RepoNamePaths }>({});
 	const [gitToken, setGitToken] = useState<string>("");
+	const [editToken, setEditToken] = useState<boolean>(true);
+	const [editSlackToken, setEditSlackToken] = useState<boolean>(true);
+	const [slackTokens, setSlackTokens] = useState<SlackTokensType>({});
 	const [dashboards, setDashboards] = useState<{ [key: string]: DashboardProps }>({});
 	const [dashboardSpeed, setDashboardSpeed] = useState<number>(10);
 	const [dashboardDucks, setDashboardDucks] = useState<boolean>(true);
@@ -46,7 +51,6 @@ function EditConfigPage() {
 	const [allowConfigEdit, setAllowConfigEdit] = useState<boolean>(true);
 	const [allowDashboardEdit, setAllowDashboardEdit] = useState<boolean>(true);
 	const [editApiKey, setEditApiKey] = useState<boolean>(true);
-	const [editToken, setEditToken] = useState<boolean>(true);
 	const [geminiApiKeys, setGeminiApiKeys] = useState<string[]>([]);
 	const [editGeminiApiKeys, setEditGeminiApiKeys] = useState<boolean>(true);
 	const [links, setLinks] = useState<{ [key: string]: CustomNavLinks }>({});
@@ -103,6 +107,16 @@ function EditConfigPage() {
 		setAllowDashboardEdit(config.ALLOW_DASHBOARD_EDIT);
 		setLinks(config.CUSTOM_NAV_LINKS || {});
 		setEditGeminiApiKeys(!config.GEMINI_API_KEY_DEFINED);
+		const localSlackToken: SlackTokensType = slackTokens;
+		config.SLACK_TOKEN_KEYS.forEach((token) => {
+			if (!("token" in localSlackToken)) {
+				localSlackToken[token] = "";
+			}
+		});
+		setSlackTokens(localSlackToken);
+		if (config.SLACK_TOKEN_KEYS.length) {
+			setEditSlackToken(false);
+		}
 	}, [config]);
 
 	const handleChange = (_event: SyntheticEvent, newValue: string) => {
@@ -139,7 +153,7 @@ function EditConfigPage() {
 			GITREPOS: repos,
 			CUSTOM_NAV_LINKS: links || {},
 			GEMINI_API_KEYS: geminiApiKeys,
-			SLACK_TOKENS: {},
+			SLACK_TOKENS: slackTokens,
 		};
 		postConfigApi(newConfig).then(() => {
 			if (useSsl != config.USE_SSL || host != config.HOST || port != config.PORT) {
@@ -174,6 +188,7 @@ function EditConfigPage() {
 					<Tab label="Miscellaneous" value="Miscellaneous" />
 					<Tab label="Jira" value="Jira" />
 					<Tab label="Git" value="Git" />
+					<Tab label="Slack" value="Slack" />
 					<Tab label="Google Gemini" value="GoogleGemini" />
 					<Tab label="Dashboards" value="Dashboards" />
 					<Tab label="Custon Links" value="CustonLinks" />
@@ -234,6 +249,14 @@ function EditConfigPage() {
 						setGitRepoPaths={setGitRepoPaths}
 						editToken={editToken}
 						setEditToken={setEditToken}
+					/>
+				</TabPanel>
+				<TabPanel value="Slack">
+					<EditSlackConfigTab
+						slackTokens={slackTokens}
+						setSlackTokens={setSlackTokens}
+						editSlackToken={editSlackToken}
+						setEditSlackToken={setEditSlackToken}
 					/>
 				</TabPanel>
 				<TabPanel value="GoogleGemini">

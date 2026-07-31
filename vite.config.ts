@@ -6,7 +6,7 @@ import type { IncomingHttpHeaders } from "node:http";
 import { IncomingMessage, ServerResponse } from "node:http";
 import zlib from "node:zlib";
 import path from "path";
-import type { ProxyOptions } from "vite";
+import type { ProxyOptions, Plugin } from "vite";
 import ViteRestart from "vite-plugin-restart";
 import { defineConfig } from "vitest/config";
 import type { ConfigPropsFile, RepoNamePaths } from "./src/Api/Types";
@@ -124,6 +124,73 @@ const serveFromCache = (res: ServerResponse, cached: CachedResponse) => {
 	res.setHeader("content-length", Buffer.byteLength(cached.body));
 	res.end(cached.body);
 };
+
+
+// From Google AI, prevents vite from displaying the full allowed paths when a bad file is called
+function genericErrorPlugin(): Plugin {
+	return {
+		name: 'generic-error-interceptor',
+		configureServer(server) {
+			server.middlewares.use((_req: IncomingMessage, res: ServerResponse, next: () => void) => {
+				const chunks: Buffer[] = [];
+
+				const originalWrite = res.write.bind(res);
+				const originalEnd = res.end.bind(res);
+
+				type StreamCallback = (error?: Error | null) => void;
+
+				res.write = function (
+					chunk: Uint8Array | string,
+					encodingOrCb?: BufferEncoding | StreamCallback,
+					cb?: StreamCallback
+				): boolean {
+					if (res.statusCode && res.statusCode !== 403) {
+						return originalWrite(chunk, encodingOrCb as BufferEncoding, cb);
+					}
+					if (chunk) {
+						chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : Buffer.from(chunk));
+					}
+					return true;
+				};
+
+				res.end = function (
+					chunk?: Uint8Array | string | (() => void),
+					encodingOrCb?: BufferEncoding | (() => void),
+					cb?: () => void
+				): ServerResponse {
+					if (res.statusCode && res.statusCode !== 403) {
+						return originalEnd(chunk as Uint8Array | string, encodingOrCb as BufferEncoding, cb);
+					}
+
+					if (chunk && typeof chunk !== 'function') {
+						chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, 'utf8') : Buffer.from(chunk));
+					}
+					
+					const body = Buffer.concat(chunks).toString('utf8');
+
+					if (res.statusCode === 403 && body.includes('outside of Vite serving allow list')) {
+						res.setHeader('Content-Type', 'text/plain');
+						
+						const cleanMessage = '403 Forbidden: Requested file is outside of the permitted project workspace.';
+						res.setHeader('Content-Length', Buffer.byteLength(cleanMessage));
+						
+						const finalEncoding: BufferEncoding = typeof encodingOrCb === 'string' ? encodingOrCb : 'utf8';
+						const finalCallback = typeof chunk === 'function' ? chunk : (typeof encodingOrCb === 'function' ? encodingOrCb : cb);
+
+						return originalEnd(cleanMessage, finalEncoding, finalCallback);
+					}
+
+					const finalEncoding: BufferEncoding = typeof encodingOrCb === 'string' ? encodingOrCb : 'utf8';
+					const finalCallback = typeof chunk === 'function' ? chunk : (typeof encodingOrCb === 'function' ? encodingOrCb : cb);
+
+					return originalEnd(Buffer.concat(chunks), finalEncoding, finalCallback);
+				};
+
+				next();
+			});
+		}
+	};
+}
 
 const bypassFunction = (timeout?: number) => {
 	const localTimeout = typeof timeout !== "undefined" ? timeout : CACHE_TTL;
@@ -526,6 +593,7 @@ export default defineConfig({
 		ViteRestart({
 			restart: ["./config.json"],
 		}),
+		genericErrorPlugin(),
 	],
 	optimizeDeps: {
 		include: ["@mui/x-data-grid"],

@@ -23,3 +23,11 @@ export const GetBranchCreator = (creator: string, allJiraUsersGroups: UsersGroup
 };
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const decodeUtf8String = (str: string): string => {
+	try {
+		return decodeURIComponent(escape(str));
+	} catch {
+		return str;
+	}
+};

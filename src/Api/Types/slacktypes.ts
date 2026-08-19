@@ -31,6 +31,7 @@ export interface MessageProp {
 	text: string;
 	ts: string;
 	files?: SlackFile[];
+	userName?: string;
 }
 
 export interface SlackEmojisProp {

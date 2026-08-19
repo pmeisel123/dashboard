@@ -1,6 +1,6 @@
 import { Box, styled } from "@mui/material";
 import type { ChannelProp, MessageProp, SlackEmojisProp, SlackUserProp } from "@src/Api";
-import { Ago } from "@src/Components";
+import { Ago, SlackApiSummary } from "@src/Components";
 import type { FC } from "react";
 import { Fragment } from "react";
 import "slack-blocks-to-jsx/dist/style.css";
@@ -40,6 +40,7 @@ export const SlackChannel: FC<{
 					{channel.topic && <div>Topic: {channel.topic}</div>}
 				</>
 			)}
+			<SlackApiSummary messages={messages} users={users} />
 
 			<StyledDate key={getDate(day)}>Today</StyledDate>
 			{messages.map((message) => {

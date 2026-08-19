@@ -8,7 +8,7 @@ import type {
 	SlackEmojisProp,
 	SlackUserProp,
 } from "@src/Api";
-import { fetchConfig, getChannelApi, getChannelsApi, getEmojisApi, getUserssApi, isSliceRecent } from "@src/Api";
+import { fetchConfig, getChannelApi, getChannelsApi, getEmojisApi, getSlackUsersApi, isSliceRecent } from "@src/Api";
 import { SlackChannel, SlackChannels } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -73,7 +73,7 @@ const Slack: FC<{
 			};
 			fetchEmojis();
 			const fetchUsers = async () => {
-				const data = await getUserssApi(instance);
+				const data = await getSlackUsersApi(instance);
 				setUsers(data);
 			};
 			fetchUsers();

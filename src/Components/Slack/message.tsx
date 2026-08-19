@@ -1,15 +1,8 @@
 import type { ChannelProp, MessageProp, SlackEmojisProp, SlackFile, SlackUserProp } from "@src/Api";
+import { decodeUtf8String, getSlackUserNameAndAvatar } from "@src/Api";
 import type { FC } from "react";
 import { Message } from "slack-blocks-to-jsx";
 import "slack-blocks-to-jsx/dist/style.css";
-
-const decodeUtf8String = (str: string): string => {
-	try {
-		return decodeURIComponent(escape(str));
-	} catch {
-		return str;
-	}
-};
 
 export const SlackFileAttachmentList: FC<{ files: SlackFile[] }> = ({ files }) => {
 	return (
@@ -69,12 +62,7 @@ export const SlackMessage: FC<{
 	channels: { [key: string]: ChannelProp };
 }> = ({ message, emojis, users, channels }) => {
 	const { user: userId, text, ts, files } = message;
-	const matchedUser = users[userId];
-	const rawDisplayName = matchedUser
-		? matchedUser.profile.display_name || matchedUser.profile.real_name || matchedUser.real_name || matchedUser.name
-		: userId;
-	const senderDisplayName = decodeUtf8String(rawDisplayName);
-	const senderAvatar = matchedUser?.profile?.image_48 || ""; // Fallback prevents strict undefined error
+	const [senderDisplayName, senderAvatar] = getSlackUserNameAndAvatar(users, userId);
 
 	let timeDisplayString = "";
 	const numericTs = parseFloat(ts) || 0;

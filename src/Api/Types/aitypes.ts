@@ -57,6 +57,18 @@ export interface AiEstimations {
 }
 
 // ==========================================
+// Slack Summary Interfaces
+// ==========================================
+export interface AiSlackSummary {
+	summary: string;
+}
+
+export interface AiSlackSummaryResponseWrapper {
+	response: AiSlackSummary;
+	modelUsed: string;
+}
+
+// ==========================================
 // API Response Interfaces
 // ==========================================
 export interface AiReleaseNotesResponseWrapper {

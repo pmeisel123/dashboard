@@ -2,7 +2,7 @@ import type { Schema } from "@google/genai";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createHash } from "crypto";
 import type { IncomingMessage } from "node:http";
-import type { BranchCommit, HolidayProps, TicketProps, UserProps } from "../src/Api/Types";
+import type { BranchCommit, HolidayProps, MessageProp, TicketProps, UserProps } from "../src/Api/Types";
 import { loadConfig } from "./config";
 interface CachedResponse {
 	body: string;
@@ -77,6 +77,15 @@ const structuredReleaseNotesOutputSchema: Schema = {
 	},
 	required: ["releaseNotes"],
 };
+const structuredSlackOutputSchema: Schema = {
+	type: Type.OBJECT,
+	properties: {
+		summary: {
+			type: Type.STRING,
+		},
+	},
+};
+
 const DoAiRequest = async (prompt: string, config: ReturnType<typeof loadConfig>, structuredOutputSchema: any) => {
 	const prompt_key = prompt ? createHash("sha256").update(prompt).digest("hex") : "no_prompt";
 
@@ -155,6 +164,10 @@ export const GetGeminiData = async (req: IncomingMessage, requestBody: string | 
 	if (req.url === "/server/gemini/releasenotes") {
 		return GetReleaseNotes(req, requestBody);
 	}
+	if (req.url === "/server/gemini/slacksummary") {
+		return GetSlackSummary(req, requestBody);
+	}
+	return JSON.stringify({ error: "Invalid endpoint" });
 };
 
 const GetReleaseNotes = async (req: IncomingMessage, requestBody: string | null) => {
@@ -347,5 +360,19 @@ const GetEstimatorData = async (req: IncomingMessage, requestBody: string | null
 		};
 
 		return await DoAiRequest(prompt, config, structuredOutputSchema);
+	}
+};
+
+const GetSlackSummary = async (req: IncomingMessage, requestBody: string | null) => {
+	const config = loadConfig();
+	if (req.method === "POST" && config.GEMINI_API_KEYS && requestBody) {
+		const parsedBody = JSON.parse(requestBody);
+		const data = parsedBody as MessageProp[];
+
+		const prompt = `
+		Using the following slack messages, generate a summary of the key points discussed in the conversation. Summarize as much as possible, make readable for non technical people
+		Messages: ${JSON.stringify(data)}
+		`;
+		return await DoAiRequest(prompt, config, structuredSlackOutputSchema);
 	}
 };

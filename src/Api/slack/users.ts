@@ -1,5 +1,5 @@
 import type { SlackUserProp } from "@src/Api";
-import { sleep } from "@src/Api";
+import { decodeUtf8String, sleep } from "@src/Api";
 
 const processResponse = async (response: Response) => {
 	const ajax_result: any = await response.json();
@@ -13,7 +13,7 @@ const processResponse = async (response: Response) => {
 	return null;
 };
 
-export const getUserssApi = async (instance: string): Promise<{ [key: string]: SlackUserProp }> => {
+export const getSlackUsersApi = async (instance: string): Promise<{ [key: string]: SlackUserProp }> => {
 	const url = "/slack/" + instance + "/users.list";
 	const options: RequestInit = {
 		method: "GET",
@@ -32,4 +32,24 @@ export const getUserssApi = async (instance: string): Promise<{ [key: string]: S
 		return {};
 	}
 	return results;
+};
+
+export const getSlackUserNameAndAvatar = (
+	users: { [key: string]: SlackUserProp },
+	userId: string,
+): [string, string] => {
+	if (users && users[userId]) {
+		const matchedUser = users[userId];
+		const rawDisplayName = matchedUser
+			? matchedUser.profile.display_name ||
+				matchedUser.profile.real_name ||
+				matchedUser.real_name ||
+				matchedUser.name
+			: userId;
+		const userName = decodeUtf8String(rawDisplayName);
+		const userAvatar =
+			matchedUser.profile.image_48 || matchedUser.profile.image_24 || matchedUser.profile.image_512 || "";
+		return [userName, userAvatar];
+	}
+	return ["", ""];
 };

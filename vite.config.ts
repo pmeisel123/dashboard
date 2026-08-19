@@ -201,7 +201,15 @@ function genericErrorPlugin(): Plugin {
 const bypassFunction = (timeout?: number) => {
 	const localTimeout = typeof timeout !== "undefined" ? timeout : CACHE_TTL;
 	const bypassFunctionInner = async (req: IncomingMessage, res: ServerResponse | undefined) => {
-		if (!res || req.method !== "GET") return;
+		if (!res || req.method !== "GET") {
+			// Request to /server is handled by the Server function, which can handle non-GET requests. All other endpoints should only allow GET requests.
+			log("Blocked", req, "", `Non-GET method (${req.method}) rejected for (${req.url})`);
+			if (res) {
+				res.writeHead(405, { "Content-Type": "text/plain", Allow: "GET" });
+				res.end("405 Method Not Allowed: Only GET requests are permitted on this endpoint.");
+			}
+			return req.url;
+		}
 		const cacheKey = req.url ?? "";
 
 		const cached = apiCache.get(cacheKey);

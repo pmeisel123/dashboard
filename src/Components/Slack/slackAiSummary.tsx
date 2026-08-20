@@ -45,7 +45,6 @@ export const SlackApiSummary: FC<{
 				};
 			});
 			postGeminiApiForSlackSummary(detailedMessages).then((response) => {
-				console.log("SlackApiSummary 3");
 				setAiResponse(response);
 			});
 		}

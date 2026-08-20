@@ -372,6 +372,7 @@ const GetSlackSummary = async (req: IncomingMessage, requestBody: string | null)
 		const prompt = `
 		Using the following slack messages, generate a summary of the key points discussed in the conversation. Summarize as much as possible, make readable for non technical people
 		Higher priority should be given to messages that are more recent.
+		If there are no recent messages, please include that at the start of the summary.
 		Messages: ${JSON.stringify(data)}
 		`;
 		return await DoAiRequest(prompt, config, structuredSlackOutputSchema);

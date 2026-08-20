@@ -22,7 +22,8 @@ const Calendar: FC<{
 	visibleUsers: Set<string>;
 	isDashboard?: boolean;
 	setLastDay: Dispatch<SetStateAction<string>>;
-}> = ({ allJiraUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard, setLastDay }) => {
+	aiLastDay?: string;
+}> = ({ allJiraUsersGroups, users, group, totalTimEstimate, visibleUsers, isDashboard, setLastDay, aiLastDay }) => {
 	const [rows, setRows] = useState<cellData[][]>([]);
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -65,7 +66,7 @@ const Calendar: FC<{
 		current_day.setDate(current_day.getDate() - current_day.getDay());
 		current_day.setHours(0, 0, 0, 0);
 		let newrows: cellData[][] = [];
-		while ((remainingTimEstimate > 0 || extra) && max_rows) {
+		while ((remainingTimEstimate > 0 || extra || (aiLastDay && current_day <= new Date(aiLastDay))) && max_rows) {
 			max_rows--;
 			if (!remainingTimEstimate) {
 				extra = false;

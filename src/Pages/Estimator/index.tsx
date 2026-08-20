@@ -1,6 +1,6 @@
 import type { AppDispatch, RootState, RoutePageProps, TicketProps } from "@src/Api";
-import { fetchBranches, fetchConfig, fetchTickets, fetchUsersAndGroups, isSliceRecent } from "@src/Api";
-import { allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
+import { fetchBranches, fetchConfig, fetchTickets, fetchUsersAndGroups, getEstimations, isSliceRecent } from "@src/Api";
+import { AiEstimator, allGroups, Calendar, FormFields, TicketTable, UsersSelector } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +22,9 @@ const EstimatorPage: FC<{
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [search, setSearch] = useState<string>(searchParams.get("search") || "");
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch] ?? []);
+	const tickets: { [key: string]: TicketProps } = useSelector(
+		(state: RootState) => state.ticketsState[jiraSearch] ?? [],
+	);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(initialDefaultEstimate);
 	const [parent, setParent] = useState<string>(searchParams.get("parent") || "");
@@ -44,6 +46,7 @@ const EstimatorPage: FC<{
 	const dispatch = useDispatch<AppDispatch>();
 	const config = useSelector((state: RootState) => state.configState);
 	const [lastDay, setLastDay] = useState<string>("");
+	const [aiLastDay, setAiLastDay] = useState<string>("");
 
 	const loadParams = () => {
 		setDefaultEstimate(parseInt(searchParams.get("defaultEstimate") || `${defaultDefaultDefaultEstimate}`, 10));
@@ -148,15 +151,15 @@ const EstimatorPage: FC<{
 		}
 	}, [search, defaultEstimate, parent, estimatePadding, group, users]);
 
-	const totalTimEstimate = useMemo(
-		() => tickets.reduce((sum, row) => sum + (row.timeestimate || defaultEstimate), 0) + estimatePadding,
+	console.log(tickets);
+
+	const estimates = useMemo(
+		() => getEstimations(tickets, defaultEstimate, estimatePadding),
 		[tickets, defaultEstimate, estimatePadding],
 	);
-	const totalTimeOriginalEstimate = useMemo(
-		() => tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || defaultEstimate), 0) + estimatePadding,
-		[tickets, defaultEstimate, estimatePadding],
-	);
-	const totalTimeSpent = useMemo(() => tickets.reduce((sum, row) => sum + (row.timespent || 0), 0), [tickets]);
+	const totalTimEstimate = estimates.totalTimEstimate;
+	const totalTimeOriginalEstimate = estimates.totalTimeOriginalEstimate;
+	const totalTimeSpent = estimates.totalTimeSpent;
 
 	return (
 		<>
@@ -182,8 +185,18 @@ const EstimatorPage: FC<{
 					/>
 				</>
 			)}
-			{(search || parent) && !!tickets.length && !!lastDay && (
+			{(search || parent) && !!Object.keys(tickets).length && !!lastDay && (
 				<strong>Work will be completed on {lastDay}</strong>
+			)}
+			{!!Object.keys(tickets).length && !loading && !!allJiraUsersGroups.loaded && (
+				<AiEstimator
+					users={users}
+					tickets={tickets}
+					allJiraUsersGroups={allJiraUsersGroups}
+					defaultEstimate={defaultEstimate}
+					estimatePadding={estimatePadding}
+					setAiLastDay={setAiLastDay}
+				/>
 			)}
 			{(search || parent) && (
 				<TicketTable
@@ -198,20 +211,26 @@ const EstimatorPage: FC<{
 					ticketsBranches={ticketsBranches}
 				/>
 			)}
-			{(search || parent) && !!tickets.length && (
-				<>
-					{!!lastDay && <strong>Work will be completed on {lastDay}</strong>}
-					<Calendar
-						users={users}
-						group={group}
-						allJiraUsersGroups={allJiraUsersGroups}
-						totalTimEstimate={totalTimEstimate}
-						visibleUsers={visibleUsers}
-						isDashboard={isDashboard}
-						setLastDay={setLastDay}
-					/>
-				</>
-			)}
+			{!loading &&
+				(search || parent) &&
+				!!Object.keys(tickets).length &&
+				isSliceRecent(config) &&
+				isSliceRecent(allJiraUsersGroups) &&
+				isSliceRecent(ticketsBranches) && (
+					<>
+						{!!lastDay && <strong>Work will be completed on {lastDay}</strong>}
+						<Calendar
+							users={users}
+							group={group}
+							allJiraUsersGroups={allJiraUsersGroups}
+							totalTimEstimate={totalTimEstimate}
+							visibleUsers={visibleUsers}
+							isDashboard={false}
+							setLastDay={setLastDay}
+							aiLastDay={aiLastDay}
+						/>
+					</>
+				)}
 		</>
 	);
 };

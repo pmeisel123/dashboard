@@ -15,7 +15,7 @@ import {
 	getBranchesCompare,
 	isSliceRecent,
 } from "@src/Api";
-import { CommitsSelector, CommitsTable } from "@src/Components";
+import { AiReleaseNotes, CommitsSelector, CommitsTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -140,13 +140,15 @@ const BranchesComparePage: FC<{
 			}
 		});
 		if (ticket_search) {
+			console.log("Searching tickets with JQL: " + ticket_search);
 			dispatch(fetchTickets([ticket_search, config])).then((data: any) => {
 				let local_tickets = { ...tickets };
-				if (data && data.payload && data.payload.length) {
-					data.payload.forEach((ticket: TicketProps) => {
-						local_tickets[ticket.key] = ticket;
-					});
+				console.log("Got tickets data from API: ", data);
+				if (data && data.payload && Object.keys(data.payload).length) {
+					console.log("Processing tickets data: ", data.payload);
+					local_tickets = { ...local_tickets, ...data.payload };
 				}
+				console.log(local_tickets);
 				setTickets(local_tickets);
 			});
 		}
@@ -180,6 +182,7 @@ const BranchesComparePage: FC<{
 	if (!Object.keys(ticketsBranches.branches).length) {
 		return;
 	}
+
 	return (
 		<>
 			<CommitsSelector
@@ -194,6 +197,16 @@ const BranchesComparePage: FC<{
 				setUseLatestRelease={setUseLatestRelease}
 				releases={releases[repo]?.releases || []}
 			/>
+			{repo &&
+				branch1 &&
+				branch2 &&
+				!loading &&
+				releases[repo] &&
+				isSliceRecent(releases[repo]) &&
+				latestRelease[repo] &&
+				isSliceRecent(latestRelease[repo]) &&
+				ticketsBranches.branches &&
+				Object.keys(ticketsBranches.branches).length && <AiReleaseNotes tickets={tickets} commits={commits} />}
 			{repo && branch1 && branch2 && (
 				<CommitsTable
 					repo={repo}

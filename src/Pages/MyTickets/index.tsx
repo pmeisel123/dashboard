@@ -7,6 +7,7 @@ import {
 	fetchTickets,
 	fetchUsersAndGroups,
 	GetBranchCreator,
+	getEstimations,
 	isSliceRecent,
 } from "@src/Api";
 import { TicketTable, UserSelector } from "@src/Components";
@@ -30,7 +31,7 @@ const MyTicketsPage: FC<{
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const hasFetchedTickets = useRef("");
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
-	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const tickets: { [key: string]: TicketProps } = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -181,9 +182,10 @@ const MyTicketsPage: FC<{
 			setSearchParams(newSearchParams);
 		}
 	}, [group, user, userFields]);
-	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
-	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
-	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	const estimation = getEstimations(tickets);
+	let totalTimEstimate = estimation.totalTimEstimate;
+	let totalTimeOriginalEstimate = estimation.totalTimeOriginalEstimate;
+	let totalTimeSpent = estimation.totalTimeSpent;
 	const owerColumnOnChange = (event: SelectChangeEvent<string[]>) => {
 		setUserFields(event.target.value as string[]);
 	};

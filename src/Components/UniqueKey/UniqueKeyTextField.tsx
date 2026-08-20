@@ -7,11 +7,13 @@ export const UniqueTextFieldFieldKey: FC<{
 	updateRow: (index: number, newKey: string) => void;
 	currentKey: string;
 	disabled: boolean;
+	disabledText?: string;
 	placeholder?: string;
 	index: number;
-}> = ({ object, updateRow, currentKey, disabled, placeholder, index }) => {
+}> = ({ object, updateRow, currentKey, disabled, disabledText, placeholder, index }) => {
 	const [localKey, setLocalKey] = useState<string>(currentKey);
 	const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
+	const localDisabledText = disabledText ? disabledText : "Input Token to Update Repos";
 	useEffect(() => {
 		if (localKey == currentKey) {
 			return;
@@ -32,7 +34,7 @@ export const UniqueTextFieldFieldKey: FC<{
 		<>
 			<TextField
 				error={isDuplicate}
-				helperText={disabled ? "Input Token to Update Repos" : isDuplicate ? "Duplicate Key" : " "}
+				helperText={disabled ? localDisabledText : isDuplicate ? "Duplicate Key" : " "}
 				id="currenKey"
 				value={localKey}
 				onChange={(event) => {

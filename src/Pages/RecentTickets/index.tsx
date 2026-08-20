@@ -1,6 +1,6 @@
 import { Button, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import type { AppDispatch, RootState, TicketProps } from "@src/Api";
-import { fetchBranches, fetchConfig, fetchTickets, getJiraDayString, isSliceRecent } from "@src/Api";
+import { fetchBranches, fetchConfig, fetchTickets, getEstimations, getJiraDayString, isSliceRecent } from "@src/Api";
 import { TicketTable } from "@src/Components";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ const RecentTicketsPage: FC<{
 	const [loading, setLoading] = useState<boolean>(true);
 	const ticketsSelector = useSelector((state: RootState) => state.ticketsState);
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
+	const tickets: { [key: string]: TicketProps } = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const ticketsBranches = useSelector((state: RootState) => state.gitBranchState);
 	const dispatch = useDispatch<AppDispatch>();
@@ -85,9 +85,10 @@ const RecentTicketsPage: FC<{
 			getFunc();
 		}
 	}, [loading]);
-	let totalTimEstimate = tickets.reduce((sum, row) => sum + (row.timeestimate || 0), 0);
-	let totalTimeOriginalEstimate = tickets.reduce((sum, row) => sum + (row.timeoriginalestimate || 0), 0);
-	let totalTimeSpent = tickets.reduce((sum, row) => sum + (row.timespent || 0), 0);
+	const estimations = getEstimations(tickets, 0, 0);
+	let totalTimEstimate = estimations.totalTimEstimate;
+	let totalTimeOriginalEstimate = estimations.totalTimeOriginalEstimate;
+	let totalTimeSpent = estimations.totalTimeSpent;
 	return (
 		<>
 			{!isDashboard && (

@@ -15,8 +15,7 @@ const BranchesPage: FC<{
 	const allJiraUsersGroups = useSelector((state: RootState) => state.usersAndGroupsState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [jiraSearch, setJiraSearch] = useState<string>("");
-	const tickets: TicketProps[] = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
-	const [ticketKeys, setTicketKeys] = useState<{ [key: string]: TicketProps }>({});
+	const tickets: { [key: string]: TicketProps } = useSelector((state: RootState) => state.ticketsState[jiraSearch]);
 	const [group, setGroup] = useState<string>(searchParams.get("group") || "");
 	const [user, setUser] = useState<string>(searchParams.get("user") || "");
 	const [loaded, setLoaded] = useState<boolean>(false);
@@ -85,24 +84,6 @@ const BranchesPage: FC<{
 			}
 		}
 	}, [ticketsBranches]);
-	useEffect(() => {
-		if (config.API_URL) {
-			if (tickets) {
-				tickets.forEach((ticket) => {
-					const key = ticket.key;
-					setTicketKeys((ticketKeys) => {
-						ticketKeys[key] = ticket;
-						return ticketKeys;
-					});
-				});
-				if (Object.keys(ticketKeys).length) {
-					setLoaded(true);
-				}
-			}
-		} else {
-			setLoaded(true);
-		}
-	}, [tickets]);
 
 	return (
 		<Box sx={{ width: "100%" }}>
@@ -119,7 +100,7 @@ const BranchesPage: FC<{
 				loaded={loaded}
 				ticketsBranches={ticketsBranches}
 				allJiraUsersGroups={allJiraUsersGroups}
-				ticketKeys={ticketKeys}
+				tickets={tickets}
 				group={group}
 				user={user}
 			/>

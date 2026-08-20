@@ -50,7 +50,7 @@ const CustomFooterStatusComponent = (props: NonNullable<GridSlotsComponentsProps
 };
 
 const TicketTable: FC<{
-	tickets: TicketProps[];
+	tickets: { [key: string]: TicketProps };
 	defaultEstimate: number | null;
 	loading: boolean;
 	totalTimEstimate: number;
@@ -167,6 +167,65 @@ const TicketTable: FC<{
 			},
 			flex: 2,
 			minWidth: 125,
+		},
+		{
+			field: "path",
+			headerName: "path",
+			renderCell: (params: GridRenderCellParams<TicketProps>) => {
+				if (params.row.path && Array.isArray(params.row.path) && params.row.path.length > 0) {
+					return (
+						<div style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+							{params.row.path.map((key: string, index: number) => (
+								<Fragment key={index}>
+									<Link
+										href={`${config.API_URL}/browse/${key}`}
+										target="_blank"
+										rel="noopener noreferrer"
+										sx={{ whiteSpace: "nowrap" }}
+									>
+										{key}
+									</Link>
+									{params.row.path &&
+										Array.isArray(params.row.path) &&
+										params.row.path.length > 0 &&
+										index < params.row.path.length - 1 && <span>{"\u00a0>\u00a0\u200b"}</span>}
+								</Fragment>
+							))}
+						</div>
+					);
+				}
+				return null;
+			},
+			valueGetter: (_params, row) => {
+				if (row.path) {
+					return row.path.join(" > ");
+				}
+			},
+			sortComparator: (_v1, _v2, cellParams1, cellParams2) => {
+				const arr1: string[] = cellParams1.api.getRow(cellParams1.id)?.path || [];
+				const arr2: string[] = cellParams2.api.getRow(cellParams2.id)?.path || [];
+
+				const maxLen = Math.max(arr1.length, arr2.length);
+				const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+
+				for (let i = 0; i < maxLen; i++) {
+					const item1 = arr1[i];
+					const item2 = arr2[i];
+
+					if (item1 === undefined) return -1;
+					if (item2 === undefined) return 1;
+
+					// Compare the keys at this index naturally (e.g., 'OPS-2' vs 'OPS-17')
+					const comparison = collator.compare(item1, item2);
+					if (comparison !== 0) {
+						return comparison;
+					}
+				}
+
+				return 0;
+			},
+			width: 150,
+			minWidth: 80,
 		},
 		{ field: "assignee", headerName: "assignee", flex: 2 },
 		{ field: "creator", headerName: "creator", flex: 2 },
@@ -433,13 +492,17 @@ const TicketTable: FC<{
 	}
 
 	const getRowClassName = (params: GridRowParams<TicketProps>): string => {
+		let className = "";
 		if (params.row.isdone) {
-			return "MuiDataGrid-row-done";
+			className += "MuiDataGrid-row-done ";
 		}
 		if (user && params.row.assignee_id != user) {
-			return "MuiDataGrid-row-notowner";
+			className += "MuiDataGrid-row-notowner";
 		}
-		return params.row.isdone ? "MuiDataGrid-row-done" : "";
+		if (params.row.is_epic) {
+			className += "MuiDataGrid-row-epic";
+		}
+		return className;
 	};
 	const getVisibility = () => {
 		if (isDashboard) {
@@ -448,10 +511,10 @@ const TicketTable: FC<{
 				tmp[field_name] = [
 					"key",
 					"parentkey",
+					"path",
 					"assignee",
 					"status",
 					"labels",
-					"parentkey",
 					"timeestimate",
 					"summary",
 					"creator",
@@ -483,7 +546,7 @@ const TicketTable: FC<{
 							},
 						}}
 						loading={loading}
-						rows={tickets}
+						rows={Object.values(tickets)}
 						columns={columns}
 						getRowClassName={getRowClassName}
 						defaultColumnModel={defaultColumnModel}
@@ -509,7 +572,7 @@ const TicketTable: FC<{
 				</TabPanel>
 				<TabPanel value="flow">
 					<TicketFlow
-						tickets={tickets}
+						tickets={Object.values(tickets)}
 						defaultEstimate={defaultEstimate}
 						config={config}
 						theme={theme}

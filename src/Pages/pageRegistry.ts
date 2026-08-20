@@ -49,5 +49,8 @@ export const pageTestRequires = (test: string | undefined, config: ConfigProps):
 	if (test === "GIT_REPOS_PATHS") {
 		return !!(config.GIT_REPOS_PATHS && Object.keys(config.GIT_REPOS_PATHS).length);
 	}
+	if (test === "SLACK_TOKENS") {
+		return !!(config.SLACK_TOKEN_KEYS && config.SLACK_TOKEN_KEYS.length);
+	}
 	return true;
 };

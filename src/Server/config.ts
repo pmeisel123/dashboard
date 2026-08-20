@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { IncomingMessage } from "node:http";
 import { dirname, join } from "node:path";
-import type { ConfigProps, ConfigPropsFile, RepoNamePaths } from "../src/Api/Types";
+import type { ConfigProps, ConfigPropsFile, RepoNamePaths, SlackTokensType } from "../src/Api/Types";
 
 const filePath = join(process.cwd(), "config.json");
 const ducks = fs.readdirSync("./src/assets/ducks/");
@@ -25,6 +25,7 @@ export const loadConfig = (): ConfigPropsFile => {
 		API_USERNAME: "",
 		API_KEY: "",
 		API_URL: "",
+		GEMINI_API_KEYS: [],
 		CUSTOM_FIELDS: {},
 		DASHBOARDS: {
 			company: {
@@ -77,6 +78,7 @@ export const loadConfig = (): ConfigPropsFile => {
 		USE_SSL: false,
 		VACATION_KEY: "email",
 		GITREPOS: [],
+		SLACK_TOKENS: {},
 	};
 	return config;
 };
@@ -114,6 +116,9 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			GIT_REPOS_PATHS: git_proxies_name_path,
 			DUCKS: ducks,
 			CUSTOM_NAV_LINKS: configFile.CUSTOM_NAV_LINKS || {},
+			GEMINI_API_KEY_DEFINED:
+				configFile.GEMINI_API_KEYS && Object.keys(configFile.GEMINI_API_KEYS).length ? true : false,
+			SLACK_TOKEN_KEYS: configFile.SLACK_TOKENS ? Object.keys(configFile.SLACK_TOKENS) : [],
 		};
 		return JSON.stringify(config, null, 2);
 	}
@@ -125,6 +130,24 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 		}
 		const configBody: ConfigPropsFile = JSON.parse(requestBody);
 		const hasNewApiCredentials = !!(configBody.API_KEY && configBody.API_USERNAME);
+		console.log(configBody.GEMINI_API_KEYS);
+		const geminiKeyClean = configBody.GEMINI_API_KEYS
+			? configBody.GEMINI_API_KEYS.filter((str) => str.trim() !== "")
+			: [];
+		let slackTokenClean: SlackTokensType = {};
+		Object.keys(configBody.SLACK_TOKENS).forEach((token) => {
+			const value = configBody.SLACK_TOKENS[token].trim();
+			console.log(token, value);
+			if (value == "") {
+				if (token in configFile.SLACK_TOKENS) {
+					slackTokenClean[token] = configFile.SLACK_TOKENS[token];
+				}
+			} else {
+				slackTokenClean[token] = value;
+			}
+		});
+		console.log(configBody.SLACK_TOKENS, slackTokenClean);
+
 		const config: ConfigPropsFile = {
 			...configBody,
 
@@ -137,6 +160,10 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 
 			GITTOKEN: configBody.GITTOKEN ? configBody.GITTOKEN : configFile.GITTOKEN,
 			GITREPOS: configBody.GITTOKEN ? configBody.GITREPOS : configFile.GITREPOS,
+
+			GEMINI_API_KEYS:
+				geminiKeyClean && Object.keys(geminiKeyClean).length ? geminiKeyClean : configFile.GEMINI_API_KEYS,
+			SLACK_TOKENS: slackTokenClean ? slackTokenClean : configFile.SLACK_TOKENS,
 
 			DASHBOARDS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARDS : configFile.DASHBOARDS,
 			DASHBOARD_DUCKS: configFile.ALLOW_DASHBOARD_EDIT ? configBody.DASHBOARD_DUCKS : configFile.DASHBOARD_DUCKS,

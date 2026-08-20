@@ -23,6 +23,8 @@ const initialState: ConfigProps & LoadedSlice = {
 	ALLOW_DASHBOARD_EDIT: true,
 	DUCKS: [],
 	CUSTOM_NAV_LINKS: {},
+	GEMINI_API_KEY_DEFINED: false,
+	SLACK_TOKEN_KEYS: [],
 	loaded: null,
 };
 

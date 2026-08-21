@@ -1,7 +1,7 @@
-import { Add, Delete } from "@mui/icons-material";
-import { Box, Button, Grid, IconButton, InputLabel, TextField } from "@mui/material";
+import { Add, Delete, Info } from "@mui/icons-material";
+import { Box, Button, Grid, IconButton, InputLabel, Link, TextField } from "@mui/material";
 import type { EditableRow, SlackTokensType } from "@src/Api/Types";
-import { UniqueTextFieldFieldKey } from "@src/Components";
+import { HtmlTooltip, UniqueTextFieldFieldKey } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { useState } from "react";
 
@@ -61,7 +61,49 @@ export const EditSlackConfigTab: FC<{
 	};
 	return (
 		<Box sx={{ width: "100%" }}>
-			<InputLabel id="api_key">Slack Tokens</InputLabel>
+			<InputLabel id="api_key">
+				Slack Tokens
+				<HtmlTooltip
+					customWidth={450}
+					title={
+						<>
+							Create you slack tokens:
+							<ol>
+								<li>
+									<Link href="https://api.slack.com/apps" target="_blank">
+										Go to Manage Your Slack Apps
+									</Link>
+								</li>
+								<li>Create or use an existing slack app</li>
+								<li>On the left nav go to the "OAuth & Permissions" page</li>
+								<li>
+									Under OAuth Tokens, create (or use an existing) Bot User OAuth Token
+									<br />
+									Use the token in the input field below. The token should look like this:
+									<br />
+									<code>xoxb-123456789012-1234567890123-abcdefghijklmnopqrstuvwx</code>
+								</li>
+								<li>
+									Under Scopes, add the following Bot Token Scopes:
+									<ul>
+										<li>channels:history</li>
+										<li>channels:join</li>
+										<li>channels:read</li>
+										<li>emoji:read</li>
+										<li>files:read</li>
+										<li>users:read</li>
+									</ul>
+								</li>
+							</ol>
+						</>
+					}
+					disableInteractive={false}
+					arrow
+					placement="right"
+				>
+					<Info style={{ cursor: "pointer" }} color="action" />
+				</HtmlTooltip>
+			</InputLabel>
 			{!editSlackToken && (
 				<Grid container spacing={2} sx={{ width: "100%" }}>
 					<Grid sx={{ width: "325px" }}>

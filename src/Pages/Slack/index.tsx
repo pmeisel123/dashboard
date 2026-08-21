@@ -94,9 +94,9 @@ const Slack: FC<{
 			}, 60000); // Refresh every minute
 			return () => clearInterval(intervalId);
 		}
-	}, [instance, channel, channels, config]);
+	}, [instance, channel, channels, config, users]);
 
-	if (messages && messages.length > 0 && channel) {
+	if (channel) {
 		return (
 			<>
 				{!isDashboard && (

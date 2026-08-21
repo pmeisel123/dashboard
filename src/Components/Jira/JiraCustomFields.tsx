@@ -8,9 +8,9 @@ import type {
 	CustomFieldsProps,
 	EditableRow,
 } from "@src/Api/Types";
+import { HtmlTooltip } from "@src/Components";
 import type { Dispatch, FC, SetStateAction } from "react";
 import { createElement, useEffect, useState } from "react";
-import { HtmlTooltip } from "./const";
 import { JiraEditCustomFieldKey } from "./JiraCustomFieldKey";
 
 export const JiraCustomFields: FC<{

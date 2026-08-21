@@ -9,6 +9,7 @@ export * from "./EditCustomNavList";
 export * from "./Estimator";
 export * from "./Jira";
 export * from "./LeftNav";
+export * from "./Misc";
 export * from "./SavePage";
 export * from "./Slack";
 export * from "./Tickets";

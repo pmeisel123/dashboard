@@ -116,14 +116,19 @@ export const EditDashboardList: FC<{
 									key={index}
 								/>
 							</Grid>
-							<Grid size={{ xs: 12, md: 8 }}>
+							<Grid size={{ xs: 12, md: 4 }}>
 								<InputLabel id="namne">Name</InputLabel>
 								<TextField
 									value={dashboards[key].name}
 									onChange={(event) => {
 										updateName(index, event.target.value);
 									}}
+									sx={{ width: "100%" }}
 								/>
+							</Grid>
+							<Grid size={{ xs: 12, md: 4 }}>
+								<InputLabel id="namne">Image Path</InputLabel>
+								<TextField disabled value={dashboards[key].imagesPath || ""} sx={{ width: "100%" }} />
 							</Grid>
 						</Grid>
 						<EditPages pages={dashboards[key].pages} setPages={getUpdatePages(index)} subPage={false} />

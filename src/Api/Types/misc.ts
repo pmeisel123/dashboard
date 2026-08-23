@@ -43,6 +43,8 @@ export interface DashboardProps {
 	key: string;
 	name: string;
 	pages: DashboardPageProps[];
+	imagesPath?: string;
+	images?: string[];
 }
 
 export interface DashboardsProps {

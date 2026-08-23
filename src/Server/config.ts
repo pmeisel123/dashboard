@@ -6,6 +6,7 @@ import type { ConfigProps, ConfigPropsFile, RepoNamePaths, SlackTokensType } fro
 
 const filePath = join(process.cwd(), "config.json");
 const ducks = fs.readdirSync("./src/assets/ducks/");
+const dashboardImageDirectory = "./src/assets/imagesfordashboard";
 
 export const loadConfig = (): ConfigPropsFile => {
 	if (fs.existsSync(filePath)) {
@@ -83,6 +84,19 @@ export const loadConfig = (): ConfigPropsFile => {
 	return config;
 };
 
+const getDashboardDirectoryName = (dashboardKey: string) => {
+	return dashboardKey.replace(/[^a-zA-Z0-9]/g, "_");
+};
+
+const setDashoardImageDirectory = (dashboardKey: string) => {
+	const dashboardDirectoryName = getDashboardDirectoryName(dashboardKey);
+	const dashboardDirectoryPath = join(dashboardImageDirectory, dashboardDirectoryName);
+	if (!existsSync(dashboardDirectoryPath)) {
+		mkdirSync(dashboardDirectoryPath, { recursive: true });
+	}
+	return dashboardDirectoryPath;
+};
+
 export const ConfigServer = (req: IncomingMessage, requestBody: string | null) => {
 	if (req.method === "GET") {
 		const configFile = loadConfig();
@@ -96,6 +110,15 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 				url: repo.url,
 			};
 		});
+
+		if (configFile.DASHBOARDS) {
+			Object.keys(configFile.DASHBOARDS).forEach((dashboardKey) => {
+				const dashboardDirectoryPath = setDashoardImageDirectory(dashboardKey);
+				configFile.DASHBOARDS[dashboardKey].imagesPath = dashboardDirectoryPath;
+				const images = fs.readdirSync(dashboardDirectoryPath);
+				configFile.DASHBOARDS[dashboardKey].images = images;
+			});
+		}
 		const config: ConfigProps = {
 			ALLOW_VACATION_EDITS: configFile.ALLOW_VACATION_EDITS,
 			ALLOW_CONFIG_EDIT: configFile.ALLOW_CONFIG_EDIT,
@@ -146,7 +169,6 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 				slackTokenClean[token] = value;
 			}
 		});
-		console.log(configBody.SLACK_TOKENS, slackTokenClean);
 
 		const config: ConfigPropsFile = {
 			...configBody,

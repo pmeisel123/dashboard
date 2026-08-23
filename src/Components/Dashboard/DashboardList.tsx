@@ -83,6 +83,19 @@ const ListDashboard: FC<{
 								)}
 							</Box>
 						))}
+						{config.DASHBOARDS[key].images &&
+							config.DASHBOARDS[key].images.map((image, index) => (
+								<Box
+									sx={{
+										paddingLeft: 5,
+									}}
+									key={index + image}
+								>
+									<ExternalLink to={config.DASHBOARDS[key].imagesPath + "/" + image}>
+										{image}
+									</ExternalLink>
+								</Box>
+							))}
 					</Box>
 				</Fragment>
 			))}

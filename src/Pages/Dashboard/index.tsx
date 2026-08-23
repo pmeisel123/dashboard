@@ -99,6 +99,9 @@ function DashboardPage() {
 	let pages_count = 0;
 	if (dashboard && config.DASHBOARDS[dashboard]) {
 		pages_count = config.DASHBOARDS[dashboard].pages.length;
+		if (config.DASHBOARDS[dashboard].images) {
+			pages_count += config.DASHBOARDS[dashboard].images.length;
+		}
 	}
 	const changePageNumber = () => {
 		if (dashboard && config.DASHBOARDS[dashboard]) {
@@ -140,7 +143,17 @@ function DashboardPage() {
 	};
 	const ChangePageFromPageNumber = () => {
 		if (dashboard) {
-			setPage(config.DASHBOARDS[dashboard].pages[pageNumber]);
+			if (config.DASHBOARDS[dashboard].pages.length > pageNumber) {
+				setPage(config.DASHBOARDS[dashboard].pages[pageNumber]);
+			} else {
+				if (config.DASHBOARDS[dashboard].images && config.DASHBOARDS[dashboard].imagesPath) {
+					let image_number = pageNumber - config.DASHBOARDS[dashboard].pages.length;
+					setPage({
+						name: config.DASHBOARDS[dashboard].images[image_number],
+						url: `${config.DASHBOARDS[dashboard].imagesPath}/${config.DASHBOARDS[dashboard].images[image_number]}`,
+					});
+				}
+			}
 		}
 	};
 
@@ -162,10 +175,10 @@ function DashboardPage() {
 						Exit Dashboard
 					</Button>
 					Dashboard &gt; {config.DASHBOARDS[dashboard].name} &gt;{" "}
-					{config.DASHBOARDS[dashboard].pages[pageNumber].name}
+					{pageNumber <= config.DASHBOARDS[dashboard].pages.length && page && <>{page.name}</>}
 					<>
 						{" "}
-						(Page {pageNumber + 1} of {config.DASHBOARDS[dashboard].pages.length})
+						(Page {pageNumber + 1} of {pages_count})
 					</>
 					<Box sx={{ clear: "both" }} />
 				</Box>

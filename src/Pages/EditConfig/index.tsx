@@ -161,7 +161,6 @@ function EditConfigPage() {
 			} else {
 				dispatch(fetchConfig()).then((data) => {
 					setLoading(false);
-					console.log(data);
 					dispatch(fetchUsersAndGroups(data.payload as ConfigProps));
 				});
 			}

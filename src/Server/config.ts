@@ -5,8 +5,9 @@ import { dirname, join } from "node:path";
 import type { ConfigProps, ConfigPropsFile, RepoNamePaths, SlackTokensType } from "../src/Api/Types";
 
 const filePath = join(process.cwd(), "config.json");
-const ducks = fs.readdirSync("./src/assets/ducks/");
-const dashboardImageDirectory = "./src/assets/imagesfordashboard";
+const topLevel = "./src/assets/";
+const ducks = fs.readdirSync(topLevel + "ducks/");
+const dashboardImageDirectory = "imagesfordashboard";
 
 export const loadConfig = (): ConfigPropsFile => {
 	if (fs.existsSync(filePath)) {
@@ -91,8 +92,8 @@ const getDashboardDirectoryName = (dashboardKey: string) => {
 const setDashoardImageDirectory = (dashboardKey: string) => {
 	const dashboardDirectoryName = getDashboardDirectoryName(dashboardKey);
 	const dashboardDirectoryPath = join(dashboardImageDirectory, dashboardDirectoryName);
-	if (!existsSync(dashboardDirectoryPath)) {
-		mkdirSync(dashboardDirectoryPath, { recursive: true });
+	if (!existsSync(topLevel + dashboardDirectoryPath)) {
+		mkdirSync(topLevel + dashboardDirectoryPath, { recursive: true });
 	}
 	return dashboardDirectoryPath;
 };
@@ -115,7 +116,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			Object.keys(configFile.DASHBOARDS).forEach((dashboardKey) => {
 				const dashboardDirectoryPath = setDashoardImageDirectory(dashboardKey);
 				configFile.DASHBOARDS[dashboardKey].imagesPath = dashboardDirectoryPath;
-				const images = fs.readdirSync(dashboardDirectoryPath);
+				const images = fs.readdirSync(topLevel + dashboardDirectoryPath);
 				configFile.DASHBOARDS[dashboardKey].images = images;
 			});
 		}

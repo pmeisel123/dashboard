@@ -12,6 +12,9 @@ const LoadPage: FC<{
 	url: string;
 	height: number;
 }> = ({ url, height }) => {
+	if (url.match(/imagesfordashboard/)) {
+		return <LoadUrlIDashboardImage url={url} height={height} />;
+	}
 	const urlObj = new URL(url, "http://random.com");
 	const matches = matchRoutes(pages, {
 		pathname: urlObj.pathname,
@@ -31,6 +34,25 @@ const LoadUrlIframe: FC<{
 	height: number;
 }> = ({ url, height }) => {
 	return <DashboardIframe id="dashboardexternal" src={url} allow="fullscreen" height={height} />;
+};
+
+const LoadUrlIDashboardImage: FC<{
+	url: string;
+	height: number;
+}> = ({ url, height }) => {
+	return (
+		<Box
+			sx={{
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center",
+				height: height,
+				width: "100%",
+			}}
+		>
+			<img src={url} alt={url} style={{ maxWidth: "75%", maxHeight: "75%", transform: "scale(1.5)" }} />
+		</Box>
+	);
 };
 
 const LoadUrl: FC<{

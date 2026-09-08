@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import type {
 	AiError,
 	AiEstimationsResponseWrapper,
@@ -26,6 +27,7 @@ const AiEstimator: FC<{
 	}
 	const [aiData, setAiData] = useState<AiEstimationsResponseWrapper | AiError | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [loadAiData, setLoadAiData] = useState<boolean>(true);
 
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
@@ -50,6 +52,14 @@ const AiEstimator: FC<{
 	const local_users: UserProps[] = Array.from(users).map((key) => allJiraUsersGroups.users[key]);
 
 	useEffect(() => {
+		setLoadAiData(false);
+	}, [users, tickets, allJiraUsersGroups]);
+	useEffect(() => {
+		if (!loadAiData) {
+			setAiData(null);
+			setLoading(true);
+			return;
+		}
 		const fetchData = async () => {
 			try {
 				const data = await postGeminiApi(local_users, tickets, usHolidays, defaultEstimate, estimatePadding);
@@ -63,8 +73,24 @@ const AiEstimator: FC<{
 		};
 
 		fetchData();
-	}, [users, tickets, allJiraUsersGroups]); // Re-runs if inputs change
+	}, [loadAiData]);
 
+	if (Object.keys(tickets).length === 0) {
+		return <></>;
+	}
+	if (!loadAiData) {
+		return (
+			<Button
+				variant="contained"
+				onClick={() => {
+					setLoadAiData(true);
+				}}
+				sx={{ width: 200 }}
+			>
+				Load Ai Estimate
+			</Button>
+		);
+	}
 	if (loading || !aiData) return <>Loading AI estimations (this may be slow)...</>;
 
 	if ("error" in aiData) {

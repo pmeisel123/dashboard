@@ -30,7 +30,6 @@ const ticketFromIssue = (issue: any, config: ConfigProps): TicketProps | null =>
 	const created: any = fields.created ?? null;
 	const updated: any = fields.updated ?? null;
 	const is_epic: boolean = fields.issuetype?.name === "Epic";
-	console.log(fields.issuetype);
 	let timeestimate: number | null = fields.timeestimate ?? null;
 	let timeoriginalestimate: number | null = fields.timeoriginalestimate ?? null;
 	let timespent: number | null = fields.timespent ?? null;
@@ -175,7 +174,6 @@ export const getTicketsApi = async (search: string, config: ConfigProps): Promis
 	for (const key in result) {
 		setPath(result, result[key]);
 	}
-	console.log(result);
 	return result;
 };
 
@@ -200,12 +198,10 @@ const getEstimate = (
 	type: "timeestimate" | "timeoriginalestimate" | "timespent",
 	defaultEstimate: number = 0,
 ) => {
-	console.log("Calculating " + type + " for ticket " + ticket.key);
 	if (type == "timespent") {
 		return ticket.timespent || 0;
 	}
 	if (ticket.isdone && type == "timeestimate") {
-		console.log(ticket.key + " is done, returning 0 for timeestimate");
 		return 0;
 	}
 	const estimate = ticket[type];
@@ -218,28 +214,15 @@ const getEstimate = (
 			} else if (type == "timeoriginalestimate") {
 				child_estimate = children_estimate.totalTimeOriginalEstimate;
 			}
-			console.log(
-				ticket.key +
-					" has children, parent estimate: " +
-					estimate +
-					", children combined estimate: " +
-					child_estimate,
-			);
 			if (child_estimate < estimate) {
 				return estimate - child_estimate;
 			}
 		}
-		console.log(
-			ticket.key +
-				" has children but no parent estimate, returning 0 for parent and relying on children estimates",
-		);
 		return 0;
 	}
 	if (estimate != null) {
-		console.log(ticket.key + " has no children, returning its own estimate of " + estimate);
 		return estimate;
 	}
-	console.log(ticket.key + " has no estimate, returning default estimate of " + defaultEstimate);
 	return defaultEstimate;
 };
 
@@ -253,17 +236,12 @@ export const getEstimations = (
 	totalTimeOriginalEstimate: number;
 	totalTimeSpent: number;
 } => {
-	console.log(
-		"Calculating estimations for tickets: " +
-			(childrenKeys.length ? childrenKeys.join(", ") : Object.keys(tickets).join(", ")),
-	);
 	if (Object.values(tickets).length === 0) {
 		return { totalTimEstimate: estimatePadding, totalTimeOriginalEstimate: estimatePadding, totalTimeSpent: 0 };
 	}
 	const ticketKeys = childrenKeys.length > 0 ? childrenKeys : Object.keys(tickets);
 	return ticketKeys.reduce(
 		(acc, key) => {
-			console.log("Processing ticket " + key);
 			const ticket = tickets[key];
 			acc.totalTimEstimate += getEstimate(tickets, ticket, "timeestimate", defaultEstimate);
 			acc.totalTimeOriginalEstimate += getEstimate(tickets, ticket, "timeoriginalestimate", defaultEstimate);

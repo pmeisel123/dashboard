@@ -25,7 +25,7 @@ export const Duck = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		setMaxSilly(config.DUCKS.length * 10);
+		setMaxSilly(config.DUCKS.length * 30);
 	}, [config]);
 
 	let today = getHolidayDayString(new Date());
@@ -54,7 +54,7 @@ export const Duck = () => {
 		return () => {
 			clearInterval(duckInterval);
 		};
-	}, []);
+	}, [max_silly]);
 
 	useEffect(() => {
 		const [duck_title, holiday_duck] = getHolidayDuck(today);

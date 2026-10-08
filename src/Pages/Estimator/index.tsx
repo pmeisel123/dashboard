@@ -23,7 +23,7 @@ const EstimatorPage: FC<{
 	const [search, setSearch] = useState<string>(searchParams.get("search") || "");
 	const [jiraSearch, setJiraSearch] = useState<string>("");
 	const tickets: { [key: string]: TicketProps } = useSelector(
-		(state: RootState) => state.ticketsState[jiraSearch] ?? {}
+		(state: RootState) => state.ticketsState[jiraSearch] ?? {},
 	);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [defaultEstimate, setDefaultEstimate] = useState<number>(initialDefaultEstimate);

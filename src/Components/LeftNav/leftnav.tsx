@@ -49,7 +49,7 @@ const LeftNav: FC<LeftNavProps> = ({ open, setLeftNavOpen, width }) => {
 							<ListItemButton
 								title={page.name}
 								component={Link}
-								to={page.path}
+								to={page.leftNavPath ? page.leftNavPath : page.path}
 								onClick={() => {
 									handleClick();
 								}}

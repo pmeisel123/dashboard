@@ -7,6 +7,7 @@ import type { FC } from "react";
 import { cloneElement, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, matchRoutes, useSearchParams } from "react-router-dom";
+import { DashboardScreen } from "./DashboardScreen";
 
 const LoadPage: FC<{
 	url: string;
@@ -253,5 +254,12 @@ export const GetModulePages = (): RoutePageProps[] => [
 				This is useful for displaying information on internal office screens.
 			</>
 		),
+	},
+	{
+		path: "/DashboardScreen",
+		leftNavPath: "/DashboardScreen?force=true",
+		name: "Dashboard Screen",
+		element: <DashboardScreen />,
+		description: <>Used for displaying dashboards on internal office screens.</>,
 	},
 ];

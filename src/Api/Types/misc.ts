@@ -126,6 +126,7 @@ export interface LoadedSlice {
 
 export interface RoutePageProps {
 	path: string;
+	leftNavPath?: string;
 	name: string;
 	element: ReactNode;
 	description: ReactNode;

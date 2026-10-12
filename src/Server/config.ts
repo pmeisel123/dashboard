@@ -23,6 +23,7 @@ export const loadConfig = (): ConfigPropsFile => {
 		ALLOW_VACATION_EDITS: true,
 		ALLOW_CONFIG_EDIT: true,
 		ALLOW_DASHBOARD_EDIT: true,
+		ANNOUNCEMENTS: {},
 		API_CONFLUENCE_URL: "",
 		API_USERNAME: "",
 		API_KEY: "",
@@ -121,6 +122,7 @@ export const ConfigServer = (req: IncomingMessage, requestBody: string | null) =
 			});
 		}
 		const config: ConfigProps = {
+			ANNOUNCEMENTS: configFile.ANNOUNCEMENTS || {},
 			ALLOW_VACATION_EDITS: configFile.ALLOW_VACATION_EDITS,
 			ALLOW_CONFIG_EDIT: configFile.ALLOW_CONFIG_EDIT,
 			ALLOW_DASHBOARD_EDIT: configFile.ALLOW_DASHBOARD_EDIT,

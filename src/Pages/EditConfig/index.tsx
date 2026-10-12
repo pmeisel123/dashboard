@@ -3,6 +3,7 @@ import { Alert, Button, Tab } from "@mui/material";
 import type { AppDispatch, ReposProps, RootState, RoutePageProps } from "@src/Api";
 import { fetchConfig, fetchUsersAndGroups, isSliceRecent, postConfigApi } from "@src/Api";
 import type {
+	AnnouncementsType,
 	ConfigProps,
 	ConfigPropsFile,
 	CustomFieldsObjectProps,
@@ -57,6 +58,7 @@ function EditConfigPage() {
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(true);
+	const [announcements, setAnnouncements] = useState<{ [key: string]: AnnouncementsType }>({});
 
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -88,6 +90,7 @@ function EditConfigPage() {
 		}
 	}, [dispatch]);
 	useEffect(() => {
+		setAnnouncements(config.ANNOUNCEMENTS);
 		setHost(config.HOST);
 		setPort(config.PORT);
 		setUseSsl(config.USE_SSL);
@@ -133,6 +136,7 @@ function EditConfigPage() {
 			});
 		});
 		const newConfig: ConfigPropsFile = {
+			ANNOUNCEMENTS: announcements,
 			ALLOW_CONFIG_EDIT: allowConfigEdit,
 			ALLOW_DASHBOARD_EDIT: allowDashboardEdit,
 			ALLOW_VACATION_EDITS: allowVacationEdit,

@@ -77,6 +77,7 @@ function DashboardPage() {
 	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
 	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "0"));
 	const [page, setPage] = useState<DashboardPageProps | null>(null);
+	const [deviceName] = useState<string>(window.localStorage.getItem("deviceName") || "");
 
 	const dispatch = useDispatch<AppDispatch>();
 	const config = useSelector((state: RootState) => state.configState);
@@ -197,7 +198,8 @@ function DashboardPage() {
 					>
 						Exit Dashboard
 					</Button>
-					Dashboard &gt; {config.DASHBOARDS[dashboard].name} &gt;{" "}
+					Dashboard
+					{deviceName && <> &gt; {deviceName}</>} &gt; {config.DASHBOARDS[dashboard].name} &gt;{" "}
 					{pageNumber <= config.DASHBOARDS[dashboard].pages.length && page && <>{page.name}</>}
 					<>
 						{" "}

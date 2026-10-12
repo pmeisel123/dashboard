@@ -4,6 +4,7 @@ import type { ConfigProps, LoadedSlice } from "./Types";
 import { getConfigApi } from "./config";
 
 const initialState: ConfigProps & LoadedSlice = {
+	ANNOUNCEMENTS: {},
 	ALLOW_VACATION_EDITS: true,
 	API_CONFLUENCE_URL: "",
 	API_KEY_DEFINED: false,

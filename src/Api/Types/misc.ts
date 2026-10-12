@@ -73,6 +73,12 @@ export type SlackTokensType = {
 	[key: string]: string;
 };
 
+export type AnnouncementsType = {
+	text: string;
+	dashboard: string;
+	override: boolean;
+};
+
 export interface ConfigProps {
 	ALLOW_VACATION_EDITS: boolean;
 	API_CONFLUENCE_URL: string;
@@ -95,6 +101,7 @@ export interface ConfigProps {
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 	GEMINI_API_KEY_DEFINED: boolean;
 	SLACK_TOKEN_KEYS: string[];
+	ANNOUNCEMENTS: { [key: string]: AnnouncementsType };
 }
 export interface ConfigPropsFile {
 	ALLOW_VACATION_EDITS: boolean;
@@ -118,6 +125,7 @@ export interface ConfigPropsFile {
 	CUSTOM_NAV_LINKS?: { [key: string]: CustomNavLinks };
 	GEMINI_API_KEYS: string[];
 	SLACK_TOKENS: SlackTokensType;
+	ANNOUNCEMENTS: { [key: string]: AnnouncementsType };
 }
 
 export interface LoadedSlice {

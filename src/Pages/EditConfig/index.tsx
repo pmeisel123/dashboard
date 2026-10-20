@@ -17,6 +17,7 @@ import type { SyntheticEvent } from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
+import { EditAnnouncementTab } from "./announcements";
 import { EditCustonNavTab } from "./customnav";
 import { EditDashboardConfigTab } from "./dashboard";
 import { EditGitConfigTab } from "./git";
@@ -58,7 +59,7 @@ function EditConfigPage() {
 	const config = useSelector((state: RootState) => state.configState);
 	const dispatch = useDispatch<AppDispatch>();
 	const [loading, setLoading] = useState<boolean>(true);
-	const [announcements, setAnnouncements] = useState<{ [key: string]: AnnouncementsType }>({});
+	const [announcements, setAnnouncements] = useState<AnnouncementsType[]>([]);
 
 	useEffect(() => {
 		const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -194,6 +195,7 @@ function EditConfigPage() {
 					<Tab label="Slack" value="Slack" />
 					<Tab label="Google Gemini" value="GoogleGemini" />
 					<Tab label="Dashboards" value="Dashboards" />
+					<Tab label="Announcements" value="Announcements" />
 					<Tab label="Custon Links" value="CustonLinks" />
 				</TabList>
 				<Button
@@ -290,6 +292,13 @@ function EditConfigPage() {
 							ALLOW_DASHBOARD_EDIT: false to ALLOW_DASHBOARD_EDIT: true
 						</Alert>
 					)}
+				</TabPanel>
+				<TabPanel value="Announcements">
+					<EditAnnouncementTab
+						dashboards={dashboards}
+						announcements={announcements}
+						setAnnouncements={setAnnouncements}
+					/>
 				</TabPanel>
 				<TabPanel value="CustonLinks">
 					<EditCustonNavTab links={links} setLinks={setLinks} />

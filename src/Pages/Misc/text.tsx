@@ -75,6 +75,7 @@ export const TextPage: FC<{
 						onChange={(event) => {
 							handleOnChange(event.target.value);
 						}}
+						multiline
 					/>
 				</>
 			)}

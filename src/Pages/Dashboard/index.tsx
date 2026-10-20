@@ -1,5 +1,12 @@
 import { Box, Button } from "@mui/material";
-import type { AppDispatch, DashboardPageProps, RootState, RoutePageProps } from "@src/Api";
+import type {
+	AnnouncementsType,
+	AppDispatch,
+	ConfigProps,
+	DashboardPageProps,
+	RootState,
+	RoutePageProps,
+} from "@src/Api";
 import { fetchConfig, isSliceRecent } from "@src/Api";
 import { DashboardIframe, DashboardLoadPageWrapper, DashboardProgress, ListDashboard } from "@src/Components";
 import { pages } from "@src/Pages/pages";
@@ -75,9 +82,14 @@ const LoadUrl: FC<{
 function DashboardPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [dashboard, setDashboard] = useState<string>(searchParams.get("dashboard") || "");
-	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "0"));
+	const [pageNumber, setPageNumber] = useState<number>(parseInt(searchParams.get("pageNumber") || "-1"));
+	const [counter, setCounter] = useState<number>(0);
 	const [page, setPage] = useState<DashboardPageProps | null>(null);
 	const [deviceName] = useState<string>(window.localStorage.getItem("deviceName") || "");
+	const [announcements, setAnouncements] = useState<AnnouncementsType[]>([]);
+	const [announcementsOverride, setAnouncementsOverride] = useState<boolean>(false);
+	const [announcementsPageNumber, setAnnouncementsPageNumber] = useState<number>(0);
+	const announcementFrequency = 5;
 
 	const dispatch = useDispatch<AppDispatch>();
 	const config = useSelector((state: RootState) => state.configState);
@@ -85,7 +97,30 @@ function DashboardPage() {
 		if (!isSliceRecent(config)) {
 			dispatch(fetchConfig());
 		}
+		const configInterval = setInterval(() => {
+			dispatch(fetchConfig());
+		}, 60000);
+		return () => {
+			clearInterval(configInterval);
+		};
 	}, [dispatch]);
+	useEffect(() => {
+		let newAnnouncements: AnnouncementsType[] = [];
+		let newAnnouncementsOverride = false;
+		if (config.ANNOUNCEMENTS) {
+			config.ANNOUNCEMENTS.forEach((announcement) => {
+				if (
+					(announcement.dashboard == "" || announcement.dashboard == dashboard) &&
+					(announcement.screen_regex == "" || deviceName.match(announcement.screen_regex))
+				) {
+					newAnnouncements.push(announcement);
+					newAnnouncementsOverride = newAnnouncementsOverride || announcement.override;
+				}
+			});
+		}
+		setAnouncements(newAnnouncements);
+		setAnouncementsOverride(newAnnouncementsOverride);
+	}, [config.ANNOUNCEMENTS, deviceName]);
 	const [windowSize, setWindowSize] = useState({
 		width: window.innerWidth,
 		height: window.innerHeight,
@@ -127,24 +162,28 @@ function DashboardPage() {
 			pages_count += config.DASHBOARDS[dashboard].images.length;
 		}
 	}
-	const changePageNumber = () => {
-		if (dashboard && config.DASHBOARDS[dashboard]) {
-			setPageNumber((pageNumber) => {
-				if (pageNumber + 1 >= pages_count) {
-					return 0;
-				} else {
-					return pageNumber + 1;
-				}
-			});
-		}
-	};
 	useEffect(() => {
 		if (dashboard && config.DASHBOARDS[dashboard]) {
-			ChangePageFromPageNumber();
+			if (
+				pageNumber % announcementFrequency == 0 &&
+				!announcementsOverride &&
+				announcementsPageNumber < announcements.length
+			) {
+				setAnnouncementsPageNumber(announcementsPageNumber + 1);
+			} else {
+				setAnnouncementsPageNumber(0);
+				if (pageNumber + 1 >= pages_count) {
+					setPageNumber(0);
+				} else {
+					setPageNumber(pageNumber + 1);
+				}
+			}
 		}
+	}, [counter]);
+	useEffect(() => {
 		const changePageNumberInterval = setInterval(() => {
 			if (dashboard && config.DASHBOARDS[dashboard]) {
-				changePageNumber();
+				setCounter((counter) => counter + 1);
 			}
 		}, config.DASHBOARD_SPEED_SECONDS * 1000);
 		return () => {
@@ -165,9 +204,30 @@ function DashboardPage() {
 		}
 		return "";
 	};
-	const ChangePageFromPageNumber = () => {
+	const ChangePageFromPageNumber = (
+		announcements: AnnouncementsType[],
+		pageNumber: number,
+		announcementsOverride: boolean,
+		announcementsPageNumber: number,
+		config: ConfigProps,
+	) => {
 		if (dashboard) {
-			if (config.DASHBOARDS[dashboard].pages.length > pageNumber) {
+			if (announcementsOverride && announcements.length > 0) {
+				const announcement_number = pageNumber % announcements.length;
+				setPage({
+					name: "Annnouncement: " + announcement_number,
+					url: announcements[announcement_number].url,
+				});
+			} else if (
+				pageNumber % announcementFrequency == 0 &&
+				!announcementsOverride &&
+				announcementsPageNumber < announcements.length
+			) {
+				setPage({
+					name: "Annnouncement: " + announcementsPageNumber,
+					url: announcements[announcementsPageNumber].url,
+				});
+			} else if (config.DASHBOARDS[dashboard].pages.length > pageNumber) {
 				setPage(config.DASHBOARDS[dashboard].pages[pageNumber]);
 			} else {
 				if (config.DASHBOARDS[dashboard].images && config.DASHBOARDS[dashboard].imagesPath) {
@@ -182,9 +242,9 @@ function DashboardPage() {
 	};
 
 	useEffect(() => {
-		ChangePageFromPageNumber();
-	}, [pageNumber]);
-	if (dashboard && config.DASHBOARDS[dashboard]) {
+		ChangePageFromPageNumber(announcements, pageNumber, announcementsOverride, announcementsPageNumber, config);
+	}, [pageNumber, announcementsPageNumber]);
+	if (dashboard && page) {
 		return (
 			<>
 				<Box>

@@ -68,7 +68,11 @@ export const StyledTextfit = ({ children }: { children: ReactNode }) => {
 				min={1}
 				max={1000}
 				throttle={50}
-				style={{ height: size.height - 5, width: size.width - 55, margin: "auto" }}
+				style={{
+					height: size.height - 5,
+					width: size.width - 55,
+					margin: "auto",
+				}}
 			>
 				{children}
 			</Textfit>

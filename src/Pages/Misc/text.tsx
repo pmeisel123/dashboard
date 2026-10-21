@@ -9,6 +9,7 @@ export const TextPage: FC<{
 }> = ({ searchParamsOveride }) => {
 	const { isDashboard } = useOutletContext<{ isDashboard?: boolean }>();
 	const [searchParams, setSearchParams] = useSearchParams(searchParamsOveride || undefined);
+	const [dashboardName] = useState<string>(searchParams.get("dashboard") || "");
 	const [text, setText] = useState<string>(searchParams.get("text") || "");
 	const [localText, setLocalText] = useState<string>(searchParams.get("text") || "");
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -55,15 +56,26 @@ export const TextPage: FC<{
 			setText(value);
 		}, 1000);
 	};
+
 	const getStyle = () => {
 		if (!isDashboard) {
 			return {
-				maxWidth: "calc(100% - 40px)",
-				maxHeight: windowSize.height - 200,
+				width: "calc(100% - 40px)",
+				height: `${windowSize.height - 200}px`,
 			};
 		}
-		return {};
+		if (!dashboardName) {
+			return {
+				width: "100%",
+				height: `${windowSize.height - 80}px`,
+			};
+		}
+		return {
+			width: "100%",
+			height: "100%",
+		};
 	};
+
 	return (
 		<>
 			{!isDashboard && (
@@ -80,7 +92,7 @@ export const TextPage: FC<{
 				</>
 			)}
 			<div style={getStyle()}>
-				<StyledTextfit key={text}>{text}</StyledTextfit>
+				<StyledTextfit>{text}</StyledTextfit>
 			</div>
 		</>
 	);

@@ -42,18 +42,20 @@ const Slack: FC<{
 		loadParams();
 	}, [searchParams]);
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
-		if (instance) {
-			newSearchParams.set("instance", instance);
-		} else {
-			newSearchParams.delete("instance");
+		if (!isDashboard) {
+			const newSearchParams = new URLSearchParams(searchParams.toString());
+			if (instance) {
+				newSearchParams.set("instance", instance);
+			} else {
+				newSearchParams.delete("instance");
+			}
+			if (channel) {
+				newSearchParams.set("channel", channel);
+			} else {
+				newSearchParams.delete("channel");
+			}
+			setSearchParams(newSearchParams);
 		}
-		if (channel) {
-			newSearchParams.set("channel", channel);
-		} else {
-			newSearchParams.delete("channel");
-		}
-		setSearchParams(newSearchParams);
 	}, [instance, channel]);
 	useEffect(() => {
 		if (!isSliceRecent(config)) {

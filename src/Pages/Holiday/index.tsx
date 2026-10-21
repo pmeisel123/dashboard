@@ -93,24 +93,26 @@ const HolidayPage: FC<{
 	}
 
 	useEffect(() => {
-		const newSearchParams = new URLSearchParams(searchParams.toString());
-		if (year != this_year) {
-			newSearchParams.set("year", year);
-		} else {
-			newSearchParams.delete("year");
-		}
-		if (holidayCategory && holidayCategory != "Bank") {
-			newSearchParams.set("holidayCategory", holidayCategory);
-		} else {
-			newSearchParams.delete("holidayCategory");
-		}
-		if (withDucks) {
-			newSearchParams.set("withDucks", "true");
-		} else {
-			newSearchParams.delete("withDucks");
-		}
-		if (searchParams.toString() != newSearchParams.toString()) {
-			setSearchParams(newSearchParams);
+		if (!isDashboard) {
+			const newSearchParams = new URLSearchParams(searchParams.toString());
+			if (year != this_year) {
+				newSearchParams.set("year", year);
+			} else {
+				newSearchParams.delete("year");
+			}
+			if (holidayCategory && holidayCategory != "Bank") {
+				newSearchParams.set("holidayCategory", holidayCategory);
+			} else {
+				newSearchParams.delete("holidayCategory");
+			}
+			if (withDucks) {
+				newSearchParams.set("withDucks", "true");
+			} else {
+				newSearchParams.delete("withDucks");
+			}
+			if (searchParams.toString() != newSearchParams.toString()) {
+				setSearchParams(newSearchParams);
+			}
 		}
 	}, [year, holidayCategory, withDucks]);
 	let holidays: HolidayProps[];

@@ -550,8 +550,16 @@ proxies["/"] = {
 			/^(51\.15\.23\.|138\.68\.230\.|27.115\.|204\.76\.|36\.70\.|45\.148\.10\.151|195\.178\.110\.15|2\.57\.121\.25|2\.57\.122\.238|92\.118\.39\.56|15\.197\.148\.33|172\.67\.128\.220|173\.254\.31\.34|216\.144\.210\.189|89\.124\.77\.148|128\.71\.76\.84|5\.34\.98\.239|67\.213|64\.62\.156)/;
 		const clientIp = req.socket?.remoteAddress;
 		if (req && req.url) {
+			if (req.url.match(/\.\./)) {
+				log("Blocked", req, "", "access attempt from url with '..' :");
+				if (res) {
+					res.writeHead(404, { "Content-Type": "text/plain" });
+					res.end(`You think you can access ${req.url}? Think again.`);
+				}
+				return false;
+			}
 			if (clientIp && maliciousIpPattern.test(clientIp)) {
-				log("Blocked4", req, "", "access attempt from suspicious IP:");
+				log("Blocked", req, "", "access attempt from suspicious IP:");
 				if (res) {
 					res.writeHead(404, { "Content-Type": "text/plain" });
 					res.end("Not Found");
